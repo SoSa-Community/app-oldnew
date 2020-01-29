@@ -6,109 +6,149 @@
  * @flow
  */
 
-import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
-
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-const App: () => React$Node = () => {
-  return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </>
-  );
-};
+import React, {Component} from 'react';
+import {FlatList, StyleSheet, Text, TextInput, View, Button} from 'react-native';
+import io from "socket.io-client";
+import { SoSaConfig } from "./sosa/config";
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
+    mainView: {
+        backgroundColor: '#121211',
+        flex: 1
+    },
+    item: {
+        color: '#ffffff',
+        borderBottomColor: '#cccccc',
+        borderBottomWidth: 1,
+        paddingVertical: 10
+    }
 });
 
-export default App;
+export default class SoSa extends Component {
+
+    constructor(props) {
+        super();
+
+        this.userId = 0;
+        this.username = 'TheBritishAreComing';
+        this.room = 'general';
+
+        this.messages = [
+            {
+                id: this.generateId(),
+                message:'hows life dan',
+                username: 'ShitTierBrit'
+            },
+            {
+                id: this.generateId(),
+                message:'not too bad, today is an interesting day so far',
+                username: 'Danda'
+            },
+            {
+                id: this.generateId(),
+                message: 'I think you can get laird too',
+                username: 'omikone'
+            }
+        ];
+
+        this.state = {
+            messages: [],
+            messageInput: ''
+        }
+    }
+
+    sendMessage = () => {
+        this.socket.emit('message', {room: this.room, msg: this.state.messageInput});
+        this.setState({ messageInput: '' });
+    };
+
+    generateRand = () => {
+        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    };
+
+    generateId = () => {
+        return `${this.generateRand()}-${this.generateRand()}-${this.generateRand()}-${this.generateRand()}-${this.generateRand()}`;
+    };
+
+    componentDidMount() {
+        this.setState({ messages: [...this.messages] });
+        console.log('Mounted', this.generateRand());
+    }
+
+    connect = () => {
+        console.log(SoSaConfig);
+        this.socket = io(SoSaConfig.chat.server, {
+            'reconnection': false,
+            'transports': ['websocket'],
+            'pingTimeout': 30000
+        });
+
+        this.socket.on('error', (error) => {
+            console.log('error', error);
+        });
+
+        this.socket.on('connect_error', (error) => {
+            console.log('connect_error', error);
+        });
+
+        this.socket.on('connect_timeout', (error) => {
+            console.log('connect_timeout', error);
+        });
+
+        this.socket.on('connect', () => {
+            console.log('connected');
+            this.socket.emit('join', {room:this.room});
+        });
+
+        this.socket.on('disconnect', (msg) => {
+            console.log(msg);
+        })
+
+        this.socket.on("message", msg => {
+            console.log('message received');
+            console.log(msg);
+            this.messages.push({
+                id: this.generateId(),
+                message : msg,
+                username: this.username
+            });
+
+            this.setState({ messages: [...this.messages]});
+        });
+    };
+
+    render() {
+        return (
+          <View style={styles.mainView}>
+            <View>
+              <Text style={{textAlign: 'left', color: '#fff', fontSize: 32, padding: 10}}>SoSa</Text>
+            </View>
+            <View style={{flex: 1, padding: 10, backgroundColor: '#444442'}}>
+                <FlatList
+                    data={this.state.messages}
+                    extraData={this.state.messages}
+                    keyExtractor={(item) => { item.id }}
+                    renderItem={({item}) => <Text style={styles.item}>{item.message}</Text>}
+                />
+            </View>
+            <View>
+                <TextInput style={{height: 40, backgroundColor: '#ffffff'}}
+                           placeholder="Enter your message"
+                           onChangeText={data => this.setState({ messageInput: data})}
+                           value={this.state.messageInput}
+               />
+                <Button
+                    title="Send"
+                    onPress={this.sendMessage}
+                />
+
+                <Button
+                    title="Connect"
+                    onPress={this.connect}
+                />
+            </View>
+
+          </View>
+        );
+  }
+}
