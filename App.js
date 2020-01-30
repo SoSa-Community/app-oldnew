@@ -67,7 +67,9 @@ export default class SoSa extends Component {
     };
 
     generateId = () => {
-        return `${this.generateRand()}-${this.generateRand()}-${this.generateRand()}-${this.generateRand()}-${this.generateRand()}`;
+        let id = `${this.generateRand()}-${this.generateRand()}-${this.generateRand()}-${this.generateRand()}-${this.generateRand()}`;
+        console.log(id);
+        return id;
     };
 
     componentDidMount() {
@@ -76,7 +78,7 @@ export default class SoSa extends Component {
     }
 
     connect = () => {
-        console.log(SoSaConfig);
+
         this.socket = io(SoSaConfig.chat.server, {
             'reconnection': false,
             'transports': ['websocket'],
@@ -127,7 +129,7 @@ export default class SoSa extends Component {
                 <FlatList
                     data={this.state.messages}
                     extraData={this.state.messages}
-                    keyExtractor={(item) => { item.id }}
+                    keyExtractor={(item) => { return item.id; }}
                     renderItem={({item}) => <Text style={styles.item}>{item.message}</Text>}
                 />
             </View>
