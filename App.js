@@ -12,15 +12,25 @@ import io from "socket.io-client";
 import { SoSaConfig } from "./sosa/config";
 
 const styles = StyleSheet.create({
-    mainView: {
+    header: {
         backgroundColor: '#121211',
-        flex: 1
+        flex: 1,
+        paddingTop: Platform.OS === 'ios' ? 24 : 0
     },
-    item: {
+
+    message: {
         color: '#ffffff',
         borderBottomColor: '#cccccc',
         borderBottomWidth: 1,
         paddingVertical: 10
+    },
+
+    status: {
+        color: '#a6a6a6',
+        borderBottomColor: '#cccccc',
+        borderBottomWidth: 1,
+        paddingVertical: 10,
+        textAlign: 'center'
     }
 });
 
@@ -33,23 +43,7 @@ export default class SoSa extends Component {
         this.username = 'TheBritishAreComing';
         this.room = 'general';
 
-        this.messages = [
-            {
-                id: this.generateId(),
-                message:'hows life dan',
-                username: 'ShitTierBrit'
-            },
-            {
-                id: this.generateId(),
-                message:'not too bad, today is an interesting day so far',
-                username: 'Danda'
-            },
-            {
-                id: this.generateId(),
-                message: 'I think you can get laird too',
-                username: 'omikone'
-            }
-        ];
+        this.messages = [];
 
         this.state = {
             messages: [],
@@ -72,12 +66,24 @@ export default class SoSa extends Component {
         return id;
     };
 
+    addMessage = (id, message, username, type='message') => {
+        this.messages.push({
+            id: id,
+            message : message,
+            username: username,
+            type: type
+        });
+
+        this.setState({ messages: [...this.messages]});
+    };
+
     componentDidMount() {
         this.setState({ messages: [...this.messages] });
         console.log('Mounted', this.generateRand());
     }
 
     connect = () => {
+        let component = this;
 
         this.socket = io(SoSaConfig.chat.server, {
             'reconnection': false,
@@ -99,42 +105,53 @@ export default class SoSa extends Component {
 
         this.socket.on('connect', () => {
             console.log('connected');
+
+            this.addMessage(this.generateId(), 'Connected to server', '', 'status');
             this.socket.emit('join', {room:this.room});
         });
 
         this.socket.on('disconnect', (msg) => {
+            this.addMessage(this.generateId(), 'Disconnected from server', '', 'status');
             console.log(msg);
         })
 
         this.socket.on("message", msg => {
             console.log('message received');
             console.log(msg);
-            this.messages.push({
-                id: this.generateId(),
-                message : msg,
-                username: this.username
-            });
 
-            this.setState({ messages: [...this.messages]});
+            component.addMessage(component.generateId(), msg, this.username);
         });
     };
 
     render() {
         return (
-          <View style={styles.mainView}>
+          <View style={styles.header}>
             <View>
               <Text style={{textAlign: 'left', color: '#fff', fontSize: 32, padding: 10}}>SoSa</Text>
+            <Button
+                title="Connect"
+                onPress={this.connect}
+            />
             </View>
             <View style={{flex: 1, padding: 10, backgroundColor: '#444442'}}>
                 <FlatList
                     data={this.state.messages}
                     extraData={this.state.messages}
                     keyExtractor={(item) => { return item.id; }}
-                    renderItem={({item}) => <Text style={styles.item}>{item.message}</Text>}
+                    renderItem={
+                                ({item}) => {
+                                    if(item.type === 'status'){
+                                        return <Text style={styles.status}>{item.message}</Text>
+                                    }else{
+                                        return <Text style={styles.message}>{item.message}</Text>
+                                    }
+
+                                }
+                    }
                 />
             </View>
-            <View>
-                <TextInput style={{height: 40, backgroundColor: '#ffffff'}}
+            <View style={{flexDirection: 'row'}}>
+                <TextInput style={{height: 40, backgroundColor: '#ffffff', flex:1}}
                            placeholder="Enter your message"
                            onChangeText={data => this.setState({ messageInput: data})}
                            value={this.state.messageInput}
@@ -142,12 +159,9 @@ export default class SoSa extends Component {
                 <Button
                     title="Send"
                     onPress={this.sendMessage}
+                    style={{flex:1}}
                 />
 
-                <Button
-                    title="Connect"
-                    onPress={this.connect}
-                />
             </View>
 
           </View>
