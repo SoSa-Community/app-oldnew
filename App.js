@@ -34,6 +34,14 @@ const styles = StyleSheet.create({
         paddingVertical: 10
     },
 
+    user: {
+        textAlign: 'center',
+        color: '#000000',
+        borderBottomColor: '#cccccc',
+        borderBottomWidth: 1,
+        paddingVertical: 10
+    },
+
     status: {
         color: '#a6a6a6',
         borderBottomColor: '#cccccc',
@@ -63,9 +71,11 @@ export default class SoSa extends Component {
 
     state = {
         joinRoomModalVisible: false,
+        roomListModalVisible: false,
+        userListModalVisible: false,
+        userList: [],
         messages: [],
         messageInput: '',
-        roomListModalVisible: false,
         rooms: []
     };
 
@@ -117,9 +127,14 @@ export default class SoSa extends Component {
         }, 'sosa');
     };
 
-    joinRoom = (communityID, roomID, callback) => {
+    closeRoomList = () => {
         this.setState({roomListModalVisible:false});
-        this.client.rooms().join((err, room) => {
+    }
+
+    joinRoom = (communityID, roomID, callback) => {
+        this.closeRoomList();
+        this.client.rooms().join((err, room, userList) => {
+            this.setState({userList: userList});
             if(err){
                 Alert.alert(
                     'Can\'t Join Room',
@@ -136,6 +151,14 @@ export default class SoSa extends Component {
 
         }, communityID, roomID);
     };
+
+    closeUserList = () => {
+        this.setState({userListModalVisible:false});
+    }
+
+    displayUserList = () => {
+        this.setState({userListModalVisible: true});
+    }
 
     componentDidMount() {
         this.setState({ messages: [...this.messages] });
@@ -191,6 +214,15 @@ export default class SoSa extends Component {
                             style={{flex:1}}
                             title='Room List'
                             onPress={this.displayRoomList}
+                        />
+                    </View>
+                </View>
+                <View style={{flexDirection: 'row', marginTop: 10}}>
+                    <View style={{flex:1}}>
+                        <Button
+                            style={{flex:1}}
+                            title='User List'
+                            onPress={this.displayUserList}
                         />
                     </View>
                 </View>
@@ -254,11 +286,36 @@ export default class SoSa extends Component {
                   <View>
                       <Button
                           title="Close"
-                          onPress={
-                              () => {
+                          onPress={this.closeRoomList}
+                      />
+                  </View>
+              </View>
+            </Modal>
 
+            <Modal
+              animationType="slide"
+              transparent={false}
+              visible={this.state.userListModalVisible}>
+              <View style={{flex: 1, paddingTop: 10}}>
+                  <View>
+                      <Text style={{textAlign: 'center', fontSize:24, paddingBottom: 10}}>Online</Text>
+                  </View>
+                  <View style={{flex:1}}>
+                      <FlatList
+                          data={this.state.userList}
+                          extraData={this.state.userList}
+                          keyExtractor={(item) => { return item.user_id; }}
+                          renderItem={
+                              ({item}) => {
+                                  return <Text style={styles.user}>{item.nickname}</Text>
                               }
                           }
+                      />
+                  </View>
+                  <View>
+                      <Button
+                          title="Close"
+                          onPress={this.closeUserList}
                       />
                   </View>
               </View>
