@@ -26,6 +26,14 @@ const styles = StyleSheet.create({
         paddingVertical: 10
     },
 
+    room: {
+        textAlign: 'center',
+        color: '#000000',
+        borderBottomColor: '#cccccc',
+        borderBottomWidth: 1,
+        paddingVertical: 10
+    },
+
     status: {
         color: '#a6a6a6',
         borderBottomColor: '#cccccc',
@@ -45,6 +53,8 @@ export default class SoSa extends Component {
     userId = 0;
     username = '';
     messages = [];
+    message = '';
+    currentRoom = null;
 
     client = new ChatClient({
         host: SoSaConfig.chat.server,
@@ -54,12 +64,13 @@ export default class SoSa extends Component {
     state = {
         joinRoomModalVisible: false,
         messages: [],
-        messageInput: ''
+        messageInput: '',
+        roomListModalVisible: false,
+        rooms: []
     };
 
     constructor(props) {
         super();
-
     }
 
     sendMessage = () => {
@@ -88,11 +99,26 @@ export default class SoSa extends Component {
         this.setState({ messages: [...this.messages]});
     };
 
-    showJoinRoomDialog = () => {
-        this.setState({joinRoomModalVisible: true});
+    displayRoomList = () => {
+        this.client.rooms().list((err, data) => {
+            if(!err){
+                this.setState({roomListModalVisible: true, rooms: data.rooms});
+            }else{
+                Alert.alert(
+                    'Error getting room list',
+                    err.message,
+                    [
+                        {text: 'OK', onPress: () => console.log('OK Pressed')},
+                    ],
+                    {cancelable: true},
+                );
+            }
+
+        }, 'sosa');
     };
 
     joinRoom = (communityID, roomID, callback) => {
+        this.setState({roomListModalVisible:false});
         this.client.rooms().join((err, room) => {
             if(err){
                 Alert.alert(
@@ -104,7 +130,7 @@ export default class SoSa extends Component {
                     {cancelable: true},
                 );
             }else{
-                console.log('Room', room.name);
+                this.currentRoom = room;
                 this.addMessage(this.generateId(), `Joined room ${room.name}`, '', 'status');
             }
 
@@ -113,7 +139,7 @@ export default class SoSa extends Component {
 
     componentDidMount() {
         this.setState({ messages: [...this.messages] });
-        console.log('Mounted', this.generateRand());
+        this.connect();
     }
 
     connect = () => {
@@ -126,7 +152,12 @@ export default class SoSa extends Component {
         },'some_signature');
 
         middleware.add('after_authenticated', (authData, client) => {
-            this.addMessage(this.generateId(), 'Connected to server', '', 'status');
+            this.addMessage(this.generateId(),
+                `Connected to server with username: ${authData.sessionData.nickname}`,
+                '',
+                'status'
+            );
+
             return authData;
 
         });
@@ -145,14 +176,25 @@ export default class SoSa extends Component {
           <View style={styles.header}>
             <View>
                 <Text style={{textAlign: 'left', color: '#fff', fontSize: 32, padding: 10}}>SoSa</Text>
-                <Button
-                    title="Connect"
-                    onPress={this.connect}
-                />
-                <Button
-                    title='Join General Chat'
-                    onPress={() => {this.joinRoom('sosa','general')}}
-                />
+
+                <View style={{flexDirection: 'row', marginTop: 10}}>
+                    <View style={{flex:1}}>
+                        <Button
+                            color= "#28a745"
+                            title="Connect"
+                            onPress={this.connect}
+                        />
+                    </View>
+
+                    <View style={{flex:1}}>
+                        <Button
+                            style={{flex:1}}
+                            title='Room List'
+                            onPress={this.displayRoomList}
+                        />
+                    </View>
+                </View>
+
             </View>
 
             <View style={{flex: 1, padding: 10, backgroundColor: '#444442'}}>
@@ -181,9 +223,46 @@ export default class SoSa extends Component {
                 <Button
                     title="Send"
                     onPress={this.sendMessage}
-                    style={{flex:1}}
                 />
             </View>
+
+            <Modal
+              animationType="slide"
+              transparent={false}
+              visible={this.state.roomListModalVisible}>
+              <View style={{flex: 1, paddingTop: 10}}>
+                  <View>
+                      <Text style={{textAlign: 'center', fontSize:24, paddingBottom: 10}}>Rooms</Text>
+                  </View>
+                  <View style={{flex:1}}>
+                      <FlatList
+                          data={this.state.rooms}
+                          extraData={this.state.rooms}
+                          keyExtractor={(item) => { return item.id; }}
+                          renderItem={
+                              ({item}) => {
+                                  return <Text style={styles.room} onPress={
+                                      () => {
+                                        this.joinRoom('sosa', item.name);
+                                      }
+                                  }
+                                  >{item.title}</Text>
+                              }
+                          }
+                      />
+                  </View>
+                  <View>
+                      <Button
+                          title="Close"
+                          onPress={
+                              () => {
+
+                              }
+                          }
+                      />
+                  </View>
+              </View>
+            </Modal>
 
           </View>
         );
