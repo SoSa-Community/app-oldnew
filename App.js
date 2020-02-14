@@ -7,9 +7,10 @@
  */
 
 import React, {Component} from 'react';
-import {FlatList, StyleSheet, Text, TextInput, View, Button} from 'react-native';
+import {FlatList, StyleSheet, Text, TextInput, View, Button, Alert, TouchableHighlight, Modal} from 'react-native';
 import io from "socket.io-client";
 import { SoSaConfig } from "./sosa/config";
+import { ChatClient } from './sosa/chat-client/module';
 
 const styles = StyleSheet.create({
     header: {
@@ -31,28 +32,38 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         paddingVertical: 10,
         textAlign: 'center'
+    },
+
+    footer: {
+        paddingBottom: Platform.OS === 'ios' ? 24 : 0,
+        flexDirection: 'row'
     }
 });
 
 export default class SoSa extends Component {
 
+    userId = 0;
+    username = '';
+    messages = [];
+
+    client = new ChatClient({
+        host: SoSaConfig.chat.server,
+        api_key: SoSaConfig.chat.api_key
+    }, io);
+
+    state = {
+        joinRoomModalVisible: false,
+        messages: [],
+        messageInput: ''
+    };
+
     constructor(props) {
         super();
 
-        this.userId = 0;
-        this.username = 'TheBritishAreComing';
-        this.room = 'general';
-
-        this.messages = [];
-
-        this.state = {
-            messages: [],
-            messageInput: ''
-        }
     }
 
     sendMessage = () => {
-        this.socket.emit('message', {room: this.room, msg: this.state.messageInput});
+        this.client.rooms().send(() => {}, 'sosa', 'general', this.state.messageInput);
         this.setState({ messageInput: '' });
     };
 
@@ -77,62 +88,73 @@ export default class SoSa extends Component {
         this.setState({ messages: [...this.messages]});
     };
 
+    showJoinRoomDialog = () => {
+        this.setState({joinRoomModalVisible: true});
+    };
+
+    joinRoom = (communityID, roomID, callback) => {
+        this.client.rooms().join((err, room) => {
+            if(err){
+                Alert.alert(
+                    'Can\'t Join Room',
+                    err.message,
+                    [
+                        {text: 'OK', onPress: () => console.log('OK Pressed')},
+                    ],
+                    {cancelable: true},
+                );
+            }else{
+                console.log('Room', room.name);
+                this.addMessage(this.generateId(), `Joined room ${room.name}`, '', 'status');
+            }
+
+        }, communityID, roomID);
+    };
+
     componentDidMount() {
         this.setState({ messages: [...this.messages] });
         console.log('Mounted', this.generateRand());
     }
 
     connect = () => {
-        let component = this;
+        let client = this.client;
+        let middleware = this.client.middleware;
 
-        this.socket = io(SoSaConfig.chat.server, {
-            'reconnection': false,
-            'transports': ['websocket'],
-            'pingTimeout': 30000
-        });
+        middleware.add('receive_message', (message, client) => {
+            this.addMessage(this.generateId(), message.parsed_content, message.nickname);
+            return message;
+        },'some_signature');
 
-        this.socket.on('error', (error) => {
-            console.log('error', error);
-        });
-
-        this.socket.on('connect_error', (error) => {
-            console.log('connect_error', error);
-        });
-
-        this.socket.on('connect_timeout', (error) => {
-            console.log('connect_timeout', error);
-        });
-
-        this.socket.on('connect', () => {
-            console.log('connected');
-
+        middleware.add('after_authenticated', (authData, client) => {
             this.addMessage(this.generateId(), 'Connected to server', '', 'status');
-            this.socket.emit('join', {room:this.room});
+            return authData;
+
         });
 
-        this.socket.on('disconnect', (msg) => {
+        middleware.add('disconnected', (message, client) => {
             this.addMessage(this.generateId(), 'Disconnected from server', '', 'status');
             console.log(msg);
-        })
-
-        this.socket.on("message", msg => {
-            console.log('message received');
-            console.log(msg);
-
-            component.addMessage(component.generateId(), msg, this.username);
+            return message;
         });
+
+        client.connect();
     };
 
     render() {
         return (
           <View style={styles.header}>
             <View>
-              <Text style={{textAlign: 'left', color: '#fff', fontSize: 32, padding: 10}}>SoSa</Text>
-            <Button
-                title="Connect"
-                onPress={this.connect}
-            />
+                <Text style={{textAlign: 'left', color: '#fff', fontSize: 32, padding: 10}}>SoSa</Text>
+                <Button
+                    title="Connect"
+                    onPress={this.connect}
+                />
+                <Button
+                    title='Join General Chat'
+                    onPress={() => {this.joinRoom('sosa','general')}}
+                />
             </View>
+
             <View style={{flex: 1, padding: 10, backgroundColor: '#444442'}}>
                 <FlatList
                     data={this.state.messages}
@@ -150,7 +172,7 @@ export default class SoSa extends Component {
                     }
                 />
             </View>
-            <View style={{flexDirection: 'row'}}>
+            <View style={styles.footer}>
                 <TextInput style={{height: 40, backgroundColor: '#ffffff', flex:1}}
                            placeholder="Enter your message"
                            onChangeText={data => this.setState({ messageInput: data})}
@@ -161,7 +183,6 @@ export default class SoSa extends Component {
                     onPress={this.sendMessage}
                     style={{flex:1}}
                 />
-
             </View>
 
           </View>
