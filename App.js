@@ -168,7 +168,22 @@ export default class SoSa extends Component {
     };
 
     displayUserList = () => {
-        this.setState({userListModalVisible: true});
+        this.client.rooms().online((err, data) => {
+            if(!err){
+                this.setState({userListModalVisible: true, user_list: data});
+
+            }else{
+                Alert.alert(
+                    'Error getting users',
+                    err.message,
+                    [
+                        {text: 'OK', onPress: () => console.log('OK Pressed')},
+                    ],
+                    {cancelable: true},
+                );
+            }
+
+        }, 'sosa', this.currentRoom.name);
     };
 
     connect = () => {
@@ -182,6 +197,11 @@ export default class SoSa extends Component {
             return message;
         },'some_signature');
 
+        middleware.add('receive_message', (message, client) => {
+            this.addMessage(this.generateId(), message.parsed_content, message.nickname);
+            return message;
+        },'some_signature');
+
         middleware.add('after_authenticated', (authData, client) => {
             this.addMessage(this.generateId(),
                 `Connected to server with username: ${authData.sessionData.nickname}`,
@@ -189,8 +209,12 @@ export default class SoSa extends Component {
                 'status'
             );
 
-            return authData;
+            if(this.currentRoom !== null){
+                console.log(this.currentRoom);
+                this.joinRoom(this.currentRoom.community_id, this.currentRoom.name);
+            }
 
+            return authData;
         });
 
         middleware.add('disconnected', (message, client) => {
