@@ -23,7 +23,13 @@ const styles = StyleSheet.create({
         color: '#ffffff',
         borderBottomColor: '#cccccc',
         borderBottomWidth: 1,
-        paddingVertical: 10
+        paddingBottom: 10
+    },
+
+    message_username: {
+        color: '#ffffff',
+        paddingTop: 10,
+        fontWeight: 'bold'
     },
 
     room: {
@@ -83,6 +89,11 @@ export default class SoSa extends Component {
         super();
     }
 
+    componentDidMount() {
+        this.setState({ messages: [...this.messages] });
+        this.connect();
+    }
+
     sendMessage = () => {
         this.client.rooms().send(() => {}, 'sosa', 'general', this.state.messageInput);
         this.setState({ messageInput: '' });
@@ -129,7 +140,7 @@ export default class SoSa extends Component {
 
     closeRoomList = () => {
         this.setState({roomListModalVisible:false});
-    }
+    };
 
     joinRoom = (communityID, roomID, callback) => {
         this.closeRoomList();
@@ -154,20 +165,17 @@ export default class SoSa extends Component {
 
     closeUserList = () => {
         this.setState({userListModalVisible:false});
-    }
+    };
 
     displayUserList = () => {
         this.setState({userListModalVisible: true});
-    }
-
-    componentDidMount() {
-        this.setState({ messages: [...this.messages] });
-        this.connect();
-    }
+    };
 
     connect = () => {
         let client = this.client;
         let middleware = this.client.middleware;
+
+        middleware.clear();
 
         middleware.add('receive_message', (message, client) => {
             this.addMessage(this.generateId(), message.parsed_content, message.nickname);
@@ -239,7 +247,10 @@ export default class SoSa extends Component {
                                     if(item.type === 'status'){
                                         return <Text style={styles.status}>{item.message}</Text>
                                     }else{
-                                        return <Text style={styles.message}>{item.message}</Text>
+                                        return  <View>
+                                                    <Text style={styles.message_username}>{item.username}</Text>
+                                                    <Text style={styles.message}>{item.message}</Text>
+                                                </View>
                                     }
 
                                 }
@@ -270,7 +281,7 @@ export default class SoSa extends Component {
                       <FlatList
                           data={this.state.rooms}
                           extraData={this.state.rooms}
-                          keyExtractor={(item) => { return item.id; }}
+                          keyExtractor={(item) => { return `${item.id}`; }}
                           renderItem={
                               ({item}) => {
                                   return <Text style={styles.room} onPress={
@@ -304,7 +315,7 @@ export default class SoSa extends Component {
                       <FlatList
                           data={this.state.userList}
                           extraData={this.state.userList}
-                          keyExtractor={(item) => { return item.user_id; }}
+                          keyExtractor={(item) => { return `${item.user_id}`; }}
                           renderItem={
                               ({item}) => {
                                   return <Text style={styles.user}>{item.nickname}</Text>
