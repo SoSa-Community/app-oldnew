@@ -11,6 +11,8 @@ import {FlatList, StyleSheet, Text, TextInput, View, Button, Alert, TouchableHig
 import io from "socket.io-client";
 import { SoSaConfig } from "./sosa/config";
 import { ChatClient } from './sosa/chat-client/module';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+
 
 const styles = StyleSheet.create({
     header: {
