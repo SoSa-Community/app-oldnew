@@ -1,6 +1,10 @@
 import {StyleSheet} from 'react-native';
 
 const Styles = StyleSheet.create({
+    message_list: {
+        marginBottom: 10
+    },
+
     message: {
         color: '#ffffff',
         borderBottomColor: '#cccccc',
@@ -10,7 +14,7 @@ const Styles = StyleSheet.create({
 
     message_username: {
         color: '#ffffff',
-        paddingTop: 10,
+        paddingBottom: 3,
         fontWeight: 'bold'
     },
 
@@ -38,8 +42,6 @@ const Styles = StyleSheet.create({
 
     status: {
         color: '#a6a6a6',
-        borderBottomColor: '#cccccc',
-        borderBottomWidth: 1,
         paddingVertical: 10,
         textAlign: 'center'
     },
