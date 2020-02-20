@@ -1,73 +1,18 @@
 import React, {Component} from 'react';
-import {FlatList, StyleSheet, Text, TextInput, View, Button, Alert, Modal} from 'react-native';
+import Styles from './styles/chat'
+import {FlatList, Text, TextInput, View, Button, Modal} from 'react-native';
 import io from "socket.io-client";
+
 import { SoSaConfig } from "../sosa/config";
 import { ChatClient } from '../sosa/chat-client/module';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
-
-const styles = StyleSheet.create({
-    message: {
-        color: '#ffffff',
-        borderBottomColor: '#cccccc',
-        borderBottomWidth: 1,
-        paddingBottom: 10
-    },
-
-    message_username: {
-        color: '#ffffff',
-        paddingTop: 10,
-        fontWeight: 'bold'
-    },
-
-    room: {
-        textAlign: 'center',
-        color: '#000000',
-        borderBottomColor: '#cccccc',
-        borderBottomWidth: 1,
-        paddingVertical: 10,
-        paddingLeft: 10
-    },
-
-    currentRoom: {
-        textAlign: 'center',
-        backgroundColor: 'red'
-    },
-
-    user: {
-        textAlign: 'center',
-        color: '#000000',
-        borderBottomColor: '#cccccc',
-        borderBottomWidth: 1,
-        paddingVertical: 10
-    },
-
-    status: {
-        color: '#a6a6a6',
-        borderBottomColor: '#cccccc',
-        borderBottomWidth: 1,
-        paddingVertical: 10,
-        textAlign: 'center'
-    },
-
-    footer: {
-        paddingBottom: Platform.OS === 'ios' ? 24 : 0,
-        flexDirection: 'row'
-    }
-});
+import Helpers from '../sosa/Helpers'
 
 export class Chat extends Component {
-
-    userId = 0;
-    username = '';
-    messages = [];
-    message = '';
-    currentRoom = null;
-
-    client = new ChatClient({
-        host: SoSaConfig.chat.server,
-        api_key: SoSaConfig.chat.api_key
-    }, io);
+    navigationContext = {};
+    homeContext = {};
+    navigation = {};
 
     state = {
         joinRoomModalVisible: false,
@@ -76,26 +21,27 @@ export class Chat extends Component {
         userList: [],
         messages: [],
         messageInput: '',
-        rooms: [],
-        connectButtonText:'connect'
+        rooms: []
     };
 
-    addHeaderIcon = (id, icon, onPress) => {};
-    addDrawerItem = (id, item) => {};
+    username = '';
+    currentRoom = null;
+
+    client = new ChatClient({
+        host: SoSaConfig.chat.server,
+        api_key: SoSaConfig.chat.api_key
+    }, io);
 
     constructor(props) {
         super();
         console.log(props);
 
-        this.addHeaderIcon = props.addHeaderIcon;
-        this.addDrawerItem = props.addDrawerItem;
+        this.navigation = props.navigation;
+        this.homeContext = props.homeContext;
+        this.navigationContext = props.navigationContext;
     }
 
     componentDidMount() {
-        this.setState({ messages: [...this.messages] });
-
-        this.addDrawerItem('room_list', (<View style={{flex:1}} key={'room_list'} />));
-
         this.setupConnectButton();
         this.connect();
     }
@@ -103,15 +49,21 @@ export class Chat extends Component {
     setupConnectButton = (disconnect:false) => {
         let color = '#28a745';
         let text = 'Connect';
-        let func = this.connect;
+        let func = () => {
+            this.connect();
+            this.navigation.closeDrawer();
+        };
 
         if(disconnect){
             color = '#dc3545';
             text = 'Disconnect';
-            func = this.disconnect;
+            func = () => {
+                this.disconnect();
+                this.navigation.closeDrawer();
+            };
         }
 
-        this.addDrawerItem('connect', (<View style={{flex:1}} key={'connect'}>
+        this.navigationContext.addDrawerItem('connect', (<View style={{flex:1}} key={'connect'}>
             <Button
                 color={color}
                 title={text}
@@ -126,25 +78,22 @@ export class Chat extends Component {
         this.setState({ messageInput: '' });
     };
 
-    generateRand = () => {
-        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    };
-
-    generateId = () => {
-        let id = `${this.generateRand()}-${this.generateRand()}-${this.generateRand()}-${this.generateRand()}-${this.generateRand()}`;
-        console.log(id);
-        return id;
+    addStatus = (message) => {
+        this.addMessage(null, message, '', 'status');
     };
 
     addMessage = (id, message, username, type='message') => {
-        this.messages.push({
+        if(!id) id = Helpers.generateId();
+        let messages = this.state.messages;
+
+        messages.push({
             id: id,
             message : message,
             username: username,
             type: type
         });
 
-        this.setState({ messages: [...this.messages]});
+        this.setState({ messages: messages});
     };
 
     updateRoomList = () => {
@@ -152,12 +101,15 @@ export class Chat extends Component {
         this.client.rooms().list((err, data) => {
             if(!err){
                 let roomViews = data.rooms.map((room) => {
-                    let roomStyles = [styles.room];
+                    let roomStyles = [Styles.room];
                     roomStyles.push({flex:1, flexDirection: 'row'});
-                    let onPress = () => this.joinRoom('sosa', room.name);
+                    let onPress = () => {
+                        this.joinRoom('sosa', room.name);
+                        this.navigation.closeDrawer();
+                    };
 
                     if(this.currentRoom !== null && room.id == this.currentRoom.id){
-                        roomStyles.push(styles.currentRoom);
+                        roomStyles.push(Styles.currentRoom);
                         onPress = () => {};
                     }
                     return  <View style={roomStyles} key={room.id} >
@@ -168,7 +120,7 @@ export class Chat extends Component {
                             </View>
                 });
 
-                this.addDrawerItem('room_list', (
+                this.navigationContext.addDrawerItem('room_list', (
                     <View style={{flex:1}} key={'room_list'}>
                         { roomViews }
                     </View>
@@ -176,75 +128,41 @@ export class Chat extends Component {
 
                 this.setState({rooms: data.rooms});
             }else{
-                Alert.alert(
-                    'Error getting room list',
-                    err.message,
-                    [
-                        {text: 'OK', onPress: () => console.log('OK Pressed')},
-                    ],
-                    {cancelable: true},
-                );
+                Helpers.showAlert('Error getting room list', err.message);
             }
 
         }, 'sosa');
     };
 
-    closeRoomList = () => {
-        this.setState({roomListModalVisible:false});
-    };
-
     joinRoom = (communityID, roomID, callback) => {
-        this.closeRoomList();
+
         this.client.rooms().join((err, room, userList) => {
             this.setState({userList: userList});
             if(err){
-                Alert.alert(
-                    'Can\'t Join Room',
-                    err.message,
-                    [
-                        {text: 'OK', onPress: () => console.log('OK Pressed')},
-                    ],
-                    {cancelable: true},
-                );
+                Helpers.showAlert('Can\'t Join Room', err.message);
+
             }else{
                 this.currentRoom = room;
-                this.addMessage(this.generateId(), `Joined room ${room.name}`, '', 'status');
-                this.addHeaderIcon('whos_online',['fal', 'users'], this.displayUserList);
+                this.addStatus(`Joined room ${room.name}`);
+                this.homeContext.addHeaderIcon('whos_online',['fal', 'users'], this.displayUserList);
             }
 
         }, communityID, roomID);
     };
 
-    closeUserList = () => {
-        this.setState({userListModalVisible:false});
-    };
-
+    closeUserList = () => this.setState({userListModalVisible:false});
     displayUserList = () => {
         if(this.currentRoom !== null){
             this.client.rooms().online((err, data) => {
                 if(!err){
                     this.setState({userListModalVisible: true, user_list: data});
                 }else{
-                    Alert.alert(
-                        'Error getting users',
-                        err.message,
-                        [
-                            {text: 'OK', onPress: () => console.log('OK Pressed')},
-                        ],
-                        {cancelable: true},
-                    );
+                    Helpers.showAlert('Error getting users',err.message );
                 }
 
             }, 'sosa', this.currentRoom.name);
         }else{
-            Alert.alert(
-                'You\'re not in a room',
-                'Please join a room first!',
-                [
-                    {text: 'OK', onPress: () => console.log('OK Pressed')},
-                ],
-                {cancelable: true},
-            );
+            Helpers.showAlert('You\'re not in a room','Please join a room first!');
         }
 
     };
@@ -255,47 +173,36 @@ export class Chat extends Component {
 
         middleware.clear();
 
-        middleware.add('receive_message', (message, client) => {
-            this.addMessage(this.generateId(), message.parsed_content, message.nickname);
-            return message;
-        },'some_signature');
+        middleware.add({
+            'receive_message': (message, client) => {
+                this.addMessage(message.id, message.parsed_content, message.nickname);
+                return message;
+            },
+            'after_authenticated': (authData, client) => {
+                this.addStatus(`Connected to server with username: ${authData.sessionData.nickname}`);
 
-        middleware.add('receive_message', (message, client) => {
-            this.addMessage(this.generateId(), message.parsed_content, message.nickname);
-            return message;
-        },'some_signature');
+                this.setupConnectButton(true);
 
-        middleware.add('after_authenticated', (authData, client) => {
-            this.addMessage(this.generateId(),
-                `Connected to server with username: ${authData.sessionData.nickname}`,
-                '',
-                'status'
-            );
+                this.updateRoomList();
 
-            this.setupConnectButton(true);
+                if(this.currentRoom !== null){
+                    console.log(this.currentRoom);
+                    this.joinRoom(this.currentRoom.community_id, this.currentRoom.name);
+                }
+                return authData;
+            },
+            'disconnect': (message, client) => {
+                this.addStatus('Disconnected from server');
+                this.setupConnectButton();
 
-            this.updateRoomList();
-
-            if(this.currentRoom !== null){
-                console.log(this.currentRoom);
-                this.joinRoom(this.currentRoom.community_id, this.currentRoom.name);
+                return message;
             }
-            return authData;
-        });
-
-        middleware.add('disconnected', (message, client) => {
-            this.addMessage(this.generateId(), 'Disconnected from server', '', 'status');
-            this.setupConnectButton();
-
-            return message;
         });
 
         client.connect();
     };
 
-    disconnect = () => {
-        this.client.disconnect();
-    };
+    disconnect = () => this.client.disconnect();
 
     render() {
         return (
@@ -308,18 +215,18 @@ export class Chat extends Component {
                     renderItem={
                                 ({item}) => {
                                     if(item.type === 'status'){
-                                        return <Text style={styles.status}>{item.message}</Text>
+                                        return <Text style={Styles.status}>{item.message}</Text>
                                     }else{
                                         return  <View>
-                                                    <Text style={styles.message_username}>{item.username}</Text>
-                                                    <Text style={styles.message}>{item.message}</Text>
+                                                    <Text style={Styles.message_username}>{item.username}</Text>
+                                                    <Text style={Styles.message}>{item.message}</Text>
                                                 </View>
                                     }
                                 }
                     }
                 />
             </View>
-            <View style={styles.footer}>
+            <View style={Styles.footer}>
                 <TextInput style={{height: 40, backgroundColor: '#ffffff', flex:1}}
                            placeholder="Enter your message"
                            onChangeText={data => this.setState({ messageInput: data})}
@@ -346,7 +253,7 @@ export class Chat extends Component {
                           keyExtractor={(item) => { return `${item.user_id}`; }}
                           renderItem={
                               ({item}) => {
-                                  return <Text style={styles.user}>{item.nickname}</Text>
+                                  return <Text style={Styles.user}>{item.nickname}</Text>
                               }
                           }
                       />

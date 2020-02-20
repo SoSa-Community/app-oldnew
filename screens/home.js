@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
 
 class Home extends Component {
     navigation = null;
-    addDrawerItem = (id, item) => {};
+    navigationContext = {};
 
     state = {
         headerIcons: []
@@ -24,7 +24,7 @@ class Home extends Component {
     constructor(props) {
         super();
         this.navigation = props.navigation;
-        this.addDrawerItem = props.navigationContext.addDrawerItem;
+        this.navigationContext = props.navigationContext;
     }
 
     addHeaderIcon = (id, icon, onPress) => {
@@ -72,7 +72,7 @@ class Home extends Component {
                 </View>
             </View>
 
-            <Chat addHeaderIcon={this.addHeaderIcon} addDrawerItem={this.addDrawerItem} />
+            <Chat homeContext={this} navigationContext={this.navigationContext} navigation={this.navigation}/>
 
           </View>
         );
