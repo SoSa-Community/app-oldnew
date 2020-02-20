@@ -7,6 +7,7 @@ Run Android:
 `npx react-native run-android`
 
 Run iOS: 
+`cd ios; pod install; cd ..`
 `npx react-native run-ios`
 
 Run Tests: 
