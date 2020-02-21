@@ -1,15 +1,15 @@
 import React, {Component} from 'react';
 import Styles from './styles/chat'
-import {Image, FlatList, Text, TextInput, View, Button, Modal} from 'react-native';
+import {Image, FlatList, Text, TextInput, View, Button, Modal, InteractionManager} from 'react-native';
 import io from "socket.io-client";
 
 import { SoSaConfig } from "../sosa/config";
-import { ChatClient } from '../sosa/chat-client/module';
+import {ChatClient, Message, MessageParser} from '../sosa/chat-client/module';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
-import HTML from 'react-native-render-html';
 
-import Helpers from '../sosa/Helpers'
+import HTML from 'react-native-render-html';
+import Helpers from '../sosa/Helpers';
 
 export class Chat extends Component {
     navigationContext = {};
@@ -36,7 +36,6 @@ export class Chat extends Component {
 
     constructor(props) {
         super();
-        console.log(props);
 
         this.navigation = props.navigation;
         this.homeContext = props.homeContext;
@@ -46,7 +45,6 @@ export class Chat extends Component {
     componentDidMount() {
         this.setupConnectButton();
         this.connect();
-        //this.addMessage(null, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque ac gravida libero. Pellentesque placerat ex neque, sed viverra sapien pretium in. Donec consectetur erat ac eros tincidunt tristique. Curabitur enim quam, porttitor eu augue ut, rhoncus euismod purus. Vivamus pulvinar sollicitudin justo, vitae ornare ligula porta a. Ut urna dui, aliquam et orci nec, fringilla accumsan orci. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.','James');
     }
 
     setupConnectButton = (disconnect:false) => {
@@ -79,29 +77,23 @@ export class Chat extends Component {
     sendMessage = () => {
         if(this.state.messageInput.length > 0){
             let message = this.state.messageInput;
+
             if(message === 'lorem'){
                 message = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque ac gravida libero. Pellentesque placerat ex neque, sed viverra sapien pretium in. Donec consectetur erat ac eros tincidunt tristique. Curabitur enim quam, porttitor eu augue ut, rhoncus euismod purus. Vivamus pulvinar sollicitudin justo, vitae ornare ligula porta a. Ut urna dui, aliquam et orci nec, fringilla accumsan orci. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.'
             }
+
             this.client.rooms().send(() => {}, this.currentRoom.community_id, this.currentRoom.name, message);
             this.setState({ messageInput: '' });
         }
     };
 
     addStatus = (message) => {
-        this.addMessage(null, message, '', 'status');
+        this.addMessage({id: Helpers.generateId(), message: message});
     };
 
-    addMessage = (id, message, username, type='message') => {
-        if(!id) id = Helpers.generateId();
+    addMessage = (item) => {
         let messages = this.state.messages;
-
-        messages.unshift({
-            id: id,
-            message : message,
-            username: username,
-            type: type
-        });
-
+        messages.unshift(item);
         this.setState({ messages: messages});
     };
 
@@ -185,7 +177,7 @@ export class Chat extends Component {
 
         middleware.add({
             'receive_message': (message, client) => {
-                this.addMessage(message.id, message.parsed_content, message.nickname);
+                this.addMessage(message);
                 return message;
             },
             'after_authenticated': (authData, client) => {
@@ -196,7 +188,6 @@ export class Chat extends Component {
                 this.updateRoomList();
 
                 if(this.currentRoom !== null){
-                    console.log(this.currentRoom);
                     this.joinRoom(this.currentRoom.community_id, this.currentRoom.name);
                 }else{
                     this.joinRoom('sosa', 'general');
@@ -224,27 +215,27 @@ export class Chat extends Component {
                     inverted
                     data={this.state.messages}
                     extraData={this.state.messages}
-                    keyExtractor={(item) => { return item.id; }}
+                    keyExtractor={(item) => { return (item.id ? item.id.toString() : item._id); }}
                     renderItem={
                                 ({item}) => {
-                                    if(item.type === 'status'){
-                                        return <Text style={Styles.status}>{item.message}</Text>
-                                    }else{
+                                    if(item instanceof Message){
                                         return  <View style={{flexDirection: 'row', marginTop:10}}>
-                                                    <View style={{marginRight: 10}}>
-                                                        <Image source={{uri : 'https://reactnativecode.com/wp-content/uploads/2018/01/2_img.png'}}
-                                                               style={{width: 32, height: 32, borderRadius: 32/2}} />
-                                                    </View>
-                                                    <View style={{flex:1}}>
-                                                        <Text style={Styles.message_username}>{item.username}</Text>
-                                                        <HTML html={item.message} baseFontStyle={{color:'#ffffff'}} debug={true} renderers={{
-                                                            spoiler: {renderer: (htmlAttribs, children, convertedCSSStyles, passProps) => (
-                                                                    <Text> {children} </Text>
-                                                                )
-                                                                , wrapper: 'Text'}
-                                                        }}/>
-                                                    </View>
-                                                </View>
+                                            <View style={{marginRight: 10}}>
+                                                <Image source={{uri : 'https://chatplayshare.com/themes/default/images/profiles/giraffe.jpg'}}
+                                                       style={{width: 32, height: 32, borderRadius: 32/2}} />
+                                            </View>
+                                            <View style={{flex:1}}>
+                                                <Text style={Styles.message_username}>{item.username}</Text>
+                                                <HTML html={item.parsed_content} baseFontStyle={{color:'#ffffff'}} renderers={{
+                                                    spoiler: {renderer: (htmlAttribs, children, convertedCSSStyles, passProps) => (
+                                                            <Text> {children} </Text>
+                                                        )
+                                                        , wrapper: 'Text'}
+                                                }}/>
+                                            </View>
+                                        </View>
+                                    }else{
+                                        return <Text style={Styles.status}>{item.message}</Text>
                                     }
                                 }
                     }
