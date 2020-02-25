@@ -1,4 +1,4 @@
-package com.sosa;
+package com.socialsavanna;
 
 import com.facebook.react.ReactActivity;
 

@@ -1,4 +1,4 @@
-package com.sosa;
+package com.socialsavanna;
 
 import android.app.Application;
 import android.content.Context;
