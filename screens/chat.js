@@ -156,8 +156,9 @@ export class Chat extends Component {
     displayUserList = () => {
         if(this.currentRoom !== null){
             this.client.rooms().online((err, data) => {
+
                 if(!err){
-                    this.setState({userListModalVisible: true, user_list: data});
+                    this.setState({userList: data, userListModalVisible: true});
                 }else{
                     Helpers.showAlert('Error getting users',err.message );
                 }
@@ -199,6 +200,16 @@ export class Chat extends Component {
                 this.setupConnectButton();
 
                 return message;
+            },
+            'rooms/join': (userData) => {
+                if(this.currentRoom && userData.community_id === this.currentRoom.community_id && userData.room_id === this.currentRoom.name){
+                    this.addStatus(`${userData.nickname} joined`);
+                }
+            },
+            'rooms/left': (userData) => {
+                if(this.currentRoom && userData.community_id === this.currentRoom.community_id && userData.room_id === this.currentRoom.name){
+                    this.addStatus(`${userData.nickname} left`);
+                }
             }
         });
 
@@ -221,7 +232,7 @@ export class Chat extends Component {
                                     if(item instanceof Message){
                                         return  <View style={{flexDirection: 'row', marginTop:10}}>
                                             <View style={{marginRight: 10}}>
-                                                <Image source={{uri : 'https://chatplayshare.com/themes/default/images/profiles/giraffe.jpg'}}
+                                                <Image source={{uri : item.picture}}
                                                        style={{width: 32, height: 32, borderRadius: 32/2}} />
                                             </View>
                                             <View style={{flex:1}}>
