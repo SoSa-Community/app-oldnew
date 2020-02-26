@@ -237,7 +237,10 @@ export class Chat extends Component {
                                             </View>
                                             <View style={{flex:1}}>
                                                 <Text style={Styles.message_username}>{item.username}</Text>
-                                                <HTML html={item.parsed_content} baseFontStyle={{color:'#ffffff'}} renderers={{
+                                                <HTML html={item.parsed_content}
+                                                      tagsStyles={{ a: { color: '#7ac256' }}}
+                                                      baseFontStyle={{color:'#ffffff'}}
+                                                      renderers={{
                                                     spoiler: {renderer: (htmlAttribs, children, convertedCSSStyles, passProps) => (
                                                             <Text> {children} </Text>
                                                         )
