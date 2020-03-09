@@ -149,25 +149,10 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-        release {
-            if (project.hasProperty('SOSA_UPLOAD_STORE_FILE')) {
-                storeFile file(SOSA_UPLOAD_STORE_FILE)
-                storePassword SOSA_UPLOAD_STORE_PASSWORD
-                keyAlias SOSA_UPLOAD_KEY_ALIAS
-                keyPassword SOSA_UPLOAD_KEY_PASSWORD
-            }
-        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
-        }
-        release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://facebook.github.io/react-native/docs/signed-apk-android.
-            signingConfig signingConfigs.release
-            minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
     // applicationVariants are e.g. debug, release
