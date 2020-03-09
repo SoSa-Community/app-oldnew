@@ -14,7 +14,7 @@ Run Tests:
 
 #Android
 
-Run Android: 
+Run: 
 `npx react-native run-android`
 
 Build APK: `./gradlew assemble`
@@ -39,9 +39,18 @@ You might get some errors for verify about various XML files, you don't need to 
 
 #iOS
 
-Run iOS: 
+Run: 
 ```
 cd ios; pod install; cd ..
 npx react-native run-ios
 ```
+
+##Build
+First you'll need to do a build, archive and distribute an IPA in XCode, this has been required since xcode 9 and will generate a folder which has a file called "ExportOptions.plist"
+
+```
+xcodebuild -workspace SoSa.xcworkspace -scheme SoSa clean archive -configuration release -sdk iphoneos -archivePath SoSa.xcarchive
+xcodebuild -archivePath SoSa.xcarchive -exportPath /path/to/export/to/SoSa.ipa -exportOptionsPlist /path/to/ExportOptions.plist -exportArchive
+```
+
 
