@@ -2,6 +2,12 @@
 
 I'm a work in progress, ignore me or don't. I'm just a readme not your boss!
 
+```
+npm config set "@fortawesome:registry" https://npm.fontawesome.com/ && \
+npm config set "//npm.fontawesome.com/:_authToken" [YOUR_KEY]
+npm install
+```
+
 If you're using App Center rename
 `android/app/src/main/assets/appcenter-config.example.json`
 to

@@ -4,7 +4,7 @@ import {Image, FlatList, Text, TextInput, View, Button, Modal, InteractionManage
 import io from "socket.io-client";
 
 import { SoSaConfig } from "../sosa/config";
-import {ChatClient, Message, MessageParser} from '../sosa/chat-client/module';
+import {ChatClient, Message, MessageParser} from 'sosa-chat-client';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 
