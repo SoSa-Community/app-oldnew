@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import Styles from './styles/chat'
-import {Image, FlatList, Text, TextInput, View, Button, Modal, InteractionManager} from 'react-native';
+import {Image, FlatList, Text, TextInput, View, Button, Modal} from 'react-native';
 import io from "socket.io-client";
 
 import { SoSaConfig } from "../sosa/config";
-import {ChatClient, Message, MessageParser} from 'sosa-chat-client';
+import {ChatClient, Message} from 'sosa-chat-client';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 
@@ -289,10 +289,7 @@ export class Chat extends Component {
                       />
                   </View>
                   <View>
-                      <Button
-                          title="Close"
-                          onPress={this.closeUserList}
-                      />
+                      <Button   title="Close"   onPress={this.closeUserList} />
                   </View>
               </View>
             </Modal>
