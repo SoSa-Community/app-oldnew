@@ -1,72 +1,34 @@
 import React, {Component} from 'react';
-import HomeScreen from './screens/home';
-import { View } from 'react-native';
+import Login from './screens/authentication/login';
+import ForgotPassword from './screens/authentication/forgot_password';
+import ForgotPasswordCode from './screens/authentication/forgot_password_code';
+import MembersWrapper from "./screens/members_wrapper";
 
 import { NavigationContainer } from '@react-navigation/native';
-import { NavigationContext } from './context/NavigationContext';
+import {createStackNavigator} from '@react-navigation/stack';
+import {View} from "react-native";
 
-import {
-    createDrawerNavigator,
-    DrawerContentScrollView,
-    DrawerItemList,
-    DrawerItem,
-} from '@react-navigation/drawer';
+import BaseStyles from './screens/styles/base';
 
-const Drawer = createDrawerNavigator();
+const Stack = createStackNavigator();
 
 export default class SoSa extends Component {
 
-    state = {
-        drawerItems:[]
-    };
-
-    CustomDrawerContent = (props) => {
-        let items = this.state.drawerItems.map((item) => {
-            if(item.view !== null){
-                return (item.view);
-            }
-        });
-
-        return (
-            <DrawerContentScrollView {...props}>
-                <View style={{flex:1}}>
-                    { items }
-                </View>
-            </DrawerContentScrollView>
-        );
-    };
-
-    addDrawerItem = (id, view) => {
-        let items = this.state.drawerItems;
-
-        let found = false;
-        items.forEach((item, index) => {
-            if(item.id === id){
-                found = true;
-                item.view = view;
-            }
-        });
-
-        if(!found) {
-            items.push({id: id, view: view});
-        }
-
-        this.setState({drawerItems: items});
-    };
-
     render() {
-
         return (
-            <NavigationContext.Provider value={{
-                addDrawerItem: this.addDrawerItem
-            }}
-            >
-                <NavigationContainer>
-                        <Drawer.Navigator drawerContent={props => this.CustomDrawerContent(props)}>
-                            <Drawer.Screen name="Home" component={HomeScreen}/>
-                        </Drawer.Navigator>
-                </NavigationContainer>
-            </NavigationContext.Provider>
+            <View style={BaseStyles.container}>
+                <View style={{flex:1}}>
+                    <NavigationContainer>
+                        <Stack.Navigator screenOptions={{headerTitle: '', headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle}}>
+                            <Stack.Screen name="Login" component={Login}/>
+                            <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+                            <Stack.Screen name="ForgotPasswordCode" component={ForgotPasswordCode} />
+                            <Stack.Screen name="MembersWrapper" component={MembersWrapper} options={{headerShown:false}}/>
+                        </Stack.Navigator>
+                    </NavigationContainer>
+                </View>
+            </View>
+
         );
   }
 }

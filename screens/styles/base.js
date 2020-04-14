@@ -5,7 +5,10 @@ const headerTextColour = '#fff';
 
 const BaseStyles = StyleSheet.create({
     header: {
-        backgroundColor: backgroundColour1,
+        backgroundColor: backgroundColour1
+    },
+
+    headerPadding: {
         marginVertical: 5,
         paddingTop: Platform.OS === 'ios' ? 24 : 0
     },
