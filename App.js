@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import Loader from './screens/loader';
 import Login from './screens/authentication/login';
 import ForgotPassword from './screens/authentication/forgot_password';
 import ForgotPasswordCode from './screens/authentication/forgot_password_code';
@@ -9,6 +10,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {View} from "react-native";
 
 import BaseStyles from './screens/styles/base';
+
 const Stack = createStackNavigator();
 
 
@@ -19,6 +21,7 @@ export default class SoSa extends Component {
                 <View style={{flex:1}}>
                     <NavigationContainer>
                         <Stack.Navigator screenOptions={{headerTitle: '', headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle}}>
+                            <Stack.Screen name="Loader" component={Loader} />
                             <Stack.Screen name="Login" component={Login} />
                             <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
                             <Stack.Screen name="ForgotPasswordCode" component={ForgotPasswordCode} />

@@ -60,13 +60,11 @@ export default class Session {
 
     hasExpired(){
         let parsedExpiry = this.getParsedExpiry();
-        console.log(parsedExpiry);
-        console.log(parsedExpiry.getTime(), (new Date()).getTime());
-
-        if(parsedExpiry !== null && parsedExpiry.getTime() > (new Date()).getTime()){
+        if(parsedExpiry !== null && parsedExpiry.getTime() > (new Date()).getUTCMilliseconds()){
             return false;
         }
         return true;
+
     }
 
     static retrieve(callback){
@@ -82,16 +80,17 @@ export default class Session {
         }
     }
 
-    async save(){
+    save(){
+        console.log(this);
         try {
-            await AsyncStorage.setItem('current_session', JSON.stringify(this));
+            AsyncStorage.setItem('current_session', JSON.stringify(this));
         } catch (e) {
             console.log('Error Saving Session', e);
         }
     }
 
     fromJSON(jsonObject={}){
-
+        console.log('blah', jsonObject);
         if(jsonObject.id)   this.setId(jsonObject.id);
         if(jsonObject.expiry) this.setExpiry(jsonObject.expiry);
         if(jsonObject.refresh_token) this.setRefreshToken(jsonObject.refresh_token);

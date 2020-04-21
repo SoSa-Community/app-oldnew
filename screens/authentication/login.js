@@ -37,7 +37,9 @@ export default class Login extends Component {
         }
     }
 
-    componentDidMount() {}
+    componentDidMount() {
+
+    }
 
     doLogin = () => {
         let deviceInstance = Device.getInstance();

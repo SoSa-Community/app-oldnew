@@ -1,6 +1,7 @@
 import {Alert} from 'react-native';
 import {SoSaConfig} from "./config";
 import Device from "./Device";
+import Session from "./Session";
 
 export default class Helpers {
 
@@ -15,6 +16,7 @@ export default class Helpers {
     };
 
     static request = (namespace, data, post=true) => {
+        let session = Session.getInstance();
 
         let uri = `${SoSaConfig.auth.server}/${namespace}`;
         let headers = {
@@ -24,6 +26,18 @@ export default class Helpers {
                 'Content-Type': 'application/json',
             }
         };
+
+        if(['login'].indexOf(namespace) === -1){
+            let device = Device.getInstance();
+
+            if(session.getId().length > 0){
+                headers.headers['session-id'] = session.getId();
+                if(session.hasExpired())    headers.headers['refresh-token'] = session.getRefreshToken();
+            }
+
+            if(device.getId().length > 0)   headers.headers['token'] = device.getId();
+        }
+
         console.log('Headers', headers);
 
         if(data){
@@ -46,6 +60,10 @@ export default class Helpers {
             }catch (e) {
                 console.log(e);
             }
+        }).then((json) => {
+            if(json.session)    session.fromJSON(json.session);
+
+            return json;
         });
     };
 
@@ -66,5 +84,21 @@ export default class Helpers {
             ],
             {cancelable: true},
         );
+    }
+
+    static validateSession(callback){
+        let error = null;
+
+        Helpers.request('validate', {}, false)
+        .then((json) => {
+            console.log(json);
+            if(json.error){error = new Error(json.error.message);}
+        })
+        .catch((e) => {
+            error = e;
+        })
+        .finally(() => {
+            callback(error);
+        });
     }
 };
