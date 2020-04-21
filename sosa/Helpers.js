@@ -1,5 +1,6 @@
 import {Alert} from 'react-native';
 import {SoSaConfig} from "./config";
+import Device from "./Device";
 
 export default class Helpers {
 

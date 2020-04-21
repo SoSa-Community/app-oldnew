@@ -7,6 +7,9 @@ import {TouchableWithoutFeedback, ActivityIndicator, Image, FlatList, Text, Text
 import Helpers from "../../sosa/Helpers";
 import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
 
+import Device from "../../sosa/Device";
+import Session from "../../sosa/Session";
+
 export default class Login extends Component {
     navigation = null;
 
@@ -19,7 +22,10 @@ export default class Login extends Component {
 
     constructor(props) {
         super();
+
+        console.log(props);
         this.navigation = props.navigation;
+
 
         if(props.route && props.route.params){
             if(props.route.params.email){
@@ -34,18 +40,27 @@ export default class Login extends Component {
     componentDidMount() {}
 
     doLogin = () => {
+        let deviceInstance = Device.getInstance();
+        let sessionInstance = Session.getInstance();
+
         this.setState({loggingIn: true});
         try{
 
             Helpers.request('login', {
                 username: this.state.usernameInput,
-                password: this.state.passwordInput
+                password: this.state.passwordInput,
+                device_secret: deviceInstance.getSecret(),
+                device_name: deviceInstance.getName(),
+                device_platform: deviceInstance.getPlatform()
             })
             .then((json) => {
-                console.log(json);
                 let error = '';
                 if(json.error){error = json.error.message;}
                 else{
+                    deviceInstance.setId(json.response.device_id);
+                    deviceInstance.save();
+
+                    sessionInstance.fromJSON(json.response.session);
                     this.navigation.replace('MembersWrapper', {});
                 }
                 this.setState({loginError: error});

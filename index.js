@@ -37,4 +37,17 @@ import App from './App';
 import {name as appName} from './app.json';
 import './patches/EngineIOHeaderWarning';
 
+import Device from "./sosa/Device";
+import Session from "./sosa/Session";
+
+Device.getInstance().init(device => {
+    console.log(device);
+});
+
+Session.getInstance().init(session => {
+    console.log(session);
+});
+
 AppRegistry.registerComponent(appName, () => App);
+
+
