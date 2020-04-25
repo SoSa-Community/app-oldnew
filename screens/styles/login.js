@@ -33,14 +33,18 @@ const Styles = StyleSheet.create({
         borderRadius: 8,
         marginBottom: 4,
         flex: 1,
-        flexDirection: 'row'
+        flexDirection: 'row',
+        paddingHorizontal: 4
     },
 
     input:{
         flex: 1
     },
 
-    inputIcon:{color: '#ccc', margin:5, marginTop: 12},
+    inputIcon:{color: '#ccc', marginHorizontal:4, marginTop: 11},
+    viewPasswordIcon: {
+        marginTop: 10
+    },
 
     forgotButton: {color: '#7ac256', padding:8, textAlign:'center'},
 

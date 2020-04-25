@@ -91,7 +91,7 @@ export default class ForgotPassword extends Component {
                         {this.state.requestError ? this.displayError() : null}
                         <View style={Styles.inputParentContainer}>
                           <View style={Styles.inputContainer}>
-                                <FontAwesomeIcon icon={['fal', 'user']}  style={Styles.inputIcon} size={18}/>
+                                <FontAwesomeIcon icon={['fal', 'envelope']}  style={Styles.inputIcon} size={18}/>
                                 <TextInput placeholder="Your e-mail address" placeholderTextColor="#ccc" value={this.state.emailInput} style={Styles.input} onChangeText={data => this.setState({ emailInput: data})}/>
                           </View>
                         </View>

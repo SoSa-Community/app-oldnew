@@ -101,4 +101,75 @@ export default class Helpers {
             callback(error);
         });
     }
+
+    static handleLogin(username, password, setIsLoading, onErrorCallback, onSuccessCallback){
+        this.handleLoginRegister(username, password, null, setIsLoading, onErrorCallback, onSuccessCallback);
+    }
+
+    static handleRegister(username, password, email, setIsLoading, onErrorCallback, onSuccessCallback){
+        this.handleLoginRegister(username, password, email, setIsLoading, onErrorCallback, onSuccessCallback);
+    }
+
+    static handleLoginRegister(username, password, email, loadingCallback, onErrorCallback, onSuccessCallback){
+        let deviceInstance = Device.getInstance();
+        let sessionInstance = Session.getInstance();
+
+        loadingCallback(true);
+        try{
+            let namespace = 'login';
+
+            let data = {
+                username: username,
+                password: password,
+                device_secret: deviceInstance.getSecret(),
+                device_name: deviceInstance.getName(),
+                device_platform: deviceInstance.getPlatform()
+            };
+
+            console.log(data);
+            console.log(email);
+            if(email !== null){
+                namespace = 'register';
+                data.email = email;
+                data.login = true;
+            }
+
+            Helpers.request(namespace, data)
+                .then((json) => {
+                    let error = '';
+                    if(json.error){
+                        error = json.error.message;
+                        onErrorCallback(error);
+                    }
+                    else{
+                        deviceInstance.setId(json.response.device_id);
+                        deviceInstance.save();
+
+                        sessionInstance.fromJSON(json.response.session);
+                        onSuccessCallback(json);
+                    }
+                })
+                .catch((e) => {
+                    console.log(e);
+                    onErrorCallback(e.getMessage());
+                })
+                .finally(() => {
+                    loadingCallback(false);
+                });
+
+        }catch(e){
+            loadingCallback(false);
+        }
+    };
+
+    static validatePassword(password){
+        if(typeof(password) === 'string') {
+            if (password.length >= 8) {
+                return true;
+            }else if(password.length === 0){
+                return false;
+            }
+        }
+        throw new Error('Password must be at-least 5 characters');
+    };
 };

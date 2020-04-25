@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import BaseStyles from '../styles/base'
 import Styles from '../styles/login'
 
-import {TouchableWithoutFeedback, ActivityIndicator, Image, FlatList, Text, TextInput, View} from 'react-native';
+import {TouchableWithoutFeedback, ActivityIndicator, Image, FlatList, Text, TextInput, View, Button} from 'react-native';
 import Helpers from "../../sosa/Helpers";
 import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
 
@@ -131,6 +131,12 @@ export default class Login extends Component {
                             </View>
                         </View>
                     </View>
+
+                    <Text style={Styles.header}>New to SoSa?</Text>
+                    <View style={Styles.content_container}>
+                        <Button title="Press here to register" onPress={() => this.navigation.navigate('Register', {})} />
+                    </View>
+
                 </View>
             </View>
 
