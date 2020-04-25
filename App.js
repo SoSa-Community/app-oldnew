@@ -46,10 +46,11 @@ export default class SoSa extends Component {
             return (
                 <View style={BaseStyles.container}>
                     <View style={{flex:1}}>
+
                         <NavigationContainer>
                             <Stack.Navigator screenOptions={{headerTitle: '', headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle}}>
-                                <Stack.Screen name="Register" component={Register} />
                                 <Stack.Screen name="Login" component={Login} />
+                                <Stack.Screen name="Register" component={Register} />
                                 <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
                                 <Stack.Screen name="ForgotPasswordCode" component={ForgotPasswordCode} />
                                 <Stack.Screen name="MembersWrapper" component={MembersWrapper} options={{headerShown:false}}/>
