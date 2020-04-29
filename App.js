@@ -20,14 +20,19 @@ const Stack = createStackNavigator();
 export default class SoSa extends Component {
 
     state = {
-        initializing: true
+        initializing: true,
+        defaultScreen: 'Login'
     }
 
     componentDidMount(): void {
         Device.getInstance().init(device => {
             Session.getInstance().init(session => {
                 Helpers.validateSession((error) => {
-                    this.setState({initializing: false});
+                    let state = {initializing: false};
+                    if(error === null) state.defaultScreen = 'MembersWrapper';
+
+                    setTimeout(() => this.setState(state), 2000);
+
                 });
             });
         });
@@ -48,7 +53,7 @@ export default class SoSa extends Component {
                     <View style={{flex:1}}>
 
                         <NavigationContainer>
-                            <Stack.Navigator screenOptions={{headerTitle: '', headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle}}>
+                            <Stack.Navigator initialRouteName={this.state.defaultScreen} screenOptions={{headerTitle: 'SoSa', headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle}}>
                                 <Stack.Screen name="Login" component={Login} />
                                 <Stack.Screen name="Register" component={Register} />
                                 <Stack.Screen name="ForgotPassword" component={ForgotPassword} />

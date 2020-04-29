@@ -43,8 +43,7 @@ export default class Login extends Component {
             (isLoading) => this.setState({loggingIn: isLoading}),
             (error) => this.setState({loginError: error}),
             (json) => {
-                console.log('success');
-                //this.navigation.replace('MembersWrapper', {});
+                this.navigation.replace('MembersWrapper', {login: true});
             }
         );
     };
@@ -53,12 +52,13 @@ export default class Login extends Component {
         return (
             <View style={BaseStyles.container}>
                 <View style={{paddingHorizontal:30, justifyContent:'center'}}>
-                    <Text style={Styles.header}>Login to SoSa</Text>
+                    <Text style={Styles.header}>Login</Text>
+                    <Text style={Styles.subheader}>With username and password</Text>
 
                     <View style={[Styles.content_container, {marginBottom: 50}]}>
                         <FormError errorState={this.state.loginError} />
                         <IconTextInput icon={['fal', 'user']} placeholder="Username or e-mail address" value={this.state.usernameInput} onChangeText={data => this.setState({ usernameInput: data})} />
-                        <SecureTextInput placeholder="New Password" onChangeText={data => this.setState({ passwordInput: data})} value={this.state.passwordInput} />
+                        <SecureTextInput icon={['fal', 'key']} placeholder="New Password" onChangeText={data => this.setState({ passwordInput: data})} value={this.state.passwordInput} />
 
                         <View style={{flexDirection: 'row', height:40}}>
                             <View style={{flex: 5}}>

@@ -34,6 +34,7 @@ export default class SecureTextInput extends Component {
         return (
             <View style={Styles.inputParentContainer}>
                 <View style={Styles.inputContainer}>
+                    { this.props.icon ? <FontAwesomeIcon icon={this.props.icon}  style={Styles.inputIcon} size={18}/> : null }
                     <TextInput placeholder={this.props.placeholder} placeholderTextColor="#ccc" style={Styles.input} secureTextEntry={this.state.hideInput} onChangeText={this.props.onChangeText} value={this.props.value}/>
                     { this.props.validateInput ? this.displaySuccess(this.props.validateInput()) : null }
                     { this.displayViewInput() }

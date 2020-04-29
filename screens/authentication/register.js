@@ -40,7 +40,7 @@ export default class Register extends Component {
             (isLoading) => this.setState({registering: isLoading}),
             (error) => this.setState({registerError: error}),
             (json) => {
-                console.log('success');
+                this.navigation.replace('MembersWrapper', {register: true});
             }
         );
     }
@@ -70,7 +70,7 @@ export default class Register extends Component {
                         <IconTextInput icon={['fal', 'envelope']} placeholder="E-mail" value={this.state.emailInput} onChangeText={data => this.setState({ emailInput: data})} />
 
                         <FormError errorState={this.state.passwordError} />
-                        <SecureTextInput placeholder="New Password" onChangeText={data => this.setState({ passwordInput: data})} validateInput={() => this.validatePassword()} />
+                        <SecureTextInput placeholder="Choose a password" onChangeText={data => this.setState({ passwordInput: data})} validateInput={() => this.validatePassword()} />
 
                         <View style={{height:40}}>
                             {

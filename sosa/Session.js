@@ -64,7 +64,13 @@ export default class Session {
             return false;
         }
         return true;
+    }
 
+    logout(callback){
+        this.setExpiry(null);
+        this.setId(null);
+        this.setRefreshToken(null);
+        this.save(callback);
     }
 
     static retrieve(callback){
@@ -80,10 +86,10 @@ export default class Session {
         }
     }
 
-    save(){
+    save(callback){
         console.log(this);
         try {
-            AsyncStorage.setItem('current_session', JSON.stringify(this));
+            AsyncStorage.setItem('current_session', JSON.stringify(this), callback);
         } catch (e) {
             console.log('Error Saving Session', e);
         }

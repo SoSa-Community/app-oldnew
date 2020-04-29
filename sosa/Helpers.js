@@ -30,7 +30,7 @@ export default class Helpers {
         if(['login'].indexOf(namespace) === -1){
             let device = Device.getInstance();
 
-            if(session.getId().length > 0){
+            if(session.getId() !== null && session.getId().length > 0){
                 headers.headers['session-id'] = session.getId();
                 if(session.hasExpired())    headers.headers['refresh-token'] = session.getRefreshToken();
             }
@@ -61,6 +61,7 @@ export default class Helpers {
                 console.log(e);
             }
         }).then((json) => {
+            console.log('JSON', json);
             if(json.session)    session.fromJSON(json.session);
 
             return json;
@@ -91,8 +92,10 @@ export default class Helpers {
 
         Helpers.request('validate', {}, false)
         .then((json) => {
-            console.log(json);
             if(json.error){error = new Error(json.error.message);}
+            else if(json.response.logged_in === false){
+                error = new Error('Invalid session');
+            }
         })
         .catch((e) => {
             error = e;
@@ -100,6 +103,21 @@ export default class Helpers {
         .finally(() => {
             callback(error);
         });
+    }
+
+    static logout(callback){
+        let error = null;
+
+        Helpers.request('logout', {}, false)
+            .then((json) => {
+                if(json.error){error = new Error(json.error.message);}
+            })
+            .catch((e) => {
+                error = e;
+            })
+            .finally(() => {
+                callback(error);
+            });
     }
 
     static handleLogin(username, password, setIsLoading, onErrorCallback, onSuccessCallback){

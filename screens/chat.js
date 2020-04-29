@@ -182,7 +182,7 @@ export class Chat extends Component {
                 return message;
             },
             'after_authenticated': (authData, client) => {
-                this.addStatus(`Connected to server with username: ${authData.sessionData.nickname}`);
+                this.addStatus(`Connected to server with username: TheBritishAreComing`);
 
                 this.setupConnectButton(true);
 
