@@ -21,7 +21,7 @@ export default class SoSa extends Component {
 
     state = {
         initializing: true,
-        defaultScreen: 'Login'
+        defaultScreen: 'ForgotPasswordCode'
     }
 
     componentDidMount(): void {
@@ -30,8 +30,8 @@ export default class SoSa extends Component {
                 Helpers.validateSession((error) => {
                     let state = {initializing: false};
                     if(error === null) state.defaultScreen = 'MembersWrapper';
-
-                    setTimeout(() => this.setState(state), 2000);
+                    this.setState(state);
+                    //setTimeout(() => this.setState(state), 2000);
 
                 });
             });

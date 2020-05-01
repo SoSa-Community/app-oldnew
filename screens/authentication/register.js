@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import BaseStyles from '../styles/base'
-import Styles from '../styles/login'
+import Styles from '../styles/onboarding'
 
 import {Text, View} from 'react-native';
 import Helpers from "../../sosa/Helpers";

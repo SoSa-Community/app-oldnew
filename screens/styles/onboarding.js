@@ -5,6 +5,10 @@ const Styles = StyleSheet.create({
         marginTop: 15
     },
 
+    formContainer: {
+        paddingHorizontal:30
+    },
+
     header: {
         fontSize: 24,
         color:'#fff',
@@ -88,6 +92,11 @@ const Styles = StyleSheet.create({
         borderRadius: 8,
         flex:1
     },
+
+    buttonRow: {
+        flexDirection: 'row',
+        height: 40
+    }
 });
 
 export default Styles;

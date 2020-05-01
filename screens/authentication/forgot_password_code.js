@@ -1,10 +1,14 @@
 import React, {Component} from 'react';
 
 import BaseStyles from '../styles/base'
-import Styles from '../styles/login'
-import {TouchableWithoutFeedback, ActivityIndicator, Button, Text, TextInput, View} from 'react-native';
-import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
+import Styles from '../styles/onboarding'
+import {TouchableWithoutFeedback, Text, View} from 'react-native';
+
 import Helpers from "../../sosa/Helpers";
+import FormError from "../../components/FormError";
+import IconTextInput from "../../components/IconTextInput";
+import SecureTextInput from "../../components/SecureTextInput";
+import ActivityButton from "../../components/ActivityButton";
 
 
 export default class ForgotPasswordCode extends Component {
@@ -19,8 +23,7 @@ export default class ForgotPasswordCode extends Component {
         checking: false,
         checkError: '',
         passwordError: '',
-        newPasswordInput:'',
-        repeatPasswordInput:''
+        passwordInput:''
     };
 
     constructor(props) {
@@ -33,7 +36,6 @@ export default class ForgotPasswordCode extends Component {
         }
     }
 
-    componentDidMount() {}
 
     setLoading = (isLoading) => {
         this.setState({checking: isLoading});
@@ -44,22 +46,6 @@ export default class ForgotPasswordCode extends Component {
         obj[field] = error;
 
         this.setState(obj);
-    };
-
-    displayError = (errorField) => {
-        if(this.state[errorField] && this.state[errorField] !== null && this.state[errorField].length > 0){
-            return <Text style={Styles.error}>{this.state[errorField]}</Text>;
-        }
-    };
-
-    displaySuccess = (errorString) => {
-        if(errorString === null){
-            return null;
-        }else if(errorString.length === 0){
-            return <FontAwesomeIcon icon={['fas', 'check']}  style={Styles.inputIcon} size={18} color='#28a745' />
-        }else{
-            return <FontAwesomeIcon icon={['fas', 'info-circle']}  style={Styles.inputIcon} size={18} color='#dc3545' onPress={() => {console.log(errorString);}} />
-        }
     };
 
     validateTextField = (inputFieldName, label, length) => {
@@ -77,20 +63,27 @@ export default class ForgotPasswordCode extends Component {
         return null;
     };
 
-    validatePassword = (inputFieldName) => {
-        let field = this.state[inputFieldName];
-        let passwordRules = 'The password must be 8 characters, include one letter, one number and one symbol';
+    formIsValid = () => {
+        let code = this.validateTextField('codeInput', 'code', this.codeLength);
+        let email = this.validateTextField('emailInput', 'email', null);
+        let password = this.validatePassword();
 
-        if(field.length >= 8){
-            if(inputFieldName === 'repeatPasswordInput'){
-                if(field !== this.state.newPasswordInput)   return 'Passwords need to match';
+        return (
+            (code !== null && code.length === 0) &&
+            (email !== null && email.length === 0) &&
+            (password !== null && password.length === 0)
+        );
+    };
 
+    validatePassword = () => {
+        try{
+            if(Helpers.validatePassword(this.state.passwordInput) === false){
+                return null;
             }
-            return '';
-        }else if(field.length > 0){
-            return 'Password must be at-least 5 characters';
+        }catch (e) {
+            return e.message;
         }
-        return null;
+        return '';
     };
 
     handleRequest = (namespace, data, errorField, callback, post= true) => {
@@ -130,122 +123,76 @@ export default class ForgotPasswordCode extends Component {
 
     validateCodePassword = () => {
         this.handleRequest('forgot/validate', {
-            email: this.state.emailInput,
-            pin: this.state.codeInput
-        },
-        'checkError',
-        (error, json) => {
-            if(error.length === 0){
-                try{
-                    this.resetPassword(json.response.token, json.response.transient);
-                }catch (e) {
-                    console.log(e);
+                email: this.state.emailInput,
+                pin: this.state.codeInput
+            },
+            'checkError',
+            (error, json) => {
+                if(error.length === 0){
+                    try{
+                        this.resetPassword(json.response.token, json.response.transient);
+                    }catch (e) {
+                        console.log(e);
+                    }
                 }
-            }
-        }, false);
+            }, false);
     };
 
     resetPassword = (token, transient) => {
         this.handleRequest('forgot/reset', {
             token: token,
             transient: transient,
-            password: this.state.repeatPasswordInput
+            password: this.state.passwordInput
         }, 'passwordError', (error, json) => {
-                if(error.length === 0){
-                    this.navigation.replace('Login', {email: this.state.emailInput, password: this.state.repeatPasswordInput, passwordReset: true});
-                }
-        });
-    };
-
-    formIsValid = () => {
-        let code = this.validateTextField('codeInput', 'code', this.codeLength);
-        let email = this.validateTextField('emailInput', 'email', null);
-        let newPassword = this.validatePassword('newPasswordInput');
-        let repeatPassword = this.validatePassword('repeatPasswordInput');
-
-        return (
-            this.state.checkError.length === 0 &&
-            this.state.passwordError.length === 0 &&
-            (code !== null && code.length === 0) &&
-            (email !== null && email.length === 0) &&
-            (newPassword !== null && newPassword.length === 0) &&
-            (repeatPassword !== null && repeatPassword.length === 0)
-        );
-    };
-
-    displayChangePasswordButton = (showActivity=false) => {
-        if(showActivity){
-            return  <TouchableWithoutFeedback>
-                        <View style={[Styles.letMeIn_button, Styles.letMeIn_button_pressed]}>
-                            <Text style={Styles.letMeIn_text}>Change My Password!</Text>
-                            <ActivityIndicator size="small" style={this.state.loggingIn ? Styles.letMeIn_activity: null}/>
-                        </View>
-                    </TouchableWithoutFeedback>;
-        }else{
-            if(this.formIsValid()){
-                return  <TouchableWithoutFeedback onPress={this.validateCodePassword} style={Styles.letMeIn_button}>
-                    <View style={[Styles.letMeIn_button]}>
-                        <Text style={Styles.letMeIn_text}>Change My Password!</Text>
-                    </View>
-                </TouchableWithoutFeedback>;
-            }else{
-                return  <TouchableWithoutFeedback>
-                    <View style={[Styles.letMeIn_button, Styles.letMeIn_button_pressed]}>
-                        <Text style={Styles.letMeIn_text}>Change My Password!</Text>
-                    </View>
-                </TouchableWithoutFeedback>;
+            if(error.length === 0){
+                this.navigation.replace('Login', {email: this.state.emailInput, password: this.state.repeatPasswordInput, passwordReset: true});
             }
-        }
+        });
     };
 
     render() {
         return (
             <View style={BaseStyles.container}>
-                <View style={{paddingHorizontal:30, justifyContent:'center'}}>
+                <View style={Styles.formContainer}>
                     <Text style={Styles.header}>Check your e-mail</Text>
                     <Text style={Styles.subheader}>You should have received an e-mail with a 6 digit code</Text>
 
                     <View style={Styles.content_container}>
 
-                        {this.displayError('checkError')}
+                        <FormError errorState={this.state.checkError} />
+                        {
+                            this.state.emailProvided ?
+                                    null :
+                                    <IconTextInput
+                                        icon={['fal', 'user']}
+                                        placeholder="Your E-mail"
+                                        value={this.state.emailInput}
+                                        onChangeText={data => this.setState({ emailInput: data})}
+                                        validateInput={() => this.validateTextField('emailInput', 'E-mail', null)}
+                                    />
+                        }
 
-                        {this.state.emailProvided ? null : <View style={Styles.inputParentContainer}>
-                            <View style={Styles.inputContainer}>
-                                <TextInput placeholder="Your E-mail" placeholderTextColor="#ccc" style={Styles.input} onChangeText={data => this.setState({ emailInput: data})} />
-                                { this.displaySuccess(this.validateTextField('emailInput', 'E-mail', null)) }
-                            </View>
-                        </View>}
+                        <IconTextInput
+                            icon={['fal', 'user']}
+                            placeholder={`Your ${this.codeLength}-Character Code`}
+                            value={this.state.codeInput}
+                            onChangeText={data => this.setState({ codeInput: data})}
+                            validateInput={() => this.validateTextField('codeInput', 'code', this.codeLength)}
+                        />
 
-                        <View style={Styles.inputParentContainer}>
-                          <View style={Styles.inputContainer}>
-                                <TextInput placeholder={`Your ${this.codeLength}-Character Code`} placeholderTextColor="#ccc" style={Styles.input} onChangeText={data => this.setState({ codeInput: data})} />
-                                { this.displaySuccess(this.validateTextField('codeInput', 'code', this.codeLength)) }
-                          </View>
-                        </View>
+                        <FormError errorState={this.state.passwordError} />
+                        <SecureTextInput placeholder="New password" onChangeText={data => this.setState({ passwordInput: data})} validateInput={() => this.validatePassword()} />
 
-                        {this.displayError('passwordError')}
-                        <View style={Styles.inputParentContainer}>
-                            <View style={Styles.inputContainer}>
-                                <TextInput placeholder="New Password" placeholderTextColor="#ccc" style={Styles.input} onChangeText={data => this.setState({ newPasswordInput: data})} secureTextEntry={true} />
-                                { this.displaySuccess(this.validatePassword('newPasswordInput')) }
-                            </View>
-                        </View>
-                        <View style={Styles.inputParentContainer}>
-                            <View style={Styles.inputContainer}>
-                                <TextInput placeholder="Retype Your New Password" placeholderTextColor="#ccc" style={Styles.input} onChangeText={data => this.setState({ repeatPasswordInput: data})} secureTextEntry={true} />
-                                { this.displaySuccess(this.validatePassword('repeatPasswordInput')) }
-                            </View>
-                        </View>
-                        <View style={{flexDirection: 'row', height:40}}>
+                        <View style={Styles.buttonRow}>
                             <View style={{flex: 4}}>
-                                <TouchableWithoutFeedback onPress={this.resetPassword} style={Styles.secondary_button}>
-                                    <View style={[Styles.secondary_button]}>
+                                <TouchableWithoutFeedback onPress={this.navigation.goBack}>
+                                    <View style={[Styles.letMeIn_button, Styles.secondary_button]}>
                                         <Text style={Styles.letMeIn_text}>Re-request</Text>
                                     </View>
                                 </TouchableWithoutFeedback>
                             </View>
                             <View style={{flex: 6}} >
-                                {this.displayChangePasswordButton(this.state.checking)}
+                                <ActivityButton showActivity={this.state.checking} onPress={this.validateCodePassword} text="Change My Password!" validateInput={() => this.formIsValid()}/>
                             </View>
                         </View>
                     </View>

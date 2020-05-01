@@ -1,9 +1,12 @@
 import React, {Component} from 'react';
-import Styles from '../styles/login'
-import {TouchableWithoutFeedback, ActivityIndicator, Image, FlatList, Text, TextInput, View} from 'react-native';
-import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
+import Styles from '../styles/onboarding'
+import {Text, View} from 'react-native';
+
 import BaseStyles from "../styles/base";
 import Helpers from "../../sosa/Helpers";
+import IconTextInput from "../../components/IconTextInput";
+import ActivityButton from "../../components/ActivityButton";
+import FormError from "../../components/FormError";
 
 export default class ForgotPassword extends Component {
 
@@ -39,7 +42,6 @@ export default class ForgotPassword extends Component {
             })
             .then((json) => {
                 let error = '';
-                console.log(json);
                 if(json.error){
                     error = json.error.message;
                     this.setError(error);
@@ -60,46 +62,16 @@ export default class ForgotPassword extends Component {
         }
     };
 
-    displayError = () => {
-        return <Text style={Styles.error}>{this.state.requestError}</Text>;
-    };
-
-    displayForgotButton = (showActivity=false) => {
-        if(showActivity){
-            return  <TouchableWithoutFeedback>
-                        <View style={[Styles.letMeIn_button, Styles.letMeIn_button_pressed]}>
-                            <Text style={Styles.letMeIn_text}>Reset My Password!</Text>
-                            <ActivityIndicator size="small" style={this.state.loggingIn ? Styles.letMeIn_activity: null}/>
-                        </View>
-                    </TouchableWithoutFeedback>;
-        }else{
-            return  <TouchableWithoutFeedback onPress={this.resetPassword} style={Styles.letMeIn_button}>
-                        <View style={[Styles.letMeIn_button]}>
-                            <Text style={Styles.letMeIn_text}>Reset My Password!</Text>
-                        </View>
-                    </TouchableWithoutFeedback>;
-        }
-    };
-
     render() {
         return (
             <View style={BaseStyles.container}>
-                <View style={{paddingHorizontal:30, justifyContent:'center'}}>
+                <View style={Styles.formContainer}>
                     <Text style={Styles.header}>What's your e-mail?</Text>
 
                     <View style={Styles.content_container}>
-                        {this.state.requestError ? this.displayError() : null}
-                        <View style={Styles.inputParentContainer}>
-                          <View style={Styles.inputContainer}>
-                                <FontAwesomeIcon icon={['fal', 'envelope']}  style={Styles.inputIcon} size={18}/>
-                                <TextInput placeholder="Your e-mail address" placeholderTextColor="#ccc" value={this.state.emailInput} style={Styles.input} onChangeText={data => this.setState({ emailInput: data})}/>
-                          </View>
-                        </View>
-                        <View style={{flexDirection: 'row', height:40}}>
-                            <View style={{flex: 1}} >
-                                {this.state.requesting ? this.displayForgotButton(true) : this.displayForgotButton()}
-                            </View>
-                        </View>
+                        <FormError errorState={this.state.requestError} />
+                        <IconTextInput icon={['fal', 'envelope']} placeholder="Your e-mail address" value={this.state.emailInput} onChangeText={data => this.setState({ emailInput: data})} />
+                        <ActivityButton showActivity={this.state.requesting} onPress={this.resetPassword} text="Reset My Password!"/>
                     </View>
                 </View>
             </View>

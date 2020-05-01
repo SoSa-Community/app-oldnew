@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import Styles from "../screens/styles/login";
+import Styles from "../screens/styles/onboarding";
 import {TextInput, View} from "react-native";
 import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
 
