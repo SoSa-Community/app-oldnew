@@ -30,7 +30,7 @@ export default class MembersWrapper extends Component {
 
     componentDidMount(): void {
 
-        this.addDrawerItem('logout', (<View style={{flex:1}} key={'logout'}>
+        this.updateDrawerItem('logout', (<View style={{flex:1}} key={'logout'}>
             <Button
                 color='#dc3545'
                 title='Logout'
@@ -80,7 +80,7 @@ export default class MembersWrapper extends Component {
         );
     };
 
-    addDrawerItem = (id, view, right) => {
+    updateDrawerItem = (id, view, right, remove) => {
         let state = 'leftDrawerItems';
         if(right) state = 'rightDrawerItems';
 
@@ -90,16 +90,28 @@ export default class MembersWrapper extends Component {
         items.forEach((item, index) => {
             if(item.id === id){
                 found = true;
-                item.view = view;
+                if(remove) {
+                    delete items[index];
+                }else{
+                    item.view = view;
+                }
             }
         });
 
-        if(!found) {
+        if(!found && !remove) {
             items.push({id: id, view: view});
         }
 
         this.setState({state: items});
     };
+
+    addDrawerItem = (id, view, right) => {
+        this.updateDrawerItem(id, view, right);
+    }
+
+    removeDrawerItem = (id, right) => {
+        this.updateDrawerItem(id, null, right, true);
+    }
 
     RightDrawer = () => {
         return (
@@ -113,7 +125,8 @@ export default class MembersWrapper extends Component {
 
         return (
             <NavigationContext.Provider value={{
-                addDrawerItem: this.addDrawerItem
+                addDrawerItem: this.addDrawerItem,
+                removeDrawerItem: this.removeDrawerItem
             }}
             >
                 <NavigationContainer independent={true}>

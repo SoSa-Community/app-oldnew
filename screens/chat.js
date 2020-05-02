@@ -52,7 +52,7 @@ export class Chat extends Component {
         this.connect();
     }
 
-    setupConnectButton = (disconnect:false) => {
+    setupConnectButton = (disconnect: false) => {
         let color = '#28a745';
         let text = 'Connect';
         let func = () => {
@@ -66,6 +66,8 @@ export class Chat extends Component {
             func = () => {
                 this.disconnect();
                 this.navigation.dangerouslyGetParent().closeDrawer();
+                this.navigationContext.removeDrawerItem('user_list', true);
+                this.navigationContext.removeDrawerItem('room_list');
             };
         }
 
@@ -168,7 +170,6 @@ export class Chat extends Component {
         }, communityID, roomID);
     };
 
-    closeUserList = () => this.setState({userListModalVisible:false});
     displayUserList = () => {
         if(this.currentRoom !== null){
             this.client.rooms().online((err, data) => {
@@ -213,7 +214,7 @@ export class Chat extends Component {
                 }
                 return authData;
             },
-            'disconnect': (message, client) => {
+            'disconnected': (message, client) => {
                 this.addStatus('Disconnected from server');
                 this.setupConnectButton();
 
