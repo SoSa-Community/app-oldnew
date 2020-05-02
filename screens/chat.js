@@ -257,15 +257,14 @@ export class Chat extends Component {
                 />
             </View>
             <View style={Styles.footer}>
-                <TextInput style={{height: 40, backgroundColor: '#ffffff', flex:1}}
-                           placeholder="Enter your message"
-                           onChangeText={data => this.setState({ messageInput: data})}
-                           value={this.state.messageInput}
-               />
-                <Button
-                    title="Send"
-                    onPress={this.sendMessage}
-                />
+                <View style={{backgroundColor: '#ffffff', flex: 1, flexDirection: 'row', paddingLeft: 10}}>
+                    <TextInput style={{height: 40, flex:1}}
+                               placeholder="Enter your message"
+                               onChangeText={data => this.setState({ messageInput: data})}
+                               value={this.state.messageInput}
+                    />
+                    <FontAwesomeIcon icon={['fal','paper-plane']}  style={{color: '#000', marginHorizontal:4, marginRight: 10, marginTop: 8}} size={22} onPress={this.sendMessage}/>
+                </View>
             </View>
 
             <Modal
