@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 import HTML from 'react-native-render-html';
 import Helpers from '../sosa/Helpers';
+import MessageInput from "../components/MessageInput";
 
 export class Chat extends Component {
     navigationContext = {};
@@ -257,14 +258,7 @@ export class Chat extends Component {
                 />
             </View>
             <View style={Styles.footer}>
-                <View style={{backgroundColor: '#ffffff', flex: 1, flexDirection: 'row', paddingLeft: 10}}>
-                    <TextInput style={{height: 40, flex:1}}
-                               placeholder="Enter your message"
-                               onChangeText={data => this.setState({ messageInput: data})}
-                               value={this.state.messageInput}
-                    />
-                    <FontAwesomeIcon icon={['fal','paper-plane']}  style={{color: '#000', marginHorizontal:4, marginRight: 10, marginTop: 8}} size={22} onPress={this.sendMessage}/>
-                </View>
+                <MessageInput onChangeText={data => this.setState({ messageInput: data})} sendAction={this.sendMessage} value={this.state.messageInput} />
             </View>
 
             <Modal
