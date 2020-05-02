@@ -11,6 +11,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import HTML from 'react-native-render-html';
 import Helpers from '../sosa/Helpers';
 import MessageInput from "../components/MessageInput";
+import UserList from "../components/chat/UserList";
+
 
 export class Chat extends Component {
     navigationContext = {};
@@ -45,6 +47,8 @@ export class Chat extends Component {
 
     componentDidMount() {
         this.setupConnectButton();
+        this.updateUserList();
+
         this.connect();
     }
 
@@ -53,7 +57,7 @@ export class Chat extends Component {
         let text = 'Connect';
         let func = () => {
             this.connect();
-            this.navigation.closeDrawer();
+            this.navigation.dangerouslyGetParent().closeDrawer();
         };
 
         if(disconnect){
@@ -61,7 +65,7 @@ export class Chat extends Component {
             text = 'Disconnect';
             func = () => {
                 this.disconnect();
-                this.navigation.closeDrawer();
+                this.navigation.dangerouslyGetParent().closeDrawer();
             };
         }
 
@@ -74,6 +78,15 @@ export class Chat extends Component {
             />
         </View>));
     };
+
+    updateUserList = () => {
+
+        this.navigationContext.addDrawerItem('user_list', (
+            <View style={{flex:1}} key={'user_list'}>
+                <UserList userList={this.state.userList} />
+            </View>
+        ), true);
+    }
 
     sendMessage = () => {
         if(this.state.messageInput.length > 0){
@@ -140,6 +153,8 @@ export class Chat extends Component {
 
         this.client.rooms().join((err, room, userList) => {
             this.setState({userList: userList});
+            this.updateUserList();
+
             if(err){
                 Helpers.showAlert('Can\'t Join Room', err.message);
 
@@ -159,7 +174,9 @@ export class Chat extends Component {
             this.client.rooms().online((err, data) => {
 
                 if(!err){
-                    this.setState({userList: data, userListModalVisible: true});
+                    this.setState({userList: data});
+                    this.updateUserList();
+                    this.navigation.openDrawer();
                 }else{
                     Helpers.showAlert('Error getting users',err.message );
                 }
@@ -260,32 +277,6 @@ export class Chat extends Component {
             <View style={Styles.footer}>
                 <MessageInput onChangeText={data => this.setState({ messageInput: data})} sendAction={this.sendMessage} value={this.state.messageInput} />
             </View>
-
-            <Modal
-              animationType="slide"
-              transparent={false}
-              visible={this.state.userListModalVisible}>
-              <View style={{flex: 1, paddingTop: 10}}>
-                  <View>
-                      <Text style={{textAlign: 'center', fontSize:24, paddingBottom: 10}}>Online</Text>
-                  </View>
-                  <View style={{flex:1}}>
-                      <FlatList
-                          data={this.state.userList}
-                          extraData={this.state.userList}
-                          keyExtractor={(item) => { return `${item.user_id}`; }}
-                          renderItem={
-                              ({item}) => {
-                                  return <Text style={Styles.user}>{item.nickname}</Text>
-                              }
-                          }
-                      />
-                  </View>
-                  <View>
-                      <Button   title="Close"   onPress={this.closeUserList} />
-                  </View>
-              </View>
-            </Modal>
 
           </View>
         );

@@ -12,13 +12,15 @@ import {
 import Session from "../sosa/Session";
 import Helpers from "../sosa/Helpers";
 
-const Drawer = createDrawerNavigator();
+const DrawerL = createDrawerNavigator();
+const DrawerR = createDrawerNavigator();
 
 export default class MembersWrapper extends Component {
 
     topNavigation = null;
     state = {
-        drawerItems:[]
+        leftDrawerItems:[],
+        rightDrawerItems:[]
     };
 
     constructor(props) {
@@ -62,8 +64,8 @@ export default class MembersWrapper extends Component {
         </View>));
     }
 
-    CustomDrawerContent = (props) => {
-        let items = this.state.drawerItems.map((item) => {
+    CustomDrawerContent = (props, state) => {
+        let items = state.map((item) => {
             if(item.view !== null){
                 return (item.view);
             }
@@ -78,8 +80,11 @@ export default class MembersWrapper extends Component {
         );
     };
 
-    addDrawerItem = (id, view) => {
-        let items = this.state.drawerItems;
+    addDrawerItem = (id, view, right) => {
+        let state = 'leftDrawerItems';
+        if(right) state = 'rightDrawerItems';
+
+        let items = this.state[state];
 
         let found = false;
         items.forEach((item, index) => {
@@ -93,8 +98,16 @@ export default class MembersWrapper extends Component {
             items.push({id: id, view: view});
         }
 
-        this.setState({drawerItems: items});
+        this.setState({state: items});
     };
+
+    RightDrawer = () => {
+        return (
+            <DrawerR.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.rightDrawerItems)} drawerPosition="right">
+                <DrawerR.Screen name="Home" component={HomeScreen}/>
+            </DrawerR.Navigator>
+        );
+    }
 
     render() {
 
@@ -104,11 +117,14 @@ export default class MembersWrapper extends Component {
             }}
             >
                 <NavigationContainer independent={true}>
-                        <Drawer.Navigator drawerContent={props => this.CustomDrawerContent(props)}>
-                            <Drawer.Screen name="Home" component={HomeScreen}/>
-                        </Drawer.Navigator>
+                    <DrawerL.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.leftDrawerItems)} drawerPosition="left">
+                        <DrawerL.Screen name="RightDrawer" component={this.RightDrawer}/>
+                    </DrawerL.Navigator>
                 </NavigationContainer>
             </NavigationContext.Provider>
         );
   }
+
+
+
 }

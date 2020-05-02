@@ -59,7 +59,7 @@ class Home extends Component {
             <View style={{paddingVertical:5}}>
                 <View style={{flexDirection: 'row', justifyContent:'center', alignItems:'center'}}>
                     <View style={{verticalAlign:'center', paddingLeft: 10, paddingRight: 5}}>
-                        <FontAwesomeIcon icon={['fal', 'bars']} style={{color: '#ffffff'}} size={18} onPress={() => {this.navigation.openDrawer()}}/>
+                        <FontAwesomeIcon icon={['fal', 'bars']} style={{color: '#ffffff'}} size={18} onPress={() => {this.navigation.dangerouslyGetParent().openDrawer()}}/>
                     </View>
                     <Text style={BaseStyles.headerTitle}>SoSa</Text>
                     { icons }
