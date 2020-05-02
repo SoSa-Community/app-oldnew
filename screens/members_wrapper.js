@@ -85,7 +85,6 @@ export default class MembersWrapper extends Component {
         if(right) state = 'rightDrawerItems';
 
         let items = this.state[state];
-
         let found = false;
         items.forEach((item, index) => {
             if(item.id === id){
@@ -101,6 +100,7 @@ export default class MembersWrapper extends Component {
         if(!found && !remove) {
             items.push({id: id, view: view});
         }
+
 
         this.setState({state: items});
     };

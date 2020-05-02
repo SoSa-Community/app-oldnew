@@ -1,8 +1,8 @@
 import React, {Component, useContext} from 'react';
 import {Text, View} from 'react-native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import withNavigationContext from './hoc/withNavigationContext';
 import { Chat } from './chat';
+import Icon from '../components/Icon.js';
 
 import BaseStyles from "./styles/base";
 
@@ -50,7 +50,7 @@ class Home extends Component {
 
         let icons = this.state.headerIcons.map((item, i) => {
            return (<View style={{verticalAlign:'center', padding: 10}} key={item.id}>
-                       <FontAwesomeIcon icon={item.icon} style={{color: '#ffffff'}} size={34} onPress={item.onPress}/>
+                       <Icon icon={item.icon} style={{color: '#ffffff'}} size={34} onPress={item.onPress}/>
                    </View>);
         });
 
@@ -59,7 +59,7 @@ class Home extends Component {
             <View style={{paddingVertical:5}}>
                 <View style={{flexDirection: 'row', justifyContent:'center', alignItems:'center'}}>
                     <View style={{verticalAlign:'center', paddingLeft: 10, paddingRight: 5}}>
-                        <FontAwesomeIcon icon={['fal', 'bars']} style={{color: '#ffffff'}} size={18} onPress={() => {this.navigation.dangerouslyGetParent().openDrawer()}}/>
+                        <Icon icon={['fal', 'bars']} style={{color: '#ffffff'}} size={18} onPress={() => {this.navigation.dangerouslyGetParent().openDrawer()}}/>
                     </View>
                     <Text style={BaseStyles.headerTitle}>SoSa</Text>
                     { icons }

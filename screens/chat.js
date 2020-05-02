@@ -5,8 +5,6 @@ import io from "socket.io-client";
 
 import { SoSaConfig } from "../sosa/config";
 import {ChatClient, Message} from 'sosa-chat-client';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-
 
 import HTML from 'react-native-render-html';
 import Helpers from '../sosa/Helpers';
@@ -130,7 +128,7 @@ export class Chat extends Component {
                         onPress = () => {};
                     }
                     return  <View style={roomStyles} key={room.id} >
-                                <FontAwesomeIcon icon={['fas', 'campfire']} size={20} style={{flex: 1, marginRight:15, justifyContent: 'center'}}  onPress={onPress} />
+                                <Icon icon={['fas', 'campfire']} size={20} style={{flex: 1, marginRight:15, justifyContent: 'center'}}  onPress={onPress} />
                                 <Text style={{flex: 1, fontSize: 16}}  onPress={onPress} >
                                      {room.title}
                                 </Text>

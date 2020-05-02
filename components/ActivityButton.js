@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import Styles from "../screens/styles/onboarding";
 import {ActivityIndicator, Text, TextInput, TouchableWithoutFeedback, View} from "react-native";
-import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
 
 export default class ActivityButton extends Component {
 
