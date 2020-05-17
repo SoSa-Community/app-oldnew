@@ -21,6 +21,7 @@ export class Chat extends Component {
     username = '';
     currentRoom = null;
     messageBuffer = [];
+    nickname = '';
 
     client = new ChatClient({
         host: SoSaConfig.chat.server,
@@ -208,6 +209,8 @@ export class Chat extends Component {
                 return message;
             },
             'after_authenticated': (authData, client) => {
+                this.nickname = authData.sessionData.nickname;
+
                 this.addStatus(`Connected to server with username: TheBritishAreComing`);
                 this.setupBufferRenderTimer();
 
@@ -307,7 +310,7 @@ export class Chat extends Component {
     render() {
         return (
           <View style={{flex: 1}}>
-            <View style={{flex: 1, padding: 10, backgroundColor: '#444442'}}>
+            <View style={{flex: 1, backgroundColor: '#444442'}}>
 
                 <FlatList
                     ref={(ref) => {this.scrollView = ref;}}
@@ -320,27 +323,35 @@ export class Chat extends Component {
                     renderItem={
                                 ({item}) => {
                                     if(item instanceof Message){
-                                        return  <View style={{flexDirection: 'row', marginTop:10}}>
-                                            <View style={{marginRight: 10}}>
-                                                <TouchableHighlight onPress={() => this.addTag(item.username)}>
-                                                    <Image source={{uri : item.picture}}
-                                                           style={{width: 32, height: 32, borderRadius: 32/2}}
+                                        let containerStyles = [Styles.messageContainer];
+                                        if(item.mentions.length > 0 && item.mentions.indexOf(this.nickname) !== -1){
+                                            containerStyles.push(Styles.messageContainerWithMention);
+                                        }
 
 
-                                                    />
-                                                </TouchableHighlight>
-                                            </View>
-                                            <View style={{flex:1}}>
-                                                <Text style={Styles.message_username}>{item.username}</Text>
-                                                <HTML html={item.parsed_content}
-                                                      tagsStyles={{ a: { color: '#7ac256' }}}
-                                                      baseFontStyle={{color:'#ffffff'}}
-                                                      renderers={{
-                                                    spoiler: {renderer: (htmlAttribs, children, convertedCSSStyles, passProps) => (
-                                                            <Text> {children} </Text>
-                                                        )
-                                                        , wrapper: 'Text'}
-                                                }}/>
+                                        return  <View style={containerStyles}>
+                                            <View style={Styles.messageContainerInner}>
+                                                <View style={{marginRight: 10}}>
+                                                    <TouchableHighlight onPress={() => this.addTag(item.username)}>
+                                                        <Image source={{uri : item.picture}}
+                                                               style={{width: 32, height: 32, borderRadius: 32/2}}
+
+
+                                                        />
+                                                    </TouchableHighlight>
+                                                </View>
+                                                <View style={{flex:1}}>
+                                                    <Text style={Styles.message_username}>{item.username}</Text>
+                                                    <HTML html={item.parsed_content}
+                                                          tagsStyles={{ a: { color: '#7ac256' }}}
+                                                          baseFontStyle={{color:'#ffffff'}}
+                                                          renderers={{
+                                                              spoiler: {renderer: (htmlAttribs, children, convertedCSSStyles, passProps) => (
+                                                                      <Text> {children} </Text>
+                                                                  )
+                                                                  , wrapper: 'Text'}
+                                                          }}/>
+                                                </View>
                                             </View>
                                         </View>
                                     }else{

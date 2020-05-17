@@ -5,6 +5,19 @@ const Styles = StyleSheet.create({
         marginBottom: 10
     },
 
+    messageContainer: {
+        marginTop:10
+    },
+
+    messageContainerWithMention: {
+        backgroundColor: '#000000'
+    },
+
+    messageContainerInner: {
+        flexDirection: 'row',
+        padding: 10
+    },
+
     message: {
         color: '#ffffff',
         borderBottomColor: '#cccccc',
