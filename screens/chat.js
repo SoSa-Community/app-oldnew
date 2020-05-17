@@ -10,12 +10,26 @@ import HTML from 'react-native-render-html';
 import Helpers from '../sosa/Helpers';
 import MessageInput from "../components/MessageInput";
 import UserList from "../components/chat/UserList";
-
+console.debug = () => {};
 
 export class Chat extends Component {
     navigationContext = {};
     homeContext = {};
     navigation = {};
+    scrollOffset = {y:0, x:0};
+    scrollView = null;
+    username = '';
+    currentRoom = null;
+    messageBuffer = [];
+
+    client = new ChatClient({
+        host: SoSaConfig.chat.server,
+        api_key: SoSaConfig.chat.api_key
+    }, io);
+
+
+    bufferRenderTimer = null;
+    bufferRenderRunning = false;
 
     state = {
         joinRoomModalVisible: false,
@@ -24,16 +38,10 @@ export class Chat extends Component {
         userList: [],
         messages: [],
         messageInput: '',
-        rooms: []
+        rooms: [],
+        scrolling: true,
+        newMessagesNotificationVisible: false
     };
-
-    username = '';
-    currentRoom = null;
-
-    client = new ChatClient({
-        host: SoSaConfig.chat.server,
-        api_key: SoSaConfig.chat.api_key
-    }, io);
 
     constructor(props) {
         super();
@@ -46,7 +54,6 @@ export class Chat extends Component {
     componentDidMount() {
         this.setupConnectButton();
         this.updateUserList();
-
         this.connect();
     }
 
@@ -98,6 +105,7 @@ export class Chat extends Component {
 
             this.client.rooms().send(() => {}, this.currentRoom.community_id, this.currentRoom.name, message);
             this.setState({ messageInput: '' });
+            this.scrollToBottom();
         }
     };
 
@@ -106,9 +114,10 @@ export class Chat extends Component {
     };
 
     addMessage = (item) => {
-        let messages = this.state.messages;
-        messages.unshift(item);
-        this.setState({ messages: messages});
+        this.messageBuffer.push(item);
+        if(this.isScrolled()){
+            this.setState({newMessagesNotificationVisible: true});
+        }
     };
 
     updateRoomList = () => {
@@ -200,6 +209,7 @@ export class Chat extends Component {
             },
             'after_authenticated': (authData, client) => {
                 this.addStatus(`Connected to server with username: TheBritishAreComing`);
+                this.setupBufferRenderTimer();
 
                 this.setupConnectButton(true);
 
@@ -251,11 +261,57 @@ export class Chat extends Component {
 
     };
 
+    isScrolled = () => {
+        if(this.scrollOffset.y > 35) return true;
+        return false;
+    }
+
+    chatMessagesOnScroll = (event) => {
+        this.scrollOffset = event.nativeEvent.contentOffset;
+        if(!this.isScrolled()){
+            this.setState({newMessagesNotificationVisible: false});
+        }
+    };
+
+    setupBufferRenderTimer = () => {
+        this.bufferRenderTimer = setTimeout(this.bufferRender, 500);
+    };
+
+    bufferRender = () => {
+        clearTimeout(this.bufferRenderTimer);
+        if(!this.bufferRenderRunning){
+            this.bufferRenderRunning = true;
+            if(this.scrollOffset.y < 35){
+                let messages = this.state.messages;
+                let bufferState = this.messageBuffer;
+
+                bufferState.forEach((message, index) => {
+                    messages.unshift(message);
+                    delete this.messageBuffer[index];
+                });
+
+                this.setState({ messages: messages});
+            }
+            this.bufferRenderRunning = false;
+            this.setupBufferRenderTimer();
+        }else{
+            this.setupBufferRenderTimer();
+        }
+    };
+
+    scrollToBottom = () => {
+        this.setState({newMessagesNotificationVisible: false});
+        this.scrollView.scrollToIndex({index:0, animated: true});
+    }
+
     render() {
         return (
           <View style={{flex: 1}}>
             <View style={{flex: 1, padding: 10, backgroundColor: '#444442'}}>
+
                 <FlatList
+                    ref={(ref) => {this.scrollView = ref;}}
+                    onScroll={this.chatMessagesOnScroll}
                     keyboardShouldPersistTaps={'always'}
                     inverted
                     data={this.state.messages}
@@ -294,6 +350,12 @@ export class Chat extends Component {
                     }
                     style={Styles.message_list}
                 />
+                {
+                    this.state.newMessagesNotificationVisible &&
+                    <TouchableHighlight onPress={this.scrollToBottom} style={Styles.newMessageScrollNotifier}>
+                        <Text style={{color: '#ffffff'}}>You have new messages waiting</Text>
+                    </TouchableHighlight>
+                }
             </View>
             <View style={Styles.footer}>
                 <MessageInput onChangeText={data => this.setState({ messageInput: data})} sendAction={this.sendMessage} value={this.state.messageInput} />

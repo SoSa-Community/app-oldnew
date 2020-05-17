@@ -49,6 +49,20 @@ const Styles = StyleSheet.create({
     footer: {
         paddingBottom: Platform.OS === 'ios' ? 24 : 0,
         flexDirection: 'row'
+    },
+
+    newMessageScrollNotifier: {
+        opacity:0.95,
+        paddingVertical: 8,
+        flex: 1,
+        flexDirection: 'row',
+        position:'absolute',
+        bottom:0,
+        left:0,
+        right:0,
+        marginBottom:8,
+        justifyContent:'center',
+        backgroundColor: '#f0ad4e', borderRadius:8
     }
 });
 
