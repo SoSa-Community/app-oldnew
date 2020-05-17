@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Styles from './styles/chat'
-import {Image, FlatList, Text, TextInput, View, Button, Modal} from 'react-native';
+import {Image, FlatList, Text, View, Button, TouchableHighlight} from 'react-native';
 import io from "socket.io-client";
 
 import { SoSaConfig } from "../sosa/config";
@@ -235,11 +235,28 @@ export class Chat extends Component {
 
     disconnect = () => this.client.disconnect();
 
+    addTag = (username) => {
+        let text = this.state.messageInput;
+        let tag = `@${username}`;
+
+        if(text.length === 0){
+            text = tag;
+        }else{
+            if(!/(.*)\s+$/.test(text)) {
+                tag = ` ${tag}`;
+            }
+            text = `${text}${tag}`;
+        }
+        this.setState({messageInput: text});
+
+    };
+
     render() {
         return (
           <View style={{flex: 1}}>
             <View style={{flex: 1, padding: 10, backgroundColor: '#444442'}}>
                 <FlatList
+                    keyboardShouldPersistTaps={'always'}
                     inverted
                     data={this.state.messages}
                     extraData={this.state.messages}
@@ -249,8 +266,13 @@ export class Chat extends Component {
                                     if(item instanceof Message){
                                         return  <View style={{flexDirection: 'row', marginTop:10}}>
                                             <View style={{marginRight: 10}}>
-                                                <Image source={{uri : item.picture}}
-                                                       style={{width: 32, height: 32, borderRadius: 32/2}} />
+                                                <TouchableHighlight onPress={() => this.addTag(item.username)}>
+                                                    <Image source={{uri : item.picture}}
+                                                           style={{width: 32, height: 32, borderRadius: 32/2}}
+
+
+                                                    />
+                                                </TouchableHighlight>
                                             </View>
                                             <View style={{flex:1}}>
                                                 <Text style={Styles.message_username}>{item.username}</Text>
