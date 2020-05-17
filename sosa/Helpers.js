@@ -169,7 +169,7 @@ export default class Helpers {
                 })
                 .catch((e) => {
                     console.log(e);
-                    onErrorCallback(e.getMessage());
+                    onErrorCallback(e.message);
                 })
                 .finally(() => {
                     loadingCallback(false);
