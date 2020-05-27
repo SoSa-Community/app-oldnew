@@ -10,7 +10,7 @@ import HTML from 'react-native-render-html';
 import Helpers from '../sosa/Helpers';
 import MessageInput from "../components/MessageInput";
 import UserList from "../components/chat/UserList";
-console.debug = () => {};
+
 
 export class Chat extends Component {
     navigationContext = {};

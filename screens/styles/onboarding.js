@@ -16,6 +16,14 @@ const Styles = StyleSheet.create({
         marginBottom: 5
     },
 
+    smallheader: {
+        fontSize: 14,
+        color:'#fff',
+        textAlign: 'center',
+        marginTop: 10,
+        marginBottom: 20
+    },
+
     subheader: {
         fontSize: 18,
         color:'#fff',
@@ -96,6 +104,16 @@ const Styles = StyleSheet.create({
     buttonRow: {
         flexDirection: 'row',
         height: 40
+    },
+
+    separatorLine: {
+        marginVertical: 20,
+        backgroundColor: '#000',
+        height: 1,
+    },
+
+    socialButton: {
+        marginHorizontal: 5
     }
 });
 
