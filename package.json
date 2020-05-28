@@ -31,7 +31,7 @@
     "react-native-gesture-handler": "^1.6.1",
     "react-native-pure-jwt": "^2.2.1",
     "react-native-reanimated": "^1.9.0",
-    "react-native-render-html": "^4.2.0",
+    "react-native-render-html": "https://github.com/SoSa-Community/react-native-render-html.git#master",
     "react-native-safe-area-context": "^0.7.3",
     "react-native-screens": "^2.8.0",
     "react-native-svg": "^11.0.1",

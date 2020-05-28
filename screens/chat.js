@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Styles from './styles/chat'
-import {Image, FlatList, Text, View, Button, TouchableHighlight} from 'react-native';
+import {Image, FlatList, Text, View, Button, TouchableHighlight, Linking} from 'react-native';
 import io from "socket.io-client";
 
 import { SoSaConfig } from "../sosa/config";
@@ -390,6 +390,9 @@ export class Chat extends Component {
                                                     <HTML html={item.parsed_content}
                                                           tagsStyles={{ a: { color: '#7ac256' }}}
                                                           baseFontStyle={{color:'#ffffff'}}
+                                                          onLinkPress={(evt, href) => {
+                                                              Linking.openURL(href);
+                                                          }}
                                                           renderers={{
                                                               spoiler: {renderer: (htmlAttribs, children, convertedCSSStyles, passProps) => (
                                                                       <Text> {children} </Text>
