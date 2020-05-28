@@ -10,6 +10,7 @@ import HTML from 'react-native-render-html';
 import Helpers from '../sosa/Helpers';
 import MessageInput from "../components/MessageInput";
 import UserList from "../components/chat/UserList";
+import Icon from "../components/Icon";
 
 
 export class Chat extends Component {
@@ -56,6 +57,11 @@ export class Chat extends Component {
         this.setupConnectButton();
         this.updateUserList();
         this.connect();
+    }
+
+    componentWillUnmount(): void {
+        this.disconnect();
+        this.client.middleware.clear();
     }
 
     setupConnectButton = (disconnect: false) => {
@@ -118,6 +124,7 @@ export class Chat extends Component {
         this.messageBuffer.push(item);
         if(this.isScrolled()){
             this.setState({newMessagesNotificationVisible: true});
+
         }
     };
 
@@ -333,11 +340,7 @@ export class Chat extends Component {
                                             <View style={Styles.messageContainerInner}>
                                                 <View style={{marginRight: 10}}>
                                                     <TouchableHighlight onPress={() => this.addTag(item.username)}>
-                                                        <Image source={{uri : item.picture}}
-                                                               style={{width: 32, height: 32, borderRadius: 32/2}}
-
-
-                                                        />
+                                                        <Image source={{uri : item.picture}} style={{width: 48, height: 48, borderRadius: 48/2}} />
                                                     </TouchableHighlight>
                                                 </View>
                                                 <View style={{flex:1}}>
