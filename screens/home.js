@@ -49,20 +49,22 @@ class Home extends Component {
     render() {
 
         let icons = this.state.headerIcons.map((item, i) => {
-           return (<View style={{verticalAlign:'center', padding: 10}} key={item.id}>
-                       <Icon icon={item.icon} style={{color: '#ffffff'}} size={34} onPress={item.onPress}/>
+           return (<View style={{verticalAlign:'center'}} key={item.id}>
+                       <Icon icon={item.icon} style={{color: '#ffffff'}} size={30} onPress={item.onPress}/>
                    </View>);
         });
 
         return (
           <View style={BaseStyles.container}>
-            <View style={{paddingVertical:5}}>
+            <View style={{paddingVertical:2}}>
                 <View style={{flexDirection: 'row', justifyContent:'center', alignItems:'center'}}>
-                    <View style={{verticalAlign:'center', paddingLeft: 10, paddingRight: 5}}>
-                        <Icon icon={['fal', 'bars']} style={{color: '#ffffff'}} size={18} onPress={() => {this.navigation.dangerouslyGetParent().openDrawer()}}/>
+                    <View style={{verticalAlign:'center', paddingLeft: 7, paddingRight: 5}}>
+                        <Icon icon={['fal', 'bars']} style={{color: '#ffffff'}} size={22} onPress={() => {this.navigation.dangerouslyGetParent().openDrawer()}}/>
                     </View>
                     <Text style={BaseStyles.headerTitle}>SoSa</Text>
-                    { icons }
+                    <View style={{verticalAlign:'center', paddingRight: 10}}>
+                        { icons }
+                    </View>
                 </View>
             </View>
             <Chat homeContext={this} navigationContext={this.navigationContext} navigation={this.navigation}/>
