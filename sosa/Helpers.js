@@ -99,12 +99,20 @@ export default class Helpers {
 
     static validateSession(callback){
         let error = null;
+        let sessionInstance = Session.getInstance();
 
         Helpers.request('validate', {}, false)
         .then((json) => {
-            if(json.error){error = new Error(json.error.message);}
-            else if(json.response.logged_in === false){
+            if(json.error){
                 error = new Error('Invalid session');
+            }else{
+                if(json.response.session){
+                    sessionInstance.fromJSON(json.response.session);
+                }
+                if(json.response.user){
+                    sessionInstance.username = json.response.user.username;
+                    sessionInstance.nickname = json.response.user.nickname;
+                }
             }
         })
         .catch((e) => {
@@ -172,6 +180,9 @@ export default class Helpers {
                         deviceInstance.save();
 
                         sessionInstance.fromJSON(json.response.session);
+                        sessionInstance.username = json.response.user.username;
+                        sessionInstance.nickname = json.response.user.nickname;
+
                         onSuccessCallback(json);
                     }
                 })
@@ -253,6 +264,8 @@ export default class Helpers {
                                 deviceInstance.save();
 
                                 sessionInstance.fromJSON(json.response.session);
+                                sessionInstance.username = json.response.user.username;
+                                sessionInstance.nickname = json.response.user.nickname;
                                 onSuccessCallback(json);
                             }
                         })

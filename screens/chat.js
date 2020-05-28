@@ -6,11 +6,16 @@ import io from "socket.io-client";
 import { SoSaConfig } from "../sosa/config";
 import {ChatClient, Message} from 'sosa-chat-client';
 
+import Session from "../sosa/Session";
+import Device from "../sosa/Device";
+
 import HTML from 'react-native-render-html';
 import Helpers from '../sosa/Helpers';
 import MessageInput from "../components/MessageInput";
 import UserList from "../components/chat/UserList";
-import Icon from "../components/Icon";
+import IconButton from "../components/IconButton";
+
+import jwt from "react-native-pure-jwt";
 
 
 export class Chat extends Component {
@@ -24,10 +29,8 @@ export class Chat extends Component {
     messageBuffer = [];
     nickname = '';
 
-    client = new ChatClient({
-        host: SoSaConfig.chat.server,
-        api_key: SoSaConfig.chat.api_key
-    }, io);
+    client;
+    session;
 
 
     bufferRenderTimer = null;
@@ -48,6 +51,8 @@ export class Chat extends Component {
     constructor(props) {
         super();
 
+        this.session = Session.getInstance()
+
         this.navigation = props.navigation;
         this.homeContext = props.homeContext;
         this.navigationContext = props.navigationContext;
@@ -56,7 +61,29 @@ export class Chat extends Component {
     componentDidMount() {
         this.setupConnectButton();
         this.updateUserList();
+
+        let device = Device.getInstance();
+
+        this.client = new ChatClient(
+            {
+                host: SoSaConfig.chat.server,
+                api_key: SoSaConfig.chat.api_key
+            },
+            io,
+            (callback) => {
+
+                let packet = {id: this.session.getId(), refresh_token: this.session.getRefreshToken()};
+                jwt.sign(packet, device.getSecret(), {alg: "HS256"}).then((token) => {
+                    callback({ token: token, deviceId: device.getId()});
+                });
+
+
+            }
+        );
+
         this.connect();
+
+
     }
 
     componentWillUnmount(): void {
@@ -110,7 +137,17 @@ export class Chat extends Component {
                 message = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque ac gravida libero. Pellentesque placerat ex neque, sed viverra sapien pretium in. Donec consectetur erat ac eros tincidunt tristique. Curabitur enim quam, porttitor eu augue ut, rhoncus euismod purus. Vivamus pulvinar sollicitudin justo, vitae ornare ligula porta a. Ut urna dui, aliquam et orci nec, fringilla accumsan orci. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.'
             }
 
-            this.client.rooms().send(() => {}, this.currentRoom.community_id, this.currentRoom.name, message);
+            this.client.rooms().send((err, message) => {
+                if(!err){
+                    console.log(message);
+                    this.addMessage(message);
+                }
+            },
+                this.currentRoom.community_id,
+                this.currentRoom.name,
+                message
+            );
+
             this.setState({ messageInput: '' });
             this.scrollToBottom();
         }
@@ -145,7 +182,7 @@ export class Chat extends Component {
                         onPress = () => {};
                     }
                     return  <View style={roomStyles} key={room.id} >
-                                <Icon icon={['fas', 'campfire']} size={20} style={{flex: 1, marginRight:15, justifyContent: 'center'}}  onPress={onPress} />
+                                <IconButton icon={['fas', 'campfire']} size={20} style={{flex: 1, marginRight:15, justifyContent: 'center'}}  onPress={onPress} />
                                 <Text style={{flex: 1, fontSize: 16}}  onPress={onPress} >
                                      {room.title}
                                 </Text>
@@ -207,6 +244,7 @@ export class Chat extends Component {
     connect = () => {
         let client = this.client;
         let middleware = this.client.middleware;
+        let chat = this;
 
         middleware.clear();
 
@@ -218,7 +256,7 @@ export class Chat extends Component {
             'after_authenticated': (authData, client) => {
                 this.nickname = authData.sessionData.nickname;
 
-                this.addStatus(`Connected to server with username: TheBritishAreComing`);
+                this.addStatus(`Connected to server with nickname: ${chat.session.nickname}`);
                 this.setupBufferRenderTimer();
 
                 this.setupConnectButton(true);
@@ -326,7 +364,7 @@ export class Chat extends Component {
                     inverted
                     data={this.state.messages}
                     extraData={this.state.messages}
-                    keyExtractor={(item) => { return (item.id ? item.id.toString() : item._id); }}
+                    keyExtractor={(item) => { return (item.id ? item.id.toString() : item.uuid); }}
                     renderItem={
                                 ({item}) => {
                                     if(item instanceof Message){
@@ -335,16 +373,20 @@ export class Chat extends Component {
                                             containerStyles.push(Styles.messageContainerWithMention);
                                         }
 
+                                        if(!item.picture || item.picture.length === 0){
+                                            item.picture = 'https://picsum.photos/seed/picsum/300/300';
+                                        }
+
 
                                         return  <View style={containerStyles}>
                                             <View style={Styles.messageContainerInner}>
                                                 <View style={{marginRight: 10}}>
-                                                    <TouchableHighlight onPress={() => this.addTag(item.username)}>
+                                                    <TouchableHighlight onPress={() => this.addTag(item.nickname)}>
                                                         <Image source={{uri : item.picture}} style={{width: 48, height: 48, borderRadius: 48/2}} />
                                                     </TouchableHighlight>
                                                 </View>
                                                 <View style={{flex:1}}>
-                                                    <Text style={Styles.message_username}>{item.username}</Text>
+                                                    <Text style={Styles.message_username}>{item.nickname}</Text>
                                                     <HTML html={item.parsed_content}
                                                           tagsStyles={{ a: { color: '#7ac256' }}}
                                                           baseFontStyle={{color:'#ffffff'}}

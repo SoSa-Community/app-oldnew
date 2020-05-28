@@ -6,6 +6,8 @@ export default class Session {
     id = '';
     expiry = '';
     refreshToken = '';
+    username = '';
+    nickname = '';
 
     /**
      * @returns {Session}
@@ -96,7 +98,7 @@ export default class Session {
     }
 
     fromJSON(jsonObject={}){
-        console.log('blah', jsonObject);
+
         if(jsonObject.id)   this.setId(jsonObject.id);
         if(jsonObject.expiry) this.setExpiry(jsonObject.expiry);
         if(jsonObject.refresh_token) this.setRefreshToken(jsonObject.refresh_token);

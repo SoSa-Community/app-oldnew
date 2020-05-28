@@ -2,7 +2,7 @@ import React, {Component, useContext} from 'react';
 import {Text, View} from 'react-native';
 import withNavigationContext from './hoc/withNavigationContext';
 import { Chat } from './chat';
-import Icon from '../components/Icon.js';
+import IconButton from '../components/IconButton.js';
 
 import BaseStyles from "./styles/base";
 
@@ -50,7 +50,7 @@ class Home extends Component {
 
         let icons = this.state.headerIcons.map((item, i) => {
            return (<View style={{verticalAlign:'center'}} key={item.id}>
-                       <Icon icon={item.icon} style={{color: '#ffffff'}} size={30} onPress={item.onPress}/>
+                       <IconButton icon={item.icon} style={{color: '#ffffff'}} size={30} onPress={item.onPress}/>
                    </View>);
         });
 
@@ -59,7 +59,7 @@ class Home extends Component {
             <View style={{paddingVertical:2}}>
                 <View style={{flexDirection: 'row', justifyContent:'center', alignItems:'center'}}>
                     <View style={{verticalAlign:'center', paddingLeft: 7, paddingRight: 5}}>
-                        <Icon icon={['fal', 'bars']} style={{color: '#ffffff'}} size={22} onPress={() => {this.navigation.dangerouslyGetParent().openDrawer()}}/>
+                        <IconButton icon={['fal', 'bars']} style={{color: '#ffffff'}} size={22} onPress={() => {this.navigation.dangerouslyGetParent().openDrawer()}}/>
                     </View>
                     <Text style={BaseStyles.headerTitle}>SoSa</Text>
                     <View style={{verticalAlign:'center', paddingRight: 10}}>
