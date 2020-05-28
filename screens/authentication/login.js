@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import BaseStyles from '../styles/base'
 import Styles from '../styles/onboarding'
 
-import {Text, View, Button, Linking, TouchableOpacity, Image} from 'react-native';
+import {Text, View, Linking, TouchableOpacity, TouchableHighlight, Image} from 'react-native';
 import Helpers from "../../sosa/Helpers";
 
 import ActivityButton from "../../components/ActivityButton";
@@ -23,7 +23,8 @@ class Login extends Component {
         passwordInput:'',
         loggingIn: false,
         loginError:'',
-        socialMediaError: ''
+        socialMediaError: '',
+        forLogin: true
     };
 
     constructor(props) {
@@ -95,20 +96,19 @@ class Login extends Component {
         }
     };
 
-
     render() {
         return (
             <View style={BaseStyles.container}>
-                <View style={{marginTop: 20, paddingHorizontal:20, justifyContent:'center'}}>
+                <View style={{marginTop: 20, paddingHorizontal:20, justifyContent:'center', flex: 1}}>
                     <Text style={Styles.header}>Login</Text>
                     <Text style={Styles.subheader}>With username and password</Text>
 
-                    <View style={[Styles.content_container, {marginBottom: 50}]}>
+                    <View style={[Styles.content_container]}>
                         <FormError errorState={this.state.loginError} />
                         <IconTextInput icon={['fal', 'user']} placeholder="Username or e-mail address" value={this.state.usernameInput} onChangeText={data => this.setState({ usernameInput: data})} />
                         <SecureTextInput icon={['fal', 'key']} placeholder="New Password" onChangeText={data => this.setState({ passwordInput: data})} value={this.state.passwordInput} />
 
-                        <View style={{flexDirection: 'row', height:40, marginBottom: 20}}>
+                        <View style={{flexDirection: 'row', height:40}}>
                             <View style={{flex: 5}}>
                                 <View>
                                     <Text style={Styles.forgotButton} onPress={() => this.navigation.navigate('ForgotPassword', {})}>Forgotten Password</Text>
@@ -119,23 +119,23 @@ class Login extends Component {
                             </View>
                         </View>
 
-                        <Text style={Styles.smallheader}>or</Text>
-                        <Text style={Styles.subheader}>With social media</Text>
-
                         <FormError errorState={this.state.socialMediaError} />
                         <View style={{marginTop: 20, flexDirection:'row', justifyContent: 'center'}}>
                             <TouchableOpacity activeOpacity={0.5} onPress={this.doLogin().withImgur} style={Styles.socialButton}>
-                                <Image source={require('../../assets/login/imgur_icon.png')} />
+                                <Image source={require('../../assets/login/imgur_icon.png')} style={Styles.socialButtonIcon}/>
                             </TouchableOpacity>
                             <TouchableOpacity activeOpacity={0.5} onPress={this.doLogin().withReddit}  style={Styles.socialButton}>
-                                <Image source={require('../../assets/login/reddit_icon.png')} />
+                                <Image source={require('../../assets/login/reddit_icon.png')} style={Styles.socialButtonIcon} />
                             </TouchableOpacity>
                         </View>
                     </View>
 
-                    <Text style={Styles.header}>New to SoSa?</Text>
-                    <View style={Styles.content_container}>
-                        <Button title="Press here to register" onPress={() => this.navigation.navigate('Register', {})} />
+                    <View style={Styles.buttonBottom}>
+                        <TouchableHighlight onPress={() => this.navigation.navigate('Register', {})} style={Styles.newToSoSaButton}>
+                            <View>
+                                <Text style={Styles.newToSoSaButtonText}>New to SoSa?</Text>
+                            </View>
+                        </TouchableHighlight>
                     </View>
 
                 </View>
