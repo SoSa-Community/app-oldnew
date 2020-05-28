@@ -28,6 +28,34 @@ export default class Helpers {
             }
         };
 
+
+        let doRequest = () => {
+
+            if(data){
+                if(post){
+                    headers.body = JSON.stringify(data);
+                }else{
+                    let keyValues = [];
+                    data.forEach((value, key) => keyValues.push(`${key}=${value}`));
+                    uri += `?${keyValues.join('&')}`;
+                }
+            }
+
+            return Helpers.fetchWithTimeout(uri, headers).then((response) => {
+                console.log('Response', response);
+                try {
+                    return response.json();
+                }catch (e) {
+                    console.log(e);
+                }
+            }).then((json) => {
+                console.log('JSON', json);
+                if(json.session)    session.fromJSON(json.session);
+
+                return json;
+            });
+        };
+
         if(['login'].indexOf(namespace) === -1){
             let device = Device.getInstance();
 
@@ -36,37 +64,18 @@ export default class Helpers {
                 if(session.hasExpired())    headers.headers['refresh-token'] = session.getRefreshToken();
             }
 
-            if(device.getId().length > 0)   headers.headers['token'] = device.getId();
-        }
-
-        console.log('Headers', headers);
-
-        if(data){
-            if(post){
-                headers.body = JSON.stringify(data);
+            if(device.getId().length > 0){
+                return jwt.sign({device_id: device.getId()}, device.getSecret(), {alg: "HS256"})
+                    .then((token) => {
+                        headers.headers['token'] = token;
+                        return doRequest();
+                    });
             }else{
-                let keyValues = [];
-                console.log(data);
-                data.forEach((value, key) => keyValues.push(`${key}=${value}`));
-                uri += `?${keyValues.join('&')}`;
+                return doRequest();
             }
+        }else{
+            return doRequest();
         }
-
-        console.log('API Request', namespace, data, uri);
-
-        return Helpers.fetchWithTimeout(uri, headers).then((response) => {
-            console.log('Response', response);
-            try {
-                return response.json();
-            }catch (e) {
-                console.log(e);
-            }
-        }).then((json) => {
-            console.log('JSON', json);
-            if(json.session)    session.fromJSON(json.session);
-
-            return json;
-        });
     };
 
     static generateRand = () => {
@@ -145,8 +154,6 @@ export default class Helpers {
                 device_platform: deviceInstance.getPlatform()
             };
 
-            console.log(data);
-            console.log(email);
             if(email !== null){
                 namespace = 'register';
                 data.email = email;

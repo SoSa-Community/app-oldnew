@@ -60,7 +60,7 @@ export default class Session {
 
     hasExpired(){
         let parsedExpiry = this.getParsedExpiry();
-        if(parsedExpiry !== null && parsedExpiry.getTime() > (new Date()).getUTCMilliseconds()){
+        if(parsedExpiry !== null && parsedExpiry.getTime() < (new Date()).getUTCMilliseconds()){
             return false;
         }
         return true;
