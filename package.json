@@ -21,7 +21,7 @@
     "@react-navigation/drawer": "^5.8.1",
     "@react-navigation/native": "^5.5.0",
     "@react-navigation/stack": "^5.4.1",
-    "@sosa/chat-client": "git+https://github.com/SoSa-Community/chat-client.git#master",
+    "@sosa/chat-client": "git+https://github.com/SoSa-Community/chat-client.git#0.0.4",
     "appcenter": "3.0.0",
     "appcenter-analytics": "3.0.0",
     "appcenter-crashes": "3.0.0",
@@ -31,7 +31,7 @@
     "react-native-gesture-handler": "^1.6.1",
     "react-native-pure-jwt": "^2.2.1",
     "react-native-reanimated": "^1.9.0",
-    "react-native-render-html": "https://github.com/SoSa-Community/react-native-render-html.git#master",
+    "react-native-render-html": "git+https://github.com/SoSa-Community/react-native-render-html.git#master",
     "react-native-safe-area-context": "^0.7.3",
     "react-native-screens": "^2.8.0",
     "react-native-svg": "^11.0.1",
@@ -39,7 +39,7 @@
     "react-native-webview": "^8.2.1",
     "react-navigation": "^4.3.9",
     "socket.io-client": "^2.3.0",
-    "sosa-chat-client": "https://github.com/SoSa-Community/chat-client.git#master"
+    "sosa-chat-client": "https://github.com/SoSa-Community/chat-client.git#0.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.10.1",
