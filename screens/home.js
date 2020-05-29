@@ -5,6 +5,7 @@ import { Chat } from './chat';
 import IconButton from '../components/IconButton.js';
 
 import BaseStyles from "./styles/base";
+import Styles from './styles/home';
 
 class Home extends Component {
     navigation = null;
@@ -56,13 +57,13 @@ class Home extends Component {
 
         return (
           <View style={BaseStyles.container}>
-            <View style={{paddingVertical:2}}>
-                <View style={{flexDirection: 'row', justifyContent:'center', alignItems:'center'}}>
-                    <View style={{verticalAlign:'center', paddingLeft: 7, paddingRight: 5}}>
+            <View>
+                <View style={Styles.menuTop}>
+                    <View style={Styles.menuTopLeft}>
                         <IconButton icon={['fal', 'bars']} style={{color: '#ffffff'}} size={22} onPress={() => {this.navigation.dangerouslyGetParent().openDrawer()}}/>
                     </View>
                     <Text style={BaseStyles.headerTitle}>SoSa</Text>
-                    <View style={{verticalAlign:'center', paddingRight: 10}}>
+                    <View style={Styles.menuTopRight}>
                         { icons }
                     </View>
                 </View>

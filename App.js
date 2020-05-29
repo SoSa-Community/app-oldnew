@@ -46,7 +46,7 @@ export default class SoSa extends Component {
                 Helpers.validateSession((error) => {
                     let state = {initializing: false};
                     if(error === null) state.defaultScreen = 'MembersWrapper';
-                    setTimeout(() => this.setState(state), 2000);
+                    this.setState(state);
 
                 });
             });
