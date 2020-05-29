@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Styles from './styles/chat'
-import {Image, FlatList, Text, View, Button, TouchableHighlight, Linking} from 'react-native';
+import {Image, FlatList, Text, View, Button, TouchableHighlight, Linking, KeyboardAvoidingView, Platform} from 'react-native';
 import io from "socket.io-client";
 
 import { SoSaConfig } from "../sosa/config";
@@ -352,75 +352,85 @@ export class Chat extends Component {
         this.scrollView.scrollToIndex({index:0, animated: true});
     }
 
+    buildWrapper = (component) => {
+        if(Platform.OS === 'ios'){
+            return  (<KeyboardAvoidingView style={{flex: 1}} behavior="padding">{component}</KeyboardAvoidingView>);
+        }else {
+            return (<View style={{flex: 1}} behavior="padding">{component}</View>);
+        }
+    }
+
     render() {
         return (
-          <View style={{flex: 1}}>
-            <View style={{flex: 1, backgroundColor: '#444442'}}>
+            this.buildWrapper(
+                <View style={{flex: 1}}>
+                        <View style={{flex: 1, backgroundColor: '#444442'}}>
 
-                <FlatList
-                    ref={(ref) => {this.scrollView = ref;}}
-                    onScroll={this.chatMessagesOnScroll}
-                    keyboardShouldPersistTaps={'always'}
-                    inverted
-                    data={this.state.messages}
-                    extraData={this.state.messages}
-                    keyExtractor={(item) => { return (item.id ? item.id.toString() : item.uuid); }}
-                    renderItem={
-                                ({item}) => {
-                                    if(item instanceof Message){
-                                        let containerStyles = [Styles.messageContainer];
-                                        if(item.mentions.length > 0 && item.mentions.indexOf(this.nickname) !== -1){
-                                            containerStyles.push(Styles.messageContainerWithMention);
-                                        }
+                            <FlatList
+                                ref={(ref) => {this.scrollView = ref;}}
+                                onScroll={this.chatMessagesOnScroll}
+                                keyboardShouldPersistTaps={'always'}
+                                inverted
+                                data={this.state.messages}
+                                extraData={this.state.messages}
+                                keyExtractor={(item) => { return (item.id ? item.id.toString() : item.uuid); }}
+                                renderItem={
+                                    ({item}) => {
+                                        if(item instanceof Message){
+                                            let containerStyles = [Styles.messageContainer];
+                                            if(item.mentions.length > 0 && item.mentions.indexOf(this.nickname) !== -1){
+                                                containerStyles.push(Styles.messageContainerWithMention);
+                                            }
 
-                                        if(!item.picture || item.picture.length === 0){
-                                            item.picture = 'https://picsum.photos/seed/picsum/300/300';
-                                        }
+                                            if(!item.picture || item.picture.length === 0){
+                                                item.picture = 'https://picsum.photos/seed/picsum/300/300';
+                                            }
 
 
-                                        return  <View style={containerStyles}>
-                                            <View style={Styles.messageContainerInner}>
-                                                <View style={{marginRight: 10}}>
-                                                    <TouchableHighlight onPress={() => this.addTag(item.nickname)}>
-                                                        <Image source={{uri : item.picture}} style={{width: 48, height: 48, borderRadius: 48/2}} />
-                                                    </TouchableHighlight>
-                                                </View>
-                                                <View style={{flex:1}}>
-                                                    <Text style={Styles.message_username}>{item.nickname}</Text>
-                                                    <HTML html={item.parsed_content}
-                                                          tagsStyles={{ a: { color: '#7ac256' }}}
-                                                          baseFontStyle={{color:'#ffffff'}}
-                                                          onLinkPress={(evt, href) => {
-                                                              Linking.openURL(href);
-                                                          }}
-                                                          renderers={{
-                                                              spoiler: {renderer: (htmlAttribs, children, convertedCSSStyles, passProps) => (
-                                                                      <Text> {children} </Text>
-                                                                  )
-                                                                  , wrapper: 'Text'}
-                                                          }}/>
+                                            return  <View style={containerStyles}>
+                                                <View style={Styles.messageContainerInner}>
+                                                    <View style={{marginRight: 10}}>
+                                                        <TouchableHighlight onPress={() => this.addTag(item.nickname)}>
+                                                            <Image source={{uri : item.picture}} style={{width: 48, height: 48, borderRadius: 48/2}} />
+                                                        </TouchableHighlight>
+                                                    </View>
+                                                    <View style={{flex:1}}>
+                                                        <Text style={Styles.message_username}>{item.nickname}</Text>
+                                                        <HTML html={item.parsed_content}
+                                                              tagsStyles={{ a: { color: '#7ac256' }}}
+                                                              baseFontStyle={{color:'#ffffff'}}
+                                                              onLinkPress={(evt, href) => {
+                                                                  Linking.openURL(href);
+                                                              }}
+                                                              renderers={{
+                                                                  spoiler: {renderer: (htmlAttribs, children, convertedCSSStyles, passProps) => (
+                                                                          <Text> {children} </Text>
+                                                                      )
+                                                                      , wrapper: 'Text'}
+                                                              }}/>
+                                                    </View>
                                                 </View>
                                             </View>
-                                        </View>
-                                    }else{
-                                        return <Text style={Styles.status}>{item.message}</Text>
+                                        }else{
+                                            return <Text style={Styles.status}>{item.message}</Text>
+                                        }
                                     }
                                 }
-                    }
-                    style={Styles.message_list}
-                />
-                {
-                    this.state.newMessagesNotificationVisible &&
-                    <TouchableHighlight onPress={this.scrollToBottom} style={Styles.newMessageScrollNotifier}>
-                        <Text style={{color: '#ffffff'}}>You have new messages waiting</Text>
-                    </TouchableHighlight>
-                }
-            </View>
-            <View style={Styles.footer}>
-                <MessageInput onChangeText={data => this.setState({ messageInput: data})} sendAction={this.sendMessage} value={this.state.messageInput} />
-            </View>
+                                style={Styles.message_list}
+                            />
+                            {
+                                this.state.newMessagesNotificationVisible &&
+                                <TouchableHighlight onPress={this.scrollToBottom} style={Styles.newMessageScrollNotifier}>
+                                    <Text style={{color: '#ffffff'}}>You have new messages waiting</Text>
+                                </TouchableHighlight>
+                            }
+                        </View>
+                        <View style={Styles.footer}>
+                            <MessageInput onChangeText={data => this.setState({ messageInput: data})} sendAction={this.sendMessage} value={this.state.messageInput} />
+                        </View>
 
-          </View>
+                </View>
+            )
         );
-  }
+    }
 }
