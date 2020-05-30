@@ -45,7 +45,8 @@ export class Chat extends Component {
         messageInput: '',
         rooms: [],
         scrolling: true,
-        newMessagesNotificationVisible: false
+        newMessagesNotificationVisible: false,
+        messageInputPosition: {start:0, end:0}
     };
 
     constructor(props) {
@@ -139,7 +140,6 @@ export class Chat extends Component {
 
             this.client.rooms().send((err, message) => {
                 if(!err){
-                    console.log(message);
                     this.addMessage(message);
                 }
             },
@@ -158,6 +158,7 @@ export class Chat extends Component {
     };
 
     addMessage = (item) => {
+        console.log(item);
         this.messageBuffer.push(item);
         if(this.isScrolled()){
             this.setState({newMessagesNotificationVisible: true});
@@ -300,10 +301,28 @@ export class Chat extends Component {
         if(text.length === 0){
             text = tag;
         }else{
-            if(!/(.*)\s+$/.test(text)) {
-                tag = ` ${tag}`;
+            let textLength = text.length;
+            let caretStart = this.state.messageInputPosition.start;
+            let caretEnd = this.state.messageInputPosition.end;
+            let part1 = '';
+            let part2 = '';
+
+            if(caretStart === caretEnd){
+                part1 = text.substr(0, caretEnd);
+                part2 = text.substr(caretEnd, textLength);
+
+                if(part1.length >= 0 && caretEnd !== 0){
+                    if(!/(.*)\s+$/.test(part1)) part1 += ' ';
+                }
+
+                if(part2.length >= 1) {
+                    if (!/^\s+(.*)$/.test(part2)) part2 = ` ${part2}`;
+                }
+            }else{
+                part1 = text.substr(0, caretStart);
+                part2 = text.substr(caretEnd, textLength);
             }
-            text = `${text}${tag}`;
+            text = `${part1}${tag}${part2}`;
         }
         this.setState({messageInput: text});
 
@@ -373,10 +392,13 @@ export class Chat extends Component {
                                 inverted
                                 data={this.state.messages}
                                 extraData={this.state.messages}
-                                keyExtractor={(item) => { return (item.id ? item.id.toString() : item.uuid); }}
+                                keyExtractor={(item) => {
+                                    return (item.id !== 0 && item.id !== null ? item.id.toString() : item.uuid);
+                                }}
                                 renderItem={
                                     ({item}) => {
                                         if(item instanceof Message){
+
                                             let containerStyles = [Styles.messageContainer];
                                             if(item.mentions.length > 0 && item.mentions.indexOf(this.nickname) !== -1){
                                                 containerStyles.push(Styles.messageContainerWithMention);
@@ -426,7 +448,13 @@ export class Chat extends Component {
                             }
                         </View>
                         <View style={Styles.footer}>
-                            <MessageInput onChangeText={data => this.setState({ messageInput: data})} sendAction={this.sendMessage} value={this.state.messageInput} />
+                            <MessageInput
+                                onChangeText={data => this.setState({ messageInput: data})}
+                                sendAction={this.sendMessage}
+                                value={this.state.messageInput}
+                                onSelectionChange={(event) => this.setState({messageInputPosition: event.nativeEvent.selection})}
+
+                            />
                         </View>
 
                 </View>
