@@ -311,6 +311,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -677,11 +678,12 @@
 			baseConfigurationReference = EA2FC8BECDEDA88519E918D1 /* Pods-SoSa.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = D772SU73Q8;
 				INFOPLIST_FILE = SoSa/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -689,6 +691,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediacake.sosa;
 				PRODUCT_NAME = SoSa;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -698,10 +701,11 @@
 			baseConfigurationReference = E93F2B890BC13AEB67128C4A /* Pods-SoSa.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = D772SU73Q8;
 				INFOPLIST_FILE = SoSa/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -709,6 +713,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediacake.sosa;
 				PRODUCT_NAME = SoSa;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
