@@ -158,7 +158,14 @@ export class Chat extends Component {
     };
 
     addMessage = (item) => {
-        console.log(item);
+        if(!item.id){
+            if(item.uuid){item.id = item.uuid;}
+            else if(item._id){
+                item.id = item._id;
+            }else{
+                item.id = Helpers.generateId();
+            }
+        }
         this.messageBuffer.push(item);
         if(this.isScrolled()){
             this.setState({newMessagesNotificationVisible: true});
@@ -392,9 +399,7 @@ export class Chat extends Component {
                                 inverted
                                 data={this.state.messages}
                                 extraData={this.state.messages}
-                                keyExtractor={(item) => {
-                                    return (item.id !== 0 && item.id !== null ? item.id.toString() : item.uuid);
-                                }}
+                                keyExtractor={(item) => item.id.toString()}
                                 renderItem={
                                     ({item}) => {
                                         if(item instanceof Message){
@@ -407,7 +412,6 @@ export class Chat extends Component {
                                             if(!item.picture || item.picture.length === 0){
                                                 item.picture = 'https://picsum.photos/seed/picsum/300/300';
                                             }
-
 
                                             return  <View style={containerStyles}>
                                                 <View style={Styles.messageContainerInner}>
