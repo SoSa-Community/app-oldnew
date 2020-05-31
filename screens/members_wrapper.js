@@ -115,7 +115,7 @@ export default class MembersWrapper extends Component {
 
     RightDrawer = () => {
         return (
-            <DrawerR.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.rightDrawerItems)} drawerPosition="right">
+            <DrawerR.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.rightDrawerItems)} drawerPosition="right" edgeWidth={38}>
                 <DrawerR.Screen name="Home" component={HomeScreen}/>
             </DrawerR.Navigator>
         );
@@ -130,7 +130,7 @@ export default class MembersWrapper extends Component {
             }}
             >
                 <NavigationContainer independent={true}>
-                    <DrawerL.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.leftDrawerItems)} drawerPosition="left">
+                    <DrawerL.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.leftDrawerItems)} drawerPosition="left" edgeWidth={38}>
                         <DrawerL.Screen name="RightDrawer" component={this.RightDrawer}/>
                     </DrawerL.Navigator>
                 </NavigationContainer>
