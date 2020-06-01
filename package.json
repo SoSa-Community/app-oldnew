@@ -21,7 +21,6 @@
     "@react-navigation/drawer": "^5.8.1",
     "@react-navigation/native": "^5.5.0",
     "@react-navigation/stack": "^5.4.1",
-    "@sosa/chat-client": "git+https://github.com/SoSa-Community/chat-client.git#0.0.4",
     "appcenter": "3.0.0",
     "appcenter-analytics": "3.0.0",
     "appcenter-crashes": "3.0.0",
@@ -39,11 +38,11 @@
     "react-native-webview": "^8.2.1",
     "react-navigation": "^4.3.9",
     "socket.io-client": "^2.3.0",
-    "sosa-chat-client": "https://github.com/SoSa-Community/chat-client.git#0.0.4"
+    "sosa-chat-client": "https://github.com/SoSa-Community/chat-client.git#0.0.6"
   },
   "devDependencies": {
-    "@babel/core": "^7.10.1",
-    "@babel/runtime": "^7.10.1",
+    "@babel/core": "^7.10.2",
+    "@babel/runtime": "^7.10.2",
     "@react-native-community/eslint-config": "^0.0.5",
     "babel-jest": "^24.9.0",
     "eslint": "^6.5.1",
