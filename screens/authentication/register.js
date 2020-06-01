@@ -3,13 +3,14 @@ import React, {Component} from 'react';
 import BaseStyles from '../styles/base'
 import Styles from '../styles/onboarding'
 
-import {Text, View} from 'react-native';
+import {Image, Linking, Text, TouchableOpacity, View} from 'react-native';
 import Helpers from "../../sosa/Helpers";
 
 import SecureTextInput from "../../components/SecureTextInput";
 import IconTextInput from "../../components/IconTextInput";
 import ActivityButton from "../../components/ActivityButton";
 import FormError from "../../components/FormError";
+import {SoSaConfig} from "../../sosa/config";
 
 export default class Register extends Component {
     navigation = null;
@@ -20,7 +21,8 @@ export default class Register extends Component {
         emailInput:'',
         registering: false,
         registerError:'',
-        passwordError: ''
+        passwordError: '',
+        socialMediaError: ''
     };
 
     constructor(props) {
@@ -33,17 +35,35 @@ export default class Register extends Component {
     };
 
     doRegister = () => {
-        Helpers.handleRegister(
-            this.state.usernameInput,
-            this.state.passwordInput,
-            this.state.emailInput,
-            (isLoading) => this.setState({registering: isLoading}),
-            (error) => this.setState({registerError: error}),
-            (json) => {
-                this.navigation.replace('MembersWrapper', {register: true});
+        return {
+            withUsernameAndPassword: () => {
+                Helpers.handleRegister(
+                    this.state.usernameInput,
+                    this.state.passwordInput,
+                    this.state.emailInput,
+                    (isLoading) => this.setState({registering: isLoading}),
+                    (error) => this.setState({registerError: error}),
+                    (json) => {
+                        this.navigation.replace('MembersWrapper', {register: true});
+                    }
+                );
+            },
+            withImgur: () => {
+                this.setState({'socialMediaError': ''});
+                Helpers.handlePreauth(() => {}, () => {}, (json) => {
+                    console.log(json);
+                    Linking.openURL(`${SoSaConfig.auth.server}/imgur/register?app=1&preauth=${json.response}`);
+                })
+            },
+            withReddit: () => {
+                this.setState({'socialMediaError': ''});
+                Helpers.handlePreauth(() => {}, () => {}, (json) => {
+                    console.log(json);
+                    Linking.openURL(`${SoSaConfig.auth.server}/reddit/register?app=1&preauth=${json.response}`);
+                })
             }
-        );
-    }
+        }
+    };
 
     validatePassword = () => {
         try{
@@ -74,8 +94,18 @@ export default class Register extends Component {
 
                         <View style={{height:40}}>
                             {
-                                <ActivityButton showActivity={this.state.registering} onPress={this.doRegister} text="Let me in!"/>
+                                <ActivityButton showActivity={this.state.registering} onPress={this.doRegister.withUsernameAndPassword} text="Let me in!"/>
                             }
+                        </View>
+
+                        <FormError errorState={this.state.socialMediaError} />
+                        <View style={{marginTop: 20, flexDirection:'row', justifyContent: 'center'}}>
+                            <TouchableOpacity activeOpacity={0.5} onPress={this.doRegister().withImgur} style={Styles.socialButton}>
+                                <Image source={require('../../assets/login/imgur_icon.png')} style={Styles.socialButtonIcon}/>
+                            </TouchableOpacity>
+                            <TouchableOpacity activeOpacity={0.5} onPress={this.doRegister().withReddit}  style={Styles.socialButton}>
+                                <Image source={require('../../assets/login/reddit_icon.png')} style={Styles.socialButtonIcon} />
+                            </TouchableOpacity>
                         </View>
                     </View>
 
