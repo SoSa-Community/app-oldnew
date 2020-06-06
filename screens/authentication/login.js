@@ -14,6 +14,7 @@ import FormError from "../../components/FormError";
 import {SoSaConfig} from "../../sosa/config";
 
 import withAppContext from '../hoc/withAppContext';
+import SocialButton from "../../components/SocialButton";
 
 class Login extends Component {
     navigation = null;
@@ -96,6 +97,68 @@ class Login extends Component {
         }
     };
 
+    CredentialLogin = () => {
+
+        let loginButton = <ActivityButton showActivity={this.state.loggingIn} onPress={this.doLogin().withUsernameAndPassword} text="Let me in!"/>
+        let forgotButton = <View>
+            <Text style={Styles.forgotButton} onPress={() => this.navigation.navigate('ForgotPassword', {})}>Forgotten Password</Text>
+        </View>;
+
+        let buttonContainer = null;
+        if(SoSaConfig.features.login.forgotPassword){
+            buttonContainer =
+                <View style={{flexDirection: 'row', height:40}}>
+                    <View style={{flex: 5}}>
+                        {forgotButton}
+                    </View>
+                <View style={{flex: 6}} >
+                    {loginButton}
+                </View>
+            </View>;
+        }else{
+            buttonContainer = <View>{loginButton}</View>;
+        }
+
+        if(SoSaConfig.features.login.credentials){
+            return <View>
+                <FormError errorState={this.state.loginError} />
+                <IconTextInput icon={['fal', 'user']} placeholder="Username or e-mail address" value={this.state.usernameInput} onChangeText={data => this.setState({ usernameInput: data})} />
+                <SecureTextInput icon={['fal', 'key']} placeholder="New Password" onChangeText={data => this.setState({ passwordInput: data})} value={this.state.passwordInput} />
+                {buttonContainer}
+            </View>
+        }
+
+        return null;
+    };
+
+    SocialLogin = () => {
+
+        let imgurButton = <SocialButton onPress={this.doLogin().withImgur} icon={require('../../assets/login/imgur_icon.png')} />;
+        let redditButton = <SocialButton onPress={this.doLogin().withReddit} icon={require('../../assets/login/reddit_icon.png')} />
+
+        return <View>
+            <FormError errorState={this.state.socialMediaError} />
+            <View style={{marginTop: 20, flexDirection:'row', justifyContent: 'center'}}>
+                {SoSaConfig.features.login.imgur ? imgurButton : null}
+                {SoSaConfig.features.login.reddit ? redditButton : null}
+            </View>
+        </View>
+    }
+
+    RegisterButton = () => {
+        if(!SoSaConfig.features.general.canRegister){
+            return <View style={Styles.buttonBottom}></View>;
+        }
+
+        return <View style={Styles.buttonBottom}>
+            <TouchableHighlight onPress={() => this.navigation.navigate('Register', {})} style={Styles.newToSoSaButton}>
+                <View>
+                    <Text style={Styles.newToSoSaButtonText}>New to SoSa?</Text>
+                </View>
+            </TouchableHighlight>
+        </View>;
+    }
+
     render() {
         return (
             <View style={BaseStyles.container}>
@@ -104,39 +167,13 @@ class Login extends Component {
                     <Text style={Styles.subheader}>With username and password</Text>
 
                     <View style={[Styles.content_container]}>
-                        <FormError errorState={this.state.loginError} />
-                        <IconTextInput icon={['fal', 'user']} placeholder="Username or e-mail address" value={this.state.usernameInput} onChangeText={data => this.setState({ usernameInput: data})} />
-                        <SecureTextInput icon={['fal', 'key']} placeholder="New Password" onChangeText={data => this.setState({ passwordInput: data})} value={this.state.passwordInput} />
 
-                        <View style={{flexDirection: 'row', height:40}}>
-                            <View style={{flex: 5}}>
-                                <View>
-                                    <Text style={Styles.forgotButton} onPress={() => this.navigation.navigate('ForgotPassword', {})}>Forgotten Password</Text>
-                                </View>
-                            </View>
-                            <View style={{flex: 6}} >
-                                <ActivityButton showActivity={this.state.loggingIn} onPress={this.doLogin().withUsernameAndPassword} text="Let me in!"/>
-                            </View>
-                        </View>
+                        <this.CredentialLogin />
 
-                        <FormError errorState={this.state.socialMediaError} />
-                        <View style={{marginTop: 20, flexDirection:'row', justifyContent: 'center'}}>
-                            <TouchableOpacity activeOpacity={0.5} onPress={this.doLogin().withImgur} style={Styles.socialButton}>
-                                <Image source={require('../../assets/login/imgur_icon.png')} style={Styles.socialButtonIcon}/>
-                            </TouchableOpacity>
-                            <TouchableOpacity activeOpacity={0.5} onPress={this.doLogin().withReddit}  style={Styles.socialButton}>
-                                <Image source={require('../../assets/login/reddit_icon.png')} style={Styles.socialButtonIcon} />
-                            </TouchableOpacity>
-                        </View>
+                        <this.SocialLogin />
                     </View>
 
-                    <View style={Styles.buttonBottom}>
-                        <TouchableHighlight onPress={() => this.navigation.navigate('Register', {})} style={Styles.newToSoSaButton}>
-                            <View>
-                                <Text style={Styles.newToSoSaButtonText}>New to SoSa?</Text>
-                            </View>
-                        </TouchableHighlight>
-                    </View>
+                    <this.RegisterButton />
 
                 </View>
             </View>
