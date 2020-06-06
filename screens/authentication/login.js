@@ -133,8 +133,8 @@ class Login extends Component {
 
     SocialLogin = () => {
 
-        let imgurButton = <SocialButton onPress={this.doLogin().withImgur} icon={require('../../assets/login/imgur_icon.png')} />;
-        let redditButton = <SocialButton onPress={this.doLogin().withReddit} icon={require('../../assets/login/reddit_icon.png')} />
+        let imgurButton = <SocialButton onPress={this.doLogin().withImgur} icon={require('../../assets/onboarding/imgur_icon.png')} />;
+        let redditButton = <SocialButton onPress={this.doLogin().withReddit} icon={require('../../assets/onboarding/reddit_icon.png')} />
 
         return <View>
             <FormError errorState={this.state.socialMediaError} />
@@ -143,7 +143,7 @@ class Login extends Component {
                 {SoSaConfig.features.login.reddit ? redditButton : null}
             </View>
         </View>
-    }
+    };
 
     RegisterButton = () => {
         if(!SoSaConfig.features.general.canRegister){
@@ -164,7 +164,6 @@ class Login extends Component {
             <View style={BaseStyles.container}>
                 <View style={{marginTop: 20, paddingHorizontal:20, justifyContent:'center', flex: 1}}>
                     <Text style={Styles.header}>Login</Text>
-                    <Text style={Styles.subheader}>With username and password</Text>
 
                     <View style={[Styles.content_container]}>
 

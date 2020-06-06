@@ -242,7 +242,7 @@ export default class Helpers {
 
         loadingCallback(true);
         try{
-            let namespace = 'device/login';
+            let namespace = 'device/onboarding';
 
             jwt
                 .sign({device_id: deviceId}, deviceInstance.getSecret(), {alg: "HS256"})
