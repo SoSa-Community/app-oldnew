@@ -74,7 +74,7 @@ export class Chat extends Component {
             (callback) => {
                 let packet = {id: this.session.getId(), refresh_token: this.session.getRefreshToken()};
                 jwt.sign(packet, device.getSecret(), {alg: "HS256"}).then((token) => {
-                    callback({ token: token, deviceId: device.getId()});
+                    callback(token, device.getId(), false);
                 });
             }
         );
