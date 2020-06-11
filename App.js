@@ -3,18 +3,18 @@ import { NavigationContainer } from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {AppState, ImageBackground, Image, Text, View, Linking} from "react-native";
 
-import LoginScreen from './screens/authentication/login';
-import ForgotPassword from './screens/authentication/forgot_password';
-import ForgotPasswordCode from './screens/authentication/forgot_password_code';
-import Register from "./screens/authentication/register";
-import MembersWrapper from "./screens/members_wrapper";
+import LoginScreen from './App/screens/authentication/login';
+import ForgotPassword from './App/screens/authentication/forgot_password';
+import ForgotPasswordCode from './App/screens/authentication/forgot_password_code';
+import Register from "./App/screens/authentication/register";
+import MembersWrapper from "./App/screens/members_wrapper";
 
-import BaseStyles from './screens/styles/base';
-import Device from "./sosa/Device";
-import Session from "./sosa/Session";
-import Helpers from "./sosa/Helpers";
+import BaseStyles from './App/screens/styles/base';
+import Device from "./App/sosa/Device";
+import Session from "./App/sosa/Session";
+import Helpers from "./App/sosa/Helpers";
 
-import { AppContext } from "./screens/context/AppContext";
+import { AppContext } from "./App/screens/context/AppContext";
 
 const Stack = createStackNavigator();
 
@@ -109,8 +109,8 @@ export default class SoSa extends Component {
         if(initializing){
             return (
                 <View style={BaseStyles.container}>
-                    <ImageBackground source={require('./assets/splash.jpg')} style={{width: '100%', height: '100%', flex:1,justifyContent: 'center', alignItems: 'center'}}>
-                        <Image source={require('./assets/splash_logo.png')} style={{width: '40%', resizeMode: 'contain'}} />
+                    <ImageBackground source={require('./App/assets/splash.jpg')} style={{width: '100%', height: '100%', flex:1,justifyContent: 'center', alignItems: 'center'}}>
+                        <Image source={require('./App/assets/splash_logo.png')} style={{width: '40%', resizeMode: 'contain'}} />
                     </ImageBackground>
 
                 </View>);
