@@ -154,7 +154,6 @@ export default class ForgotPasswordCode extends Component {
         return (
             <View style={BaseStyles.container}>
                 <View style={Styles.formContainer}>
-                    <Text style={Styles.header}>Check your e-mail</Text>
                     <Text style={Styles.subheader}>You should have received an e-mail with a 6 digit code</Text>
 
                     <View style={Styles.content_container}>

@@ -16,7 +16,7 @@ export default class MessageInput extends Component {
                     onSubmitEditing={this.props.sendAction}
                     onSelectionChange={this.props.onSelectionChange}
                 />
-                <IconButton icon={['fal','paper-plane']}  style={{color: '#000', marginHorizontal:4, marginRight: 10, marginTop: 8}} size={22} onPress={this.props.sendAction} />
+                <IconButton icon={['fal','paper-plane']}  style={{color: '#000', marginHorizontal:4, marginRight: 10}} size={22} onPress={this.props.sendAction} />
             </View>
         )
     }

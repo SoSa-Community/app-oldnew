@@ -72,13 +72,10 @@ export class Chat extends Component {
             },
             io,
             (callback) => {
-
                 let packet = {id: this.session.getId(), refresh_token: this.session.getRefreshToken()};
                 jwt.sign(packet, device.getSecret(), {alg: "HS256"}).then((token) => {
                     callback({ token: token, deviceId: device.getId()});
                 });
-
-
             }
         );
 
@@ -232,17 +229,7 @@ export class Chat extends Component {
 
     displayUserList = () => {
         if(this.currentRoom !== null){
-            this.client.rooms().online((err, data) => {
-
-                if(!err){
-                    this.setState({userList: data});
-                    this.updateUserList();
-                    this.navigation.openDrawer();
-                }else{
-                    Helpers.showAlert('Error getting users',err.message );
-                }
-
-            }, 'sosa', this.currentRoom.name);
+            this.navigation.openDrawer();
         }else{
             Helpers.showAlert('You\'re not in a room','Please join a room first!');
         }

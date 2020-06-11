@@ -37,22 +37,6 @@ export default class Register extends Component {
         this.setState({registering: isLoading});
     };
 
-    doRegister = () => {
-        return {
-
-            withImgur: () => {
-
-            },
-            withReddit: () => {
-                this.setState({'socialMediaError': ''});
-                Helpers.handlePreauth(() => {}, () => {}, (json) => {
-                    console.log(json);
-                    Linking.openURL(`${SoSaConfig.auth.server}/reddit/register?app=1&preauth=${json.response}`);
-                })
-            }
-        }
-    };
-
     validatePassword = () => {
         try{
             if(Helpers.validatePassword(this.state.passwordInput) === false){
@@ -117,7 +101,7 @@ export default class Register extends Component {
             let redditButton = <SocialButton onPress={() => register('reddit')} icon={require(`${onboardingPath}reddit_icon.png`)} />
 
             return <View>
-                <Text style={[Styles.subheader, {marginTop: 40}]}>Use an existing Account</Text>
+                <Text style={[Styles.subheader, {marginTop: 40}]}>Join using another platform</Text>
                 <FormError errorState={this.state.socialMediaError} />
                 <View style={{marginTop: 20, flexDirection:'row', justifyContent: 'center'}}>
                     {SoSaConfig.features.register.imgur ? imgurButton : null}
@@ -132,8 +116,6 @@ export default class Register extends Component {
         return (
             <View style={BaseStyles.container}>
                 <View style={{paddingHorizontal:30, justifyContent:'center'}}>
-                    <Text style={Styles.header}>Join SoSa</Text>
-
                     <View style={Styles.content_container}>
                         <this.CredentialRegister />
                         <this.SocialRegister />

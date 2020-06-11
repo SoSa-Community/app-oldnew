@@ -14,10 +14,11 @@ const BaseStyles = StyleSheet.create({
     },
 
     headerTitle: {
-        textAlign: 'left',
+        alignSelf: 'center',
+        textAlign: 'center',
         color: headerTextColour,
-        fontSize: 26,
-        paddingHorizontal: 10,
+        fontSize: 24,
+        padding: 10,
         flex: 1
     },
 

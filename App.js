@@ -46,7 +46,7 @@ export default class SoSa extends Component {
                 Helpers.validateSession((error) => {
                     let state = {initializing: false};
                     if(error === null) state.defaultScreen = 'MembersWrapper';
-                    this.setState(state);
+                    setTimeout(() => this.setState(state), 3000);
 
                 });
             });
@@ -120,11 +120,11 @@ export default class SoSa extends Component {
                     <View style={{flex:1}}>
                         <AppContext.Provider value={{addDeeplinkListener: this.addDeeplinkListener}}>
                             <NavigationContainer>
-                                <Stack.Navigator initialRouteName={this.state.defaultScreen} screenOptions={{headerTitle: 'SoSa', headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle}}>
-                                    <Stack.Screen name="Login" component={LoginScreen} />
-                                    <Stack.Screen name="Register" component={Register} />
-                                    <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-                                    <Stack.Screen name="ForgotPasswordCode" component={ForgotPasswordCode} />
+                                <Stack.Navigator initialRouteName={this.state.defaultScreen} screenOptions={{headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle, headerTintColor: 'white', headerTitleContainerStyle: { left: 10 }}} >
+                                    <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Welcome to SoSa' }}/>
+                                    <Stack.Screen name="Register" component={Register} options={{ title: 'Join SoSa' }} />
+                                    <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ title: 'Forgotten Password' }} />
+                                    <Stack.Screen name="ForgotPasswordCode" component={ForgotPasswordCode} options={{title: 'Check your e-mail'}}/>
                                     <Stack.Screen name="MembersWrapper" component={MembersWrapper} options={{headerShown:false}}/>
                                 </Stack.Navigator>
                             </NavigationContainer>

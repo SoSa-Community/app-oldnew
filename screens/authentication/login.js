@@ -49,7 +49,7 @@ class Login extends Component {
 
     componentDidMount(): void {
         const login = this;
-        this.addDeeplinkListener('login','preauth', (data) => {
+        this.addDeeplinkListener('login', 'preauth', (data) => {
             if(data.status === 'success'){
                 Helpers.deviceLogin(data.device_id, () => {},
                     (error) => {
