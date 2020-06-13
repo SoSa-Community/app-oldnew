@@ -128,6 +128,7 @@ export class Chat extends Component {
     }
 
     sendMessage = () => {
+        console.log(this.state.messageInput);
         if(this.state.messageInput.length > 0){
             let message = this.state.messageInput;
 
@@ -377,7 +378,7 @@ export class Chat extends Component {
         return (
             this.buildWrapper(
                 <View style={{flex: 1}}>
-                        <View style={{flex: 1, backgroundColor: '#444442'}}>
+                        <View style={{flex: 1, backgroundColor: '#2b2b2b'}}>
 
                             <FlatList
                                 ref={(ref) => {this.scrollView = ref;}}
