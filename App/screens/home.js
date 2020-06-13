@@ -51,7 +51,7 @@ class Home extends Component {
 
         let icons = this.state.headerIcons.map((item, i) => {
            return (<View style={{verticalAlign:'center'}} key={item.id}>
-                       <IconButton icon={item.icon} style={{color: '#ffffff'}} size={30} onPress={item.onPress}/>
+                       <IconButton icon={item.icon} style={{color: '#CCC'}} activeStyle={{color: '#444442'}} size={30} onPress={item.onPress}/>
                    </View>);
         });
 
@@ -60,7 +60,7 @@ class Home extends Component {
             <View>
                 <View style={Styles.menuTop}>
                     <View style={Styles.menuTopLeft}>
-                        <IconButton icon={['fal', 'bars']} style={{color: '#ffffff'}} size={22} onPress={() => {this.navigation.dangerouslyGetParent().openDrawer()}}/>
+                        <IconButton icon={['fal', 'bars']} style={{color: '#CCC'}} size={22} onPress={() => {this.navigation.dangerouslyGetParent().openDrawer()}}/>
                     </View>
                     <Text style={BaseStyles.headerTitle}>SoSa</Text>
                     <View style={Styles.menuTopRight}>

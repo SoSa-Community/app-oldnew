@@ -30,7 +30,7 @@ export default class MembersWrapper extends Component {
 
     componentDidMount(): void {
 
-        this.updateDrawerItem('logout', (<View style={{flex:1}} key={'logout'}>
+        this.updateDrawerItem('logout', (<View style={{justifyContent: 'flex-end'}} key={'logout'}>
             <Button
                 color='#dc3545'
                 title='Logout'
@@ -59,28 +59,37 @@ export default class MembersWrapper extends Component {
                         { cancelable: true }
                     );
                 }}
-                style={{justifyContent:'flex-end'}}
             />
-        </View>));
+        </View>),false, true);
     }
 
-    CustomDrawerContent = (props, state) => {
-        let items = state.map((item) => {
-            if(item.view !== null){
-                return (item.view);
+    CustomDrawerContent = (props, state, scrollable) => {
+        let items = [];
+        let bottomItems = [];
+
+        state.forEach((item) => {
+            if(item.view !== null) {
+                if(item.bottom){
+                    bottomItems.push(item.view);
+                }else{
+                    items.push(item.view);
+                }
             }
         });
 
+        const TagName = (!scrollable ? View : DrawerContentScrollView);
+        console.log(TagName);
         return (
-            <DrawerContentScrollView {...props}>
-                <View style={{flex:1}}>
+            <TagName {...props} style={{flex: 1}}>
                     { items }
-                </View>
-            </DrawerContentScrollView>
+                    <View style={{ flex: 1, justifyContent: 'flex-end'}}>
+                        { bottomItems }
+                    </View>
+            </TagName>
         );
     };
 
-    updateDrawerItem = (id, view, right, remove) => {
+    updateDrawerItem = (id, view, right, bottom, remove) => {
         let state = 'leftDrawerItems';
         if(right) state = 'rightDrawerItems';
 
@@ -98,24 +107,24 @@ export default class MembersWrapper extends Component {
         });
 
         if(!found && !remove) {
-            items.push({id: id, view: view});
+            items.push({id: id, view: view, bottom: bottom});
         }
 
 
         this.setState({state: items});
     };
 
-    addDrawerItem = (id, view, right) => {
-        this.updateDrawerItem(id, view, right);
+    addDrawerItem = (id, view, right, bottom) => {
+        this.updateDrawerItem(id, view, right, bottom);
     }
 
-    removeDrawerItem = (id, right) => {
-        this.updateDrawerItem(id, null, right, true);
+    removeDrawerItem = (id, right, bottom) => {
+        this.updateDrawerItem(id, null, right, bottom,true);
     }
 
     RightDrawer = () => {
         return (
-            <DrawerR.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.rightDrawerItems)} drawerPosition="right" edgeWidth={38}>
+            <DrawerR.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.rightDrawerItems, true)} drawerPosition="right" drawerType="slide" edgeWidth={38}>
                 <DrawerR.Screen name="Home" component={HomeScreen}/>
             </DrawerR.Navigator>
         );
@@ -130,7 +139,7 @@ export default class MembersWrapper extends Component {
             }}
             >
                 <NavigationContainer independent={true}>
-                    <DrawerL.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.leftDrawerItems)} drawerPosition="left" edgeWidth={38}>
+                    <DrawerL.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.leftDrawerItems, false)} drawerPosition="left" drawerType="slide" edgeWidth={38}>
                         <DrawerL.Screen name="RightDrawer" component={this.RightDrawer}/>
                     </DrawerL.Navigator>
                 </NavigationContainer>

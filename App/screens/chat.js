@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Styles from './styles/chat'
-import {Image, FlatList, Text, View, Button, TouchableHighlight, Linking, KeyboardAvoidingView, Platform} from 'react-native';
+import {Image, FlatList, Text, View, Button, TouchableHighlight, Linking, KeyboardAvoidingView, Platform, ScrollView} from 'react-native';
 import io from "socket.io-client";
 
 import { SoSaConfig } from "../sosa/config";
@@ -13,9 +13,9 @@ import HTML from 'react-native-render-html';
 import Helpers from '../sosa/Helpers';
 import MessageInput from "../components/MessageInput";
 import UserList from "../components/chat/UserList";
-import IconButton from "../components/IconButton";
 
 import jwt from "react-native-pure-jwt";
+import RoomItem from "../components/chat/RoomItem";
 
 
 export class Chat extends Component {
@@ -25,7 +25,6 @@ export class Chat extends Component {
     scrollOffset = {y:0, x:0};
     scrollView = null;
     username = '';
-    currentRoom = null;
     messageBuffer = [];
     nickname = '';
 
@@ -46,7 +45,8 @@ export class Chat extends Component {
         rooms: [],
         scrolling: true,
         newMessagesNotificationVisible: false,
-        messageInputPosition: {start:0, end:0}
+        messageInputPosition: {start:0, end:0},
+        currentRoom: null
     };
 
     constructor(props) {
@@ -108,14 +108,13 @@ export class Chat extends Component {
             };
         }
 
-        this.navigationContext.addDrawerItem('connect', (<View style={{flex:1}} key={'connect'}>
+        this.navigationContext.addDrawerItem('connect', (<View key={'connect'}>
             <Button
                 color={color}
                 title={text}
                 onPress={func}
-                style={{justifyContent:'flex-end'}}
             />
-        </View>));
+        </View>), false, true);
     };
 
     updateUserList = () => {
@@ -141,8 +140,8 @@ export class Chat extends Component {
                     this.addMessage(message);
                 }
             },
-                this.currentRoom.community_id,
-                this.currentRoom.name,
+                this.state.currentRoom.community_id,
+                this.state.currentRoom.name,
                 message
             );
 
@@ -176,28 +175,24 @@ export class Chat extends Component {
         this.client.rooms().list((err, data) => {
             if(!err){
                 let roomViews = data.rooms.map((room) => {
-                    let roomStyles = [Styles.room];
-                    roomStyles.push({flex:1, flexDirection: 'row'});
-                    let onPress = () => {
-                        this.joinRoom('sosa', room.name);
-                        this.navigation.closeDrawer();
-                    };
-
-                    if(this.currentRoom !== null && room.id == this.currentRoom.id){
-                        roomStyles.push(Styles.currentRoom);
-                        onPress = () => {};
-                    }
-                    return  <View style={roomStyles} key={room.id} >
-                                <IconButton icon={['fas', 'campfire']} size={20} style={{flex: 1, marginRight:15, justifyContent: 'center'}}  onPress={onPress} />
-                                <Text style={{flex: 1, fontSize: 16}}  onPress={onPress} >
-                                     {room.title}
-                                </Text>
-                            </View>
+                    return <RoomItem key={room.id}
+                                     onPress={() => {
+                                        this.joinRoom('sosa', room.name);
+                                        this.navigation.closeDrawer();
+                                     }}
+                                     room={room}
+                                     roomActive={(this.state.currentRoom !== null && room.id === this.state.currentRoom.id)}
+                    />
                 });
 
                 this.navigationContext.addDrawerItem('room_list', (
-                    <View style={{flex:1}} key={'room_list'}>
-                        { roomViews }
+                    <View style={{flex: 1}} key={'room_list'}>
+                        <View style={{justifyContent:'center', alignItems:'center', marginTop: 8}}>
+                            <Text style={{justifyContent:'center', fontSize:16}}>Rooms</Text>
+                        </View>
+                        <ScrollView style={{flex:1}}>
+                            { roomViews }
+                        </ScrollView>
                     </View>
                 ));
 
@@ -219,7 +214,7 @@ export class Chat extends Component {
                 Helpers.showAlert('Can\'t Join Room', err.message);
 
             }else{
-                this.currentRoom = room;
+                this.setState({currentRoom: room});
                 this.addStatus(`Joined room ${room.name}`);
 
                 this.homeContext.addHeaderIcon('whos_online',['fal', 'users'], this.displayUserList);
@@ -229,7 +224,7 @@ export class Chat extends Component {
     };
 
     displayUserList = () => {
-        if(this.currentRoom !== null){
+        if(this.state.currentRoom !== null){
             this.navigation.openDrawer();
         }else{
             Helpers.showAlert('You\'re not in a room','Please join a room first!');
@@ -259,8 +254,8 @@ export class Chat extends Component {
 
                 this.updateRoomList();
 
-                if(this.currentRoom !== null){
-                    this.joinRoom(this.currentRoom.community_id, this.currentRoom.name);
+                if(this.state.currentRoom !== null){
+                    this.joinRoom(this.state.currentRoom.community_id, this.state.currentRoom.name);
                 }else{
                     this.joinRoom('sosa', 'general');
                 }
@@ -273,12 +268,12 @@ export class Chat extends Component {
                 return message;
             },
             'rooms/join': (userData) => {
-                if(this.currentRoom && userData.community_id === this.currentRoom.community_id && userData.room_id === this.currentRoom.name){
+                if(this.state.currentRoom && userData.community_id === this.state.currentRoom.community_id && userData.room_id === this.state.currentRoom.name){
                     this.addStatus(`${userData.nickname} joined`);
                 }
             },
             'rooms/left': (userData) => {
-                if(this.currentRoom && userData.community_id === this.currentRoom.community_id && userData.room_id === this.currentRoom.name){
+                if(this.state.currentRoom && userData.community_id === this.state.currentRoom.community_id && userData.room_id === this.state.currentRoom.name){
                     this.addStatus(`${userData.nickname} left`);
                 }
             }

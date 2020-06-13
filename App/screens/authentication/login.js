@@ -166,14 +166,10 @@ class Login extends Component {
                     <Text style={Styles.header}>Login</Text>
 
                     <View style={[Styles.content_container]}>
-
                         <this.CredentialLogin />
-
                         <this.SocialLogin />
                     </View>
-
                     <this.RegisterButton />
-
                 </View>
             </View>
 
