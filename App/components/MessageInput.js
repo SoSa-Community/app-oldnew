@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import {TextInput, View, TouchableOpacity} from "react-native";
-import IconButton from "./IconButton";
+import Icon from "./Icon";
 
 export default class MessageInput extends Component {
 
@@ -18,7 +18,7 @@ export default class MessageInput extends Component {
                     multiline={true}
                 />
                 <TouchableOpacity onPress={this.props.sendAction} style={{alignSelf:'center', backgroundColor:'#7ac256', height:42, width:42, borderRadius: 24, alignItems: 'center', justifyContent: 'center'}}>
-                    <IconButton icon={['fal','paper-plane']}  style={{color: '#fff'}} size={18}  />
+                    <Icon icon={['fal','paper-plane']}  style={{color: '#fff'}} size={18}  />
                 </TouchableOpacity>
             </View>
         )

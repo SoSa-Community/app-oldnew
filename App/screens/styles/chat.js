@@ -45,14 +45,6 @@ const Styles = StyleSheet.create({
         backgroundColor: 'red'
     },
 
-    user: {
-        textAlign: 'center',
-        color: '#000000',
-        borderBottomColor: '#cccccc',
-        borderBottomWidth: 1,
-        paddingVertical: 10
-    },
-
     status: {
         color: '#a6a6a6',
         paddingVertical: 10,

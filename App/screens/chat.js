@@ -118,10 +118,14 @@ export class Chat extends Component {
     };
 
     updateUserList = () => {
-
+        const navigation = this.navigation;
         this.navigationContext.addDrawerItem('user_list', (
             <View style={{flex:1}} key={'user_list'}>
-                <UserList userList={this.state.userList} />
+                <UserList userList={this.state.userList} onPress={
+                    (user) => {
+                        navigation.closeDrawer();
+                        this.addTag(user.nickname);
+                    }} />
             </View>
         ), true);
     }
@@ -166,36 +170,40 @@ export class Chat extends Component {
         this.messageBuffer.push(item);
         if(this.isScrolled()){
             this.setState({newMessagesNotificationVisible: true});
-
         }
+    };
+
+    renderRoomList = (rooms) => {
+        if(!rooms){ rooms = this.state.rooms; }
+
+        let roomViews = rooms.map((room) => {
+            return <RoomItem key={room.id}
+                             onPress={() => {
+                                 this.joinRoom('sosa', room.name);
+                                 this.navigation.closeDrawer();
+                             }}
+                             room={room}
+                             roomActive={(this.state.currentRoom !== null && room.id === this.state.currentRoom.id)}
+            />
+        });
+
+        this.navigationContext.addDrawerItem('room_list', (
+            <View style={{flex: 1}} key={'room_list'}>
+                <View style={{justifyContent:'center', alignItems:'center', marginVertical: 8}}>
+                    <Text style={{justifyContent:'center', fontSize:16, color:'#fff'}}>Rooms</Text>
+                </View>
+                <ScrollView style={{flex:1}}>
+                    { roomViews }
+                </ScrollView>
+            </View>
+        ));
     };
 
     updateRoomList = () => {
 
         this.client.rooms().list((err, data) => {
             if(!err){
-                let roomViews = data.rooms.map((room) => {
-                    return <RoomItem key={room.id}
-                                     onPress={() => {
-                                        this.joinRoom('sosa', room.name);
-                                        this.navigation.closeDrawer();
-                                     }}
-                                     room={room}
-                                     roomActive={(this.state.currentRoom !== null && room.id === this.state.currentRoom.id)}
-                    />
-                });
-
-                this.navigationContext.addDrawerItem('room_list', (
-                    <View style={{flex: 1}} key={'room_list'}>
-                        <View style={{justifyContent:'center', alignItems:'center', marginTop: 8}}>
-                            <Text style={{justifyContent:'center', fontSize:16}}>Rooms</Text>
-                        </View>
-                        <ScrollView style={{flex:1}}>
-                            { roomViews }
-                        </ScrollView>
-                    </View>
-                ));
-
+                this.renderRoomList(data.rooms);
                 this.setState({rooms: data.rooms});
             }else{
                 Helpers.showAlert('Error getting room list', err.message);
@@ -218,6 +226,7 @@ export class Chat extends Component {
                 this.addStatus(`Joined room ${room.name}`);
 
                 this.homeContext.addHeaderIcon('whos_online',['fal', 'users'], this.displayUserList);
+                this.renderRoomList();
             }
 
         }, communityID, roomID);

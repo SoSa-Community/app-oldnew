@@ -78,9 +78,9 @@ export default class MembersWrapper extends Component {
         });
 
         const TagName = (!scrollable ? View : DrawerContentScrollView);
-        console.log(TagName);
+
         return (
-            <TagName {...props} style={{flex: 1}}>
+            <TagName {...props} style={{flex: 1, backgroundColor: '#121211'}}>
                     { items }
                     <View style={{ flex: 1, justifyContent: 'flex-end'}}>
                         { bottomItems }
