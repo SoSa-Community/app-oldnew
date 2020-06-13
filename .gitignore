@@ -58,6 +58,5 @@ buck-out/
 # CocoaPods
 /ios/Pods/
 
-sosa/config.js
-sosa/chat-client/
+App/sosa/config.js
 android/app/src/main/assets/appcenter-config.json
