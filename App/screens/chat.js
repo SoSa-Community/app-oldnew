@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Styles from './styles/chat'
-import {Image, FlatList, Text, View, Button, TouchableHighlight, Linking, KeyboardAvoidingView, Platform, ScrollView} from 'react-native';
+import {Image, FlatList, Text, View, Button, TouchableHighlight, Linking, KeyboardAvoidingView, Platform, ScrollView, Keyboard} from 'react-native';
 import io from "socket.io-client";
 
 import { SoSaConfig } from "../sosa/config";
@@ -234,6 +234,7 @@ export class Chat extends Component {
 
     displayUserList = () => {
         if(this.state.currentRoom !== null){
+            Keyboard.dismiss();
             this.navigation.openDrawer();
         }else{
             Helpers.showAlert('You\'re not in a room','Please join a room first!');
@@ -449,7 +450,6 @@ export class Chat extends Component {
                                 sendAction={this.sendMessage}
                                 value={this.state.messageInput}
                                 onSelectionChange={(event) => this.setState({messageInputPosition: event.nativeEvent.selection})}
-
                             />
                         </View>
 

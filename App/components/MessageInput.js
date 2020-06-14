@@ -16,6 +16,7 @@ export default class MessageInput extends Component {
                     value={this.props.value}
                     onSelectionChange={this.props.onSelectionChange}
                     multiline={true}
+                    onBlur={this.props.onBlur}
                 />
                 <TouchableOpacity onPress={this.props.sendAction} style={{alignSelf:'center', backgroundColor:'#7ac256', height:42, width:42, borderRadius: 24, alignItems: 'center', justifyContent: 'center'}}>
                     <Icon icon={['fal','paper-plane']}  style={{color: '#fff'}} size={18}  />

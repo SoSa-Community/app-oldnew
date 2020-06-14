@@ -1,5 +1,5 @@
 import React, {Component, useContext} from 'react';
-import {Text, View} from 'react-native';
+import {Keyboard, Text, View} from 'react-native';
 import withNavigationContext from './hoc/withNavigationContext';
 import { Chat } from './chat';
 import IconButton from '../components/IconButton.js';
@@ -60,7 +60,10 @@ class Home extends Component {
             <View>
                 <View style={Styles.menuTop}>
                     <View style={Styles.menuTopLeft}>
-                        <IconButton icon={['fal', 'bars']} style={{color: '#CCC'}} size={22} onPress={() => {this.navigation.dangerouslyGetParent().openDrawer()}}/>
+                        <IconButton icon={['fal', 'bars']} style={{color: '#CCC'}} size={22} onPress={() => {
+                            Keyboard.dismiss();
+                            this.navigation.dangerouslyGetParent().openDrawer()
+                        }}/>
                     </View>
                     <Text style={BaseStyles.headerTitle}>SoSa</Text>
                     <View style={Styles.menuTopRight}>
