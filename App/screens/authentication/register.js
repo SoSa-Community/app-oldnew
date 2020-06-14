@@ -99,6 +99,7 @@ export default class Register extends Component {
 
             let imgurButton = <SocialButton onPress={() => register('imgur')} icon={require(`${onboardingPath}imgur_icon.png`)} />;
             let redditButton = <SocialButton onPress={() => register('reddit')} icon={require(`${onboardingPath}reddit_icon.png`)} />
+            let twitterButton = <SocialButton onPress={() => register('twitter')} icon={require(`${onboardingPath}twitter_icon.png`)} />
 
             return <View>
                 <Text style={[Styles.subheader, {marginTop: 40}]}>Join using another platform</Text>
@@ -106,6 +107,7 @@ export default class Register extends Component {
                 <View style={{marginTop: 20, flexDirection:'row', justifyContent: 'center'}}>
                     {SoSaConfig.features.register.imgur ? imgurButton : null}
                     {SoSaConfig.features.register.reddit ? redditButton : null}
+                    {SoSaConfig.features.register.twitter ? twitterButton : null}
                 </View>
             </View>;
         }

@@ -50,6 +50,7 @@ class Login extends Component {
     componentDidMount(): void {
         const login = this;
         this.addDeeplinkListener('login', 'preauth', (data) => {
+            console.log('Hello', data);
             if(data.status === 'success'){
                 Helpers.deviceLogin(data.device_id, () => {},
                     (error) => {
@@ -93,6 +94,13 @@ class Login extends Component {
                     console.log(json);
                     Linking.openURL(`${SoSaConfig.auth.server}/reddit/login?app=1&preauth=${json.response}`);
                 })
+            },
+            withTwitter: () => {
+                this.setState({'socialMediaError': ''});
+                Helpers.handlePreauth(() => {}, () => {}, (json) => {
+                    console.log(json);
+                    Linking.openURL(`${SoSaConfig.auth.server}/twitter/login?app=1&preauth=${json.response}`);
+                })
             }
         }
     };
@@ -135,12 +143,14 @@ class Login extends Component {
 
         let imgurButton = <SocialButton onPress={this.doLogin().withImgur} icon={require('../../assets/onboarding/imgur_icon.png')} />;
         let redditButton = <SocialButton onPress={this.doLogin().withReddit} icon={require('../../assets/onboarding/reddit_icon.png')} />
+        let twitterButton = <SocialButton onPress={this.doLogin().withTwitter} icon={require('../../assets/onboarding/twitter_icon.png')} />
 
         return <View>
             <FormError errorState={this.state.socialMediaError} />
             <View style={{marginTop: 20, flexDirection:'row', justifyContent: 'center'}}>
                 {SoSaConfig.features.login.imgur ? imgurButton : null}
                 {SoSaConfig.features.login.reddit ? redditButton : null}
+                {SoSaConfig.features.login.twitter ? twitterButton : null}
             </View>
         </View>
     };
