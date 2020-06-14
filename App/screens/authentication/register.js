@@ -14,8 +14,9 @@ import ActivityButton from "../../components/ActivityButton";
 import FormError from "../../components/FormError";
 
 import SocialButton from "../../components/SocialButton";
+import withAppContext from "../hoc/withAppContext";
 
-export default class Register extends Component {
+class Register extends Component {
     navigation = null;
 
     state = {
@@ -31,7 +32,31 @@ export default class Register extends Component {
     constructor(props) {
         super();
         this.navigation = props.navigation;
+        console.log(props);
+        if(props.appContext){
+            this.addDeeplinkListener = props.appContext.addDeeplinkListener;
+            this.removeDeeplinkListener = props.appContext.removeDeeplinkListener;
+        }
     }
+
+    componentDidMount(): void {
+        this.addDeeplinkListener('login', 'preauth', (data) => {
+            if(data.status === 'success'){
+                Helpers.deviceLogin(data.device_id, () => {},
+                    (error) => {
+                        this.setState({'socialMediaError': error});
+                    },
+                    (json) => {
+                        this.setState({'socialMediaError': ''});
+                        this.navigation.replace('MembersWrapper', {login: true});
+                    }
+                );
+            }else{
+                this.setState({'socialMediaError': data.error});
+            }
+        }, true);
+    }
+
 
     setLoading = (isLoading) => {
         this.setState({registering: isLoading});
@@ -128,3 +153,7 @@ export default class Register extends Component {
         );
   }
 }
+
+
+const RegistrationScreen = withAppContext(Register);
+export default RegistrationScreen;

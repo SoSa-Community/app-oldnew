@@ -6,7 +6,7 @@ import {AppState, ImageBackground, Image, Text, View, Linking} from "react-nativ
 import LoginScreen from './App/screens/authentication/login';
 import ForgotPassword from './App/screens/authentication/forgot_password';
 import ForgotPasswordCode from './App/screens/authentication/forgot_password_code';
-import Register from "./App/screens/authentication/register";
+import RegistrationScreen from "./App/screens/authentication/register";
 import MembersWrapper from "./App/screens/members_wrapper";
 
 import BaseStyles from './App/screens/styles/base';
@@ -20,7 +20,7 @@ const Stack = createStackNavigator();
 
 
 export default class SoSa extends Component {
-
+    navigation = React.createRef();
     coldBoot = true;
     state = {
         initializing: true,
@@ -39,7 +39,6 @@ export default class SoSa extends Component {
     componentDidMount(): void {
         AppState.addEventListener("change", this._handleAppStateChange);
         Linking.addEventListener('url', this.handleDeepLink);
-
 
         Device.getInstance().init(device => {
             Session.getInstance().init(session => {
@@ -88,17 +87,32 @@ export default class SoSa extends Component {
 
     deepLinkingListeners = {};
 
-    addDeeplinkListener = (namespace='', method='', callback) => {
+    addDeeplinkListener = (namespace='', method='', callback, onlyOneAllowed=false) => {
         if(!this.deepLinkingListeners[namespace]) this.deepLinkingListeners[namespace] = {};
         if(!this.deepLinkingListeners[namespace][method]) this.deepLinkingListeners[namespace][method] = [];
 
-        this.deepLinkingListeners[namespace][method].push(callback);
+        if(onlyOneAllowed){
+            this.deepLinkingListeners[namespace][method] = [callback];
+        }else{
+            this.deepLinkingListeners[namespace][method].push(callback);
+        }
+
     }
+
+    removeDeeplinkListener = (namespace='', method='') => {
+        if(this.deepLinkingListeners[namespace] && this.deepLinkingListeners[namespace][method]){
+               delete this.deepLinkingListeners[namespace][method];
+        }
+    };
 
     fireDeeplinkListener = (namespace='', method='', data) => {
         if(this.deepLinkingListeners[namespace] && this.deepLinkingListeners[namespace][method]){
             this.deepLinkingListeners[namespace][method].forEach((listener) => {
-                listener(data);
+                try{
+                    listener(data);
+                }catch (e) {
+                    console.log(e);
+                }
             })
         }
     }
@@ -118,11 +132,11 @@ export default class SoSa extends Component {
             return (
                 <View style={BaseStyles.container}>
                     <View style={{flex:1}}>
-                        <AppContext.Provider value={{addDeeplinkListener: this.addDeeplinkListener}}>
-                            <NavigationContainer>
+                        <AppContext.Provider value={{addDeeplinkListener: this.addDeeplinkListener, removeDeeplinkListener: this.removeDeeplinkListener}}>
+                            <NavigationContainer reg={this.navigation}>
                                 <Stack.Navigator initialRouteName={this.state.defaultScreen} screenOptions={{headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle, headerTintColor: 'white', headerTitleContainerStyle: { left: 10 }}} >
                                     <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Welcome to SoSa' }}/>
-                                    <Stack.Screen name="Register" component={Register} options={{ title: 'Join SoSa' }} />
+                                    <Stack.Screen name="Register" component={RegistrationScreen} options={{ title: 'Join SoSa' }} />
                                     <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ title: 'Forgotten Password' }} />
                                     <Stack.Screen name="ForgotPasswordCode" component={ForgotPasswordCode} options={{title: 'Check your e-mail'}}/>
                                     <Stack.Screen name="MembersWrapper" component={MembersWrapper} options={{headerShown:false}}/>

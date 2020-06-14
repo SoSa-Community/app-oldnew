@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import BaseStyles from '../styles/base'
 import Styles from '../styles/onboarding'
 
-import {Text, View, Linking, TouchableOpacity, TouchableHighlight, Image} from 'react-native';
+import {Text, View, Linking, TouchableHighlight} from 'react-native';
 import Helpers from "../../sosa/Helpers";
 
 import ActivityButton from "../../components/ActivityButton";
@@ -44,13 +44,13 @@ class Login extends Component {
 
         if(props.appContext){
             this.addDeeplinkListener = props.appContext.addDeeplinkListener;
+            this.removeDeeplinkListener = props.appContext.removeDeeplinkListener;
         }
     }
 
     componentDidMount(): void {
-        const login = this;
         this.addDeeplinkListener('login', 'preauth', (data) => {
-            console.log('Hello', data);
+
             if(data.status === 'success'){
                 Helpers.deviceLogin(data.device_id, () => {},
                     (error) => {
@@ -58,14 +58,13 @@ class Login extends Component {
                     },
                     (json) => {
                         this.setState({'socialMediaError': ''});
-                        console.log(login);
-                        login.navigation.replace('MembersWrapper', {login: true});
+                        this.navigation.replace('MembersWrapper', {login: true});
                     }
                 );
             }else{
                 this.setState({'socialMediaError': data.error});
             }
-        })
+        }, true);
     }
 
     doLogin = () => {
