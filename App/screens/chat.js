@@ -254,7 +254,7 @@ export class Chat extends Component {
                 return message;
             },
             'after_authenticated': (authData, client) => {
-                this.nickname = authData.sessionData.nickname;
+                this.nickname = chat.session.nickname;
 
                 this.addStatus(`Connected to server with nickname: ${chat.session.nickname}`);
                 this.setupBufferRenderTimer();
