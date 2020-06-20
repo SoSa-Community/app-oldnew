@@ -1,6 +1,5 @@
 import {getDeviceName, getSystemName, getBrand, getModel} from 'react-native-device-info';
 import AsyncStorage from "@react-native-community/async-storage";
-import {call} from "react-native-reanimated";
 
 export default class Device {
 

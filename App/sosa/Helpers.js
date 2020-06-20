@@ -20,6 +20,8 @@ export default class Helpers {
         let session = Session.getInstance();
 
         let uri = `${SoSaConfig.auth.server}/${namespace}`;
+        console.log('Request URI', uri);
+        console.log('Request Data', data);
         let headers = {
             method: post?'POST':'GET',
             headers: {
@@ -242,7 +244,7 @@ export default class Helpers {
 
         loadingCallback(true);
         try{
-            let namespace = 'device/onboarding';
+            let namespace = 'device/login';
 
             jwt
                 .sign({device_id: deviceId}, deviceInstance.getSecret(), {alg: "HS256"})
@@ -251,9 +253,11 @@ export default class Helpers {
                         device_id: deviceId,
                         token: token
                     };
+                    console.log(data);
 
                     Helpers.request(namespace, data)
                         .then((json) => {
+                            console.log(json);
                             let error = '';
                             if(json.error){
                                 error = json.error.message;
