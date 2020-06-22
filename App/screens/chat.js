@@ -168,6 +168,7 @@ export class Chat extends Component {
             }
         }
         this.messageBuffer.push(item);
+
         if(this.isScrolled()){
             this.setState({newMessagesNotificationVisible: true});
         }
@@ -350,12 +351,14 @@ export class Chat extends Component {
             this.bufferRenderRunning = true;
             if(this.scrollOffset.y < 35){
                 let messages = this.state.messages;
-                let bufferState = this.messageBuffer;
+                let bufferState = this.messageBuffer.splice(0);
 
                 bufferState.forEach((message, index) => {
                     messages.unshift(message);
                     delete this.messageBuffer[index];
                 });
+
+                if(messages.length > 100) messages.splice(50, messages.length - 1);
 
                 this.setState({ messages: messages});
             }
