@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Styles from './styles/chat'
-import {Image, FlatList, Text, View, Button, TouchableHighlight, Linking, KeyboardAvoidingView, Platform, ScrollView, Keyboard} from 'react-native';
+import {Image, FlatList, Text, View, Button, TouchableHighlight, TouchableOpacity, Linking, KeyboardAvoidingView, Platform, ScrollView, Keyboard} from 'react-native';
 import io from "socket.io-client";
 
 import { SoSaConfig } from "../sosa/config";
@@ -27,6 +27,11 @@ export class Chat extends Component {
     username = '';
     messageBuffer = [];
     nickname = '';
+    coolDown = false;
+    coolDownTimer = null;
+    slowDownCounter = 0;
+    slowDownTimer = null;
+
 
     client;
     session;
@@ -45,8 +50,11 @@ export class Chat extends Component {
         rooms: [],
         scrolling: true,
         newMessagesNotificationVisible: false,
+        slowDownNotifierVisible: false,
         messageInputPosition: {start:0, end:0},
-        currentRoom: null
+        currentRoom: null,
+        canSend: true,
+        fuckWith: false
     };
 
     constructor(props) {
@@ -131,26 +139,46 @@ export class Chat extends Component {
     }
 
     sendMessage = () => {
-        console.log(this.state.messageInput);
-        if(this.state.messageInput.length > 0){
-            let message = this.state.messageInput;
+        if(!this.coolDown && this.slowDownCounter < 3){
+            let message = this.state.messageInput.trim();
+            if(message.length > 0){
+                this.coolDown = true;
 
-            if(message === 'lorem'){
-                message = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque ac gravida libero. Pellentesque placerat ex neque, sed viverra sapien pretium in. Donec consectetur erat ac eros tincidunt tristique. Curabitur enim quam, porttitor eu augue ut, rhoncus euismod purus. Vivamus pulvinar sollicitudin justo, vitae ornare ligula porta a. Ut urna dui, aliquam et orci nec, fringilla accumsan orci. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.'
+                clearTimeout(this.coolDownTimer);
+                this.coolDownTimer = setTimeout(() => {
+                    this.coolDown = false;
+                }, this.slowDownCounter * 200);
+
+                clearTimeout(this.slowDownTimer);
+                this.slowDownTimer = setTimeout(() => {
+                    this.slowDownCounter = 0;
+                    this.setState({slowDownNotifierVisible: false, canSend: true, fuckWith: false});
+                },5000);
+
+                this.slowDownCounter++;
+
+                this.client.rooms().send((err, message) => {
+                        if(!err){
+                            this.addMessage(message);
+                        }
+                    },
+                    this.state.currentRoom.community_id,
+                    this.state.currentRoom.name,
+                    message
+                );
+
+                this.setState({ messageInput: '' });
+                this.scrollToBottom();
             }
+        }else{
+            this.slowDownCounter++;
 
-            this.client.rooms().send((err, message) => {
-                if(!err){
-                    this.addMessage(message);
-                }
-            },
-                this.state.currentRoom.community_id,
-                this.state.currentRoom.name,
-                message
-            );
+            if(this.slowDownCounter > 3){
+                let data = {slowDownNotifierVisible: true, canSend: false};
+                if(this.slowDownCounter > 4) data.fuckWith = true;
 
-            this.setState({ messageInput: '' });
-            this.scrollToBottom();
+                this.setState(data);
+            }
         }
     };
 
@@ -386,7 +414,7 @@ export class Chat extends Component {
         return (
             this.buildWrapper(
                 <View style={{flex: 1}}>
-                        <View style={{flex: 1, backgroundColor: '#2b2b2b'}}>
+                        <View style={{flex: 1, backgroundColor: '#2b2b2b', zIndex:1000}}>
 
                             <FlatList
                                 ref={(ref) => {this.scrollView = ref;}}
@@ -446,6 +474,12 @@ export class Chat extends Component {
                                     <Text style={{color: '#ffffff'}}>You have new messages waiting</Text>
                                 </TouchableHighlight>
                             }
+                            {
+                                this.state.slowDownNotifierVisible &&
+                                <TouchableHighlight onPress={() => this.setState({slowDownNotifierVisible: false})} style={Styles.slowDownNotifier}>
+                                    <Text style={{color: '#000'}}>Whoa slow down buddy!</Text>
+                                </TouchableHighlight>
+                            }
                         </View>
                         <View style={Styles.footer}>
                             <MessageInput
@@ -453,6 +487,8 @@ export class Chat extends Component {
                                 sendAction={this.sendMessage}
                                 value={this.state.messageInput}
                                 onSelectionChange={(event) => this.setState({messageInputPosition: event.nativeEvent.selection})}
+                                fuckWith={this.state.fuckWith}
+                                canSend={this.state.canSend}
                             />
                         </View>
 

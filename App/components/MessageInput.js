@@ -1,11 +1,31 @@
 import React, {Component} from 'react';
 
-import {TextInput, View, TouchableOpacity} from "react-native";
+import {TextInput, View, TouchableOpacity, Dimensions} from "react-native";
 import Icon from "./Icon";
 
 export default class MessageInput extends Component {
+    fucking = false;
+    buttonLeft: 0;
 
     render() {
+        let buttonBackgroundColor = this.props.canSend ? '#7ac256' : '#ccc';
+        let buttonStyles = {alignSelf:'center', backgroundColor:buttonBackgroundColor, height:42, width:42, borderRadius: 24, alignItems: 'center', justifyContent: 'center', zIndex:999};
+
+        if(this.props.fuckWith){
+            buttonStyles.position = 'absolute';
+
+            if(!this.fucking){
+                this.fucking = true;
+                this.buttonLeft = Math.floor(Math.random() * ((Math.round(Dimensions.get('window').width) - 42) + 1));
+            }
+            buttonStyles.left = this.buttonLeft;
+        }
+
+        let onPress = () => {
+            this.props.sendAction();
+            this.fucking = false;
+        };
+
         return (
             <View style={{backgroundColor: '#121211', flex: 1, flexDirection: 'row', paddingHorizontal: 4, paddingVertical: 4}}>
                 <TextInput
@@ -18,7 +38,7 @@ export default class MessageInput extends Component {
                     multiline={true}
                     onBlur={this.props.onBlur}
                 />
-                <TouchableOpacity onPress={this.props.sendAction} style={{alignSelf:'center', backgroundColor:'#7ac256', height:42, width:42, borderRadius: 24, alignItems: 'center', justifyContent: 'center'}}>
+                <TouchableOpacity onPress={onPress} style={buttonStyles}>
                     <Icon icon={['fal','paper-plane']}  style={{color: '#fff'}} size={18}  />
                 </TouchableOpacity>
             </View>

@@ -68,6 +68,20 @@ const Styles = StyleSheet.create({
         marginBottom:8,
         justifyContent:'center',
         backgroundColor: '#f0ad4e', borderRadius:8
+    },
+
+    slowDownNotifier: {
+        opacity:0.75,
+        paddingVertical: 8,
+        flex: 1,
+        flexDirection: 'row',
+        position:'absolute',
+        bottom:0,
+        left:0,
+        right:0,
+        marginBottom:8,
+        justifyContent:'center',
+        backgroundColor: '#ccc', borderRadius:8
     }
 });
 
