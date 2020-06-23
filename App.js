@@ -40,18 +40,14 @@ export default class SoSa extends Component {
         AppState.addEventListener("change", this._handleAppStateChange);
         Linking.addEventListener('url', this.handleDeepLink);
 
-        Device.getInstance().init(device => {
-            Session.getInstance().init(session => {
-                Helpers.validateSession((error) => {
-                    let state = {initializing: false};
-                    if(error === null) state.defaultScreen = 'MembersWrapper';
-                    setTimeout(() => this.setState(state), 3000);
-
-                });
-            });
+        Helpers.authCheck((device, session, error) => {
+            let state = {initializing: false};
+            if(error === null) state.defaultScreen = 'MembersWrapper';
+            setTimeout(() => this.setState(state), 3000);
         });
 
         this.coldBoot = false;
+
     }
 
     componentWillUnmount(): void {

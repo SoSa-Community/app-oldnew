@@ -28,38 +28,46 @@ export default class MembersWrapper extends Component {
         this.topNavigation = props.navigation;
     }
 
+    logout = (sessionAutoExpired) => {
+        let clearSession = () => {
+            let session = Session.getInstance();
+            session.logout(() => {
+                this.topNavigation.replace('Login', {logout: true})
+            });
+        }
+
+
+        if(sessionAutoExpired === true){
+            clearSession();
+            Alert.alert("Oooof", "Sorry you were logged out, please login again!",
+                [{text: "Sure!",style: "cancel"}],
+                { cancelable: true }
+            );
+        }
+        else{
+            Alert.alert("Are you sure?", "Are you sure you want to logout?",
+                [
+                    {
+                        text: "Cancel",
+                        style: "cancel"
+                    },
+                    {
+                        text: "OK",
+                        onPress: () => {
+                            Helpers.logout(clearSession);
+                        }
+                    }
+                ],
+                { cancelable: true }
+            );
+        }
+    }
+
+
     componentDidMount(): void {
 
         this.updateDrawerItem('logout', (<View style={{justifyContent: 'flex-end'}} key={'logout'}>
-            <Button
-                color='#dc3545'
-                title='Logout'
-                onPress={() => {
-                    Alert.alert(
-                        "Are you sure?",
-                        "Are you sure you want to logout?",
-                        [
-                            {
-                                text: "Cancel",
-                                style: "cancel"
-                            },
-                            {
-                                text: "OK",
-                                onPress: () => {
-                                    Helpers.logout(() => {
-                                        let session = Session.getInstance();
-                                        session.logout(() => {
-                                            this.topNavigation.replace('Login', {logout: true})
-                                        });
-
-                                    });
-                                }
-                            }
-                        ],
-                        { cancelable: true }
-                    );
-                }}
-            />
+            <Button color='#dc3545' title='Logout' onPress={this.logout} />
         </View>),false, true);
     }
 
@@ -135,7 +143,8 @@ export default class MembersWrapper extends Component {
         return (
             <NavigationContext.Provider value={{
                 addDrawerItem: this.addDrawerItem,
-                removeDrawerItem: this.removeDrawerItem
+                removeDrawerItem: this.removeDrawerItem,
+                logout: this.logout
             }}
             >
                 <NavigationContainer independent={true}>

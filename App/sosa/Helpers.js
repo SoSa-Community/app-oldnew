@@ -6,6 +6,16 @@ import jwt from "react-native-pure-jwt";
 
 export default class Helpers {
 
+    static authCheck = (callback) => {
+        Device.getInstance().init(device => {
+            Session.getInstance().init(session => {
+                Helpers.validateSession((error) => {
+                    callback(device, session, error);
+                });
+            });
+        });
+    };
+
     static fetchWithTimeout = (url, options, timeout) => {
         if(typeof(timeout) === "undefined") timeout = 3000;
 

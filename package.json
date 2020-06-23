@@ -38,7 +38,7 @@
     "react-native-webview": "^8.2.1",
     "react-navigation": "^4.3.9",
     "socket.io-client": "^2.3.0",
-    "sosa-chat-client": "https://github.com/SoSa-Community/chat-client.git#0.0.8"
+    "sosa-chat-client": "https://github.com/SoSa-Community/chat-client.git#0.0.9"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",

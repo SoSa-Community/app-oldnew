@@ -79,17 +79,22 @@ export class Chat extends Component {
                 api_key: SoSaConfig.chat.api_key
             },
             io,
-            (callback) => {
-                let packet = {id: this.session.getId(), refresh_token: this.session.getRefreshToken()};
-                jwt.sign(packet, device.getSecret(), {alg: "HS256"}).then((token) => {
-                    callback(token, device.getId(), false);
-                });
+            {
+                get: (callback) => {
+                    let packet = {id: this.session.getId(), refresh_token: this.session.getRefreshToken()};
+                    jwt.sign(packet, device.getSecret(), {alg: "HS256"}).then((token) => {
+                        callback(token, device.getId(), false);
+                    });
+                },
+                reauth: (callback) => {
+                    Helpers.authCheck((device, session, error) => {
+                        callback(error);
+                    });
+                },
+                authFailed: () => this.navigationContext.logout(true)
             }
         );
-
         this.connect();
-
-
     }
 
     componentWillUnmount(): void {
@@ -283,7 +288,7 @@ export class Chat extends Component {
                 this.addMessage(message);
                 return message;
             },
-            'after_authenticated': (authData, client) => {
+            'authentication_successful': (authData, client) => {
                 this.nickname = chat.session.nickname;
 
                 this.addStatus(`Connected to server with nickname: ${chat.session.nickname}`);
