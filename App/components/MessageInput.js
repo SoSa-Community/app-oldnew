@@ -9,7 +9,7 @@ export default class MessageInput extends Component {
 
     render() {
         let buttonBackgroundColor = this.props.canSend ? '#7ac256' : '#ccc';
-        let buttonStyles = {alignSelf:'center', backgroundColor:buttonBackgroundColor, height:42, width:42, borderRadius: 24, alignItems: 'center', justifyContent: 'center', zIndex:999};
+        let buttonStyles = {alignSelf:'center', backgroundColor:buttonBackgroundColor, height:42, width:42, borderRadius: 24, alignItems: 'center', justifyContent: 'center'};
 
         if(this.props.fuckWith){
             buttonStyles.position = 'absolute';

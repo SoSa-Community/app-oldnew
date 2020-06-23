@@ -440,12 +440,14 @@ export class Chat extends Component {
                                             return  <View style={containerStyles}>
                                                 <View style={Styles.messageContainerInner}>
                                                     <View style={{marginRight: 10}}>
-                                                        <TouchableHighlight onPress={() => this.addTag(item.nickname)}>
+                                                        <TouchableOpacity onPress={() => this.addTag(item.nickname)}>
                                                             <Image source={{uri : item.picture}} style={{width: 48, height: 48, borderRadius: 48/2}} />
-                                                        </TouchableHighlight>
+                                                        </TouchableOpacity>
                                                     </View>
                                                     <View style={{flex:1}}>
-                                                        <Text style={Styles.message_username}>{item.nickname}</Text>
+                                                        <TouchableOpacity onPress={() => this.addTag(item.nickname)}>
+                                                            <Text style={Styles.message_username}>{item.nickname}</Text>
+                                                        </TouchableOpacity>
                                                         <HTML html={item.parsed_content}
                                                               tagsStyles={{ a: { color: '#7ac256' }}}
                                                               baseFontStyle={{color:'#ffffff'}}
