@@ -551,12 +551,7 @@ export class Chat extends Component {
                                 </TouchableHighlight>
                             }
                         </View>
-
-                        <View style={{flex:0, height:this.state.tagSearchData.length * 40}}>
-                            <UserList userList={this.state.tagSearchData} onPress={(user) => this.addTag(user.nickname, true)} slim={true}/>
-                        </View>
-
-
+                        <UserList userList={this.state.tagSearchData} onPress={(user) => this.addTag(user.nickname, true)} slim={true}/>
                         <View style={Styles.footer}>
                             <MessageInput
                                 onChangeText={data => this.setState({ messageInput: data})}

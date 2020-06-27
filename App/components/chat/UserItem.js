@@ -12,7 +12,7 @@ const Styles = StyleSheet.create({
         alignItems: 'center',
         paddingLeft: 12,
         paddingVertical: 12,
-        borderTopColor: '#ccc',
+        borderTopColor: '#444442',
         borderTopWidth: 0.15
     },
 
