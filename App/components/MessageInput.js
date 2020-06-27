@@ -27,9 +27,10 @@ export default class MessageInput extends Component {
         };
 
         return (
-            <View style={{backgroundColor: '#121211', flex: 1, flexDirection: 'row', paddingHorizontal: 4, paddingVertical: 4}}>
+            <View style={{backgroundColor: '#121211', flex: 1, flexDirection: 'row', paddingHorizontal: 4, paddingVertical: 6}}>
                 <TextInput
-                    style={{maxHeight: 100, flex:1, backgroundColor: '#444442', borderRadius: 22, color: '#fff', marginRight: 6, paddingHorizontal:12, paddingVertical: 6}}
+                    selection={this.props.selection}
+                    style={{alignContent:'center', maxHeight: 100, flex:1, backgroundColor: '#444442', borderRadius: 22, color: '#fff', marginRight: 6, paddingHorizontal:12, paddingTop:12, paddingBottom:12, alignSelf:'center' }}
                     placeholderTextColor = "#ccc"
                     placeholder="Enter your message"
                     onChangeText={this.props.onChangeText}
@@ -38,6 +39,7 @@ export default class MessageInput extends Component {
                     multiline={true}
                     onBlur={this.props.onBlur}
                     onKeyPress={this.props.onKeyPress}
+                    autoCorrect={this.props.autoCorrect}
                 />
                 <TouchableOpacity onPress={onPress} style={buttonStyles}>
                     <Icon icon={['fal','paper-plane']}  style={{color: '#fff'}} size={18}  />

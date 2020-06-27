@@ -16,7 +16,6 @@ import UserList from "../components/chat/UserList";
 
 import jwt from "react-native-pure-jwt";
 import RoomItem from "../components/chat/RoomItem";
-import UserItem from "../components/chat/UserItem";
 
 
 export class Chat extends Component {
@@ -34,6 +33,8 @@ export class Chat extends Component {
     slowDownTimer = null;
     tagPosition = {start:0, end:0};
     messageInputPosition = {start:0, end:0};
+
+    messageInput = ''; //We use this as well as state because setState doesn't update immediately and can create a race condition
 
     client;
     session;
@@ -143,7 +144,7 @@ export class Chat extends Component {
 
     sendMessage = () => {
         if(!this.coolDown && this.slowDownCounter < 3){
-            let message = this.state.messageInput.trim();
+            let message = this.messageInput.trim();
             if(message.length > 0){
                 this.coolDown = true;
 
@@ -447,20 +448,25 @@ export class Chat extends Component {
 
     messageInputSelectionChange = (event) => {
         this.messageInputPosition = event.nativeEvent.selection;
+        console.log('Selection Change', this.messageInputPosition);
+    }
 
-        let message = this.state.messageInput;
+    checkForTags = () => {
+        let message = this.messageInput;
         let end = this.messageInputPosition.end;
         let atIndex = message.lastIndexOf('@', end);
 
+        console.log('Check for tags', message, this.messageInputPosition);
+
         let matches = [];
         this.tagPosition = {start: 0, end: 0};
-
         if(atIndex !== -1){
             let space = message.indexOf(' ', atIndex);
             if(space === -1) space = message.length;
 
             if(space >= end){
-                let part = this.state.messageInput.substring(atIndex + 1, space).trim().toLowerCase();
+                let part = message.substring(atIndex + 1, space).trim().toLowerCase();
+                console.log(part);
                 let searchArray = this.state.userList;
                 searchArray.forEach((user) => {
                     if(matches.length < 3 && user.nickname.toLowerCase().includes(part)){
@@ -477,7 +483,7 @@ export class Chat extends Component {
 
         return (
             this.buildWrapper(
-                <View style={{flex: 1}}>
+                <View style={{flex: 1, marginBottom: Platform.OS === 'ios' ? 24 : 0}}>
                         <View style={{flex: 1, backgroundColor: '#2b2b2b', zIndex:1000}}>
 
                             <FlatList
@@ -551,10 +557,17 @@ export class Chat extends Component {
                         <UserList userList={this.state.tagSearchData} onPress={(user) => this.addTag(user.nickname, true)} slim={true}/>
                         <View style={Styles.footer}>
                             <MessageInput
-                                onChangeText={data => this.setState({ messageInput: data})}
+                                onChangeText={data => {
+                                    this.messageInput = data;
+                                    this.setState({ messageInput: data});
+                                    if(Platform.OS === 'ios') this.checkForTags();
+                                }}
                                 sendAction={this.sendMessage}
                                 value={this.state.messageInput}
-                                onSelectionChange={this.messageInputSelectionChange}
+                                onSelectionChange={(event) => {
+                                    this.messageInputSelectionChange(event);
+                                    if(Platform.OS === 'android') this.checkForTags();
+                                }}
                                 fuckWith={this.state.fuckWith}
                                 canSend={this.state.canSend}
                             />

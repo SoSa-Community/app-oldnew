@@ -52,7 +52,6 @@ const Styles = StyleSheet.create({
     },
 
     footer: {
-        paddingBottom: Platform.OS === 'ios' ? 24 : 0,
         flexDirection: 'row'
     },
 
