@@ -471,9 +471,6 @@ export class Chat extends Component {
             }
         }
         this.setState({tagSearchData: matches});
-
-        console.log(event.nativeEvent.selection);
-
     }
 
     render() {
@@ -486,7 +483,7 @@ export class Chat extends Component {
                             <FlatList
                                 ref={(ref) => {this.scrollView = ref;}}
                                 onScroll={this.chatMessagesOnScroll}
-                                keyboardShouldPersistTaps={'always'}
+                                keyboardShouldPersistTaps={'handled'}
                                 inverted
                                 data={this.state.messages}
                                 extraData={this.state.messages}
