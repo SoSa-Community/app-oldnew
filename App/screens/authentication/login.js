@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import BaseStyles from '../styles/base'
 import Styles from '../styles/onboarding'
 
-import {Text, View, Linking, TouchableHighlight} from 'react-native';
+import {Text, View, Linking, TouchableHighlight, KeyboardAvoidingView} from 'react-native';
 import Helpers from "../../sosa/Helpers";
 
 import ActivityButton from "../../components/ActivityButton";
@@ -170,18 +170,21 @@ class Login extends Component {
 
     render() {
         return (
-            <View style={BaseStyles.container}>
-                <View style={{marginTop: 20, paddingHorizontal:20, justifyContent:'center', flex: 1}}>
-                    <Text style={Styles.header}>Login</Text>
-
-                    <View style={[Styles.content_container]}>
-                        <this.CredentialLogin />
-                        <this.SocialLogin />
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : null}
+                style={{ flex: 1 }}
+            >
+                <View style={BaseStyles.container}>
+                    <View style={{marginTop: 20, paddingHorizontal:20, flex: 1}}>
+                        <Text style={Styles.header}>Login</Text>
+                        <View style={[Styles.content_container]}>
+                            <this.CredentialLogin />
+                            <this.SocialLogin />
+                        </View>
+                        <this.RegisterButton />
                     </View>
-                    <this.RegisterButton />
                 </View>
-            </View>
-
+            </KeyboardAvoidingView>
 
         );
   }
