@@ -37,6 +37,7 @@ export default class MessageInput extends Component {
                     onSelectionChange={this.props.onSelectionChange}
                     multiline={true}
                     onBlur={this.props.onBlur}
+                    onKeyPress={this.props.onKeyPress}
                 />
                 <TouchableOpacity onPress={onPress} style={buttonStyles}>
                     <Icon icon={['fal','paper-plane']}  style={{color: '#fff'}} size={18}  />

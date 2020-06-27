@@ -16,6 +16,7 @@ import UserList from "../components/chat/UserList";
 
 import jwt from "react-native-pure-jwt";
 import RoomItem from "../components/chat/RoomItem";
+import UserItem from "../components/chat/UserItem";
 
 
 export class Chat extends Component {
@@ -31,27 +32,24 @@ export class Chat extends Component {
     coolDownTimer = null;
     slowDownCounter = 0;
     slowDownTimer = null;
-
+    tagPosition = {start:0, end:0};
+    messageInputPosition = {start:0, end:0};
 
     client;
     session;
-
 
     bufferRenderTimer = null;
     bufferRenderRunning = false;
 
     state = {
-        joinRoomModalVisible: false,
-        roomListModalVisible: false,
-        userListModalVisible: false,
         userList: [],
         messages: [],
+        tagSearchData: [],
         messageInput: '',
         rooms: [],
         scrolling: true,
         newMessagesNotificationVisible: false,
         slowDownNotifierVisible: false,
-        messageInputPosition: {start:0, end:0},
         currentRoom: null,
         canSend: true,
         fuckWith: false
@@ -249,7 +247,9 @@ export class Chat extends Component {
     joinRoom = (communityID, roomID, callback) => {
 
         this.client.rooms().join((err, room, userList) => {
+            this.sortUserList(userList);
             this.setState({userList: userList});
+
             this.updateUserList();
 
             if(err){
@@ -312,13 +312,32 @@ export class Chat extends Component {
                 return message;
             },
             'rooms/join': (userData) => {
-                if(this.state.currentRoom && userData.community_id === this.state.currentRoom.community_id && userData.room_id === this.state.currentRoom.name){
+                if(this.state.currentRoom){
+
                     this.addStatus(`${userData.nickname} joined`);
+
+                    let userList = this.state.userList;
+                    let add = true;
+                    userList.forEach((user, index) => {
+                        if(user.nickname === userData.nickname) add = false;
+                    });
+                    if(add){
+                        userList.push(userData);
+                        this.sortUserList(userList);
+                        this.setState({userList: userList});
+                    }
                 }
             },
             'rooms/left': (userData) => {
-                if(this.state.currentRoom && userData.community_id === this.state.currentRoom.community_id && userData.room_id === this.state.currentRoom.name){
+                if(this.state.currentRoom){
                     this.addStatus(`${userData.nickname} left`);
+                    let userList = this.state.userList;
+
+                    userList.forEach((user, index) => {
+                        if(user.nickname === userData.nickname) delete userList[index];
+                    });
+                    this.sortUserList(userList);
+                    this.setState({userList: userList});
                 }
             }
         });
@@ -326,9 +345,13 @@ export class Chat extends Component {
         client.connect();
     };
 
+    sortUserList = (userList) => {
+        userList.sort((a,b) => a.nickname.localeCompare(b.nickname, [], {numeric: true, ignorePunctuation: true}));
+    }
+
     disconnect = () => this.client.disconnect();
 
-    addTag = (username) => {
+    addTag = (username, usingTagList) => {
         let text = this.state.messageInput;
         let tag = `@${username}`;
 
@@ -336,8 +359,15 @@ export class Chat extends Component {
             text = tag;
         }else{
             let textLength = text.length;
-            let caretStart = this.state.messageInputPosition.start;
-            let caretEnd = this.state.messageInputPosition.end;
+            let caretStart = this.messageInputPosition.start;
+            let caretEnd = this.messageInputPosition.end;
+
+            if(usingTagList && this.tagPosition.end > 0){
+                caretStart = this.tagPosition.start;
+                caretEnd = this.tagPosition.end;
+                tag += ' ';
+            }
+
             let part1 = '';
             let part2 = '';
 
@@ -415,7 +445,39 @@ export class Chat extends Component {
         }
     }
 
+    messageInputSelectionChange = (event) => {
+        this.messageInputPosition = event.nativeEvent.selection;
+
+        let message = this.state.messageInput;
+        let end = this.messageInputPosition.end;
+        let atIndex = message.lastIndexOf('@', end);
+
+        let matches = [];
+        this.tagPosition = {start: 0, end: 0};
+
+        if(atIndex !== -1){
+            let space = message.indexOf(' ', atIndex);
+            if(space === -1) space = message.length;
+
+            if(space >= end){
+                let part = this.state.messageInput.substring(atIndex + 1, space).trim().toLowerCase();
+                let searchArray = this.state.userList;
+                searchArray.forEach((user) => {
+                    if(matches.length < 3 && user.nickname.toLowerCase().includes(part)){
+                        matches.push(user);
+                    }
+                });
+                this.tagPosition = {start: atIndex, end: space};
+            }
+        }
+        this.setState({tagSearchData: matches});
+
+        console.log(event.nativeEvent.selection);
+
+    }
+
     render() {
+
         return (
             this.buildWrapper(
                 <View style={{flex: 1}}>
@@ -475,6 +537,7 @@ export class Chat extends Component {
                                 }
                                 style={Styles.message_list}
                             />
+
                             {
                                 this.state.newMessagesNotificationVisible &&
                                 <TouchableHighlight onPress={this.scrollToBottom} style={Styles.newMessageScrollNotifier}>
@@ -488,12 +551,18 @@ export class Chat extends Component {
                                 </TouchableHighlight>
                             }
                         </View>
+
+                        <View style={{flex:0, height:this.state.tagSearchData.length * 40}}>
+                            <UserList userList={this.state.tagSearchData} onPress={(user) => this.addTag(user.nickname, true)} slim={true}/>
+                        </View>
+
+
                         <View style={Styles.footer}>
                             <MessageInput
                                 onChangeText={data => this.setState({ messageInput: data})}
                                 sendAction={this.sendMessage}
                                 value={this.state.messageInput}
-                                onSelectionChange={(event) => this.setState({messageInputPosition: event.nativeEvent.selection})}
+                                onSelectionChange={this.messageInputSelectionChange}
                                 fuckWith={this.state.fuckWith}
                                 canSend={this.state.canSend}
                             />
