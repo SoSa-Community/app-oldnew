@@ -57,18 +57,16 @@ class Home extends Component {
 
         return (
           <View style={BaseStyles.container}>
-            <View>
-                <View style={Styles.menuTop}>
-                    <View style={Styles.menuTopLeft}>
-                        <IconButton icon={['fal', 'bars']} style={{color: '#CCC'}} size={22} onPress={() => {
-                            Keyboard.dismiss();
-                            this.navigation.dangerouslyGetParent().openDrawer()
-                        }}/>
-                    </View>
-                    <Text style={BaseStyles.headerTitle}>SoSa</Text>
-                    <View style={Styles.menuTopRight}>
-                        { icons }
-                    </View>
+            <View style={Styles.menuTop}>
+                <View style={Styles.menuTopLeft}>
+                    <IconButton icon={['fal', 'bars']} style={{color: '#CCC'}} size={22} onPress={() => {
+                        Keyboard.dismiss();
+                        this.navigation.dangerouslyGetParent().openDrawer()
+                    }}/>
+                </View>
+                <Text style={BaseStyles.headerTitle}>SoSa</Text>
+                <View style={Styles.menuTopRight}>
+                    { icons }
                 </View>
             </View>
             <Chat homeContext={this} navigationContext={this.navigationContext} navigation={this.navigation}/>

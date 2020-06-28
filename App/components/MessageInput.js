@@ -9,7 +9,7 @@ const Styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         paddingHorizontal: 4,
-        paddingVertical: 6
+        paddingTop: 6
     },
 
     innerContainer: {

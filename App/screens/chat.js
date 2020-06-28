@@ -149,22 +149,17 @@ export class Chat extends Component {
                 this.coolDown = true;
 
                 clearTimeout(this.coolDownTimer);
-                this.coolDownTimer = setTimeout(() => {
-                    this.coolDown = false;
-                }, this.slowDownCounter * 200);
-
                 clearTimeout(this.slowDownTimer);
+
+                this.coolDownTimer = setTimeout(() => this.coolDown = false, this.slowDownCounter * 200);
                 this.slowDownTimer = setTimeout(() => {
                     this.slowDownCounter = 0;
                     this.setState({slowDownNotifierVisible: false, canSend: true, fuckWith: false});
                 },5000);
-
                 this.slowDownCounter++;
 
                 this.client.rooms().send((err, message) => {
-                        if(!err){
-                            this.addMessage(message);
-                        }
+                        if(!err) this.addMessage(message);
                     },
                     this.state.currentRoom.community_id,
                     this.state.currentRoom.name,
@@ -448,15 +443,12 @@ export class Chat extends Component {
 
     messageInputSelectionChange = (event) => {
         this.messageInputPosition = event.nativeEvent.selection;
-        console.log('Selection Change', this.messageInputPosition);
     }
 
     checkForTags = () => {
         let message = this.messageInput;
         let end = this.messageInputPosition.end;
         let atIndex = message.lastIndexOf('@', end);
-
-        console.log('Check for tags', message, this.messageInputPosition);
 
         let matches = [];
         this.tagPosition = {start: 0, end: 0};
@@ -466,7 +458,6 @@ export class Chat extends Component {
 
             if(space >= end){
                 let part = message.substring(atIndex + 1, space).trim().toLowerCase();
-                console.log(part);
                 let searchArray = this.state.userList;
                 searchArray.forEach((user) => {
                     if(matches.length < 3 && user.nickname.toLowerCase().includes(part)){
