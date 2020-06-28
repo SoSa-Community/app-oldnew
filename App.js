@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import {AppState, ImageBackground, Image, Text, View, Linking} from "react-native";
+import {AppState, ImageBackground, Image, StatusBar, View, Linking} from "react-native";
 
 import LoginScreen from './App/screens/authentication/login';
 import ForgotPassword from './App/screens/authentication/forgot_password';
@@ -119,6 +119,7 @@ export default class SoSa extends Component {
         if(initializing){
             return (
                 <View style={BaseStyles.container}>
+                    <StatusBar barStyle="light-content" backgroundColor="#121211" />
                     <ImageBackground source={require('./App/assets/splash.jpg')} style={{width: '100%', height: '100%', flex:1,justifyContent: 'center', alignItems: 'center'}}>
                         <Image source={require('./App/assets/splash_logo.png')} style={{width: '40%', resizeMode: 'contain'}} />
                     </ImageBackground>
@@ -128,6 +129,7 @@ export default class SoSa extends Component {
             return (
                 <View style={BaseStyles.container}>
                     <View style={{flex:1}}>
+                        <StatusBar barStyle="light-content" backgroundColor="#121211"/>
                         <AppContext.Provider value={{addDeeplinkListener: this.addDeeplinkListener, removeDeeplinkListener: this.removeDeeplinkListener}}>
                             <NavigationContainer reg={this.navigation}>
                                 <Stack.Navigator initialRouteName={this.state.defaultScreen} screenOptions={{headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle, headerTintColor: 'white', headerTitleContainerStyle: { left: 10 }}} >
