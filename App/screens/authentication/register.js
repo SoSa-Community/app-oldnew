@@ -48,7 +48,7 @@ class Register extends Component {
                     },
                     (json) => {
                         this.setState({'socialMediaError': ''});
-                        this.navigation.replace('MembersWrapper', {login: true});
+                        this.navigation.replace('MembersArea', {login: true});
                     }
                 );
             }else{
@@ -84,7 +84,7 @@ class Register extends Component {
                     (isLoading) => this.setState({registering: isLoading}),
                     (error) => this.setState({registerError: error}),
                     (json) => {
-                        this.navigation.replace('MembersWrapper', {register: true});
+                        this.navigation.replace('MembersArea', {register: true});
                     }
                 );
             };

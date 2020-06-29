@@ -17,11 +17,16 @@ import UserList from "../components/chat/UserList";
 import jwt from "react-native-pure-jwt";
 import RoomItem from "../components/chat/RoomItem";
 
+import withMembersNavigationContext from "./hoc/withMembersNavigationContext";
+
 
 export class Chat extends Component {
+    drawerNavigationContext = {};
     navigationContext = {};
-    homeContext = {};
+
     navigation = {};
+    drawerNavigation = {};
+
     scrollOffset = {y:0, x:0};
     scrollView = null;
     username = '';
@@ -62,8 +67,9 @@ export class Chat extends Component {
         this.session = Session.getInstance()
 
         this.navigation = props.navigation;
-        this.homeContext = props.homeContext;
         this.navigationContext = props.navigationContext;
+        this.drawerNavigation = this.navigationContext.drawerNavigation;
+        this.drawerNavigationContext = props.navigationContext.drawerNavigationContext
     }
 
     componentDidMount() {
@@ -106,7 +112,7 @@ export class Chat extends Component {
         let text = 'Connect';
         let func = () => {
             this.connect();
-            this.navigation.dangerouslyGetParent().closeDrawer();
+            this.drawerNavigation.dangerouslyGetParent().closeDrawer();
         };
 
         if(disconnect){
@@ -114,13 +120,13 @@ export class Chat extends Component {
             text = 'Disconnect';
             func = () => {
                 this.disconnect();
-                this.navigation.dangerouslyGetParent().closeDrawer();
-                this.navigationContext.removeDrawerItem('user_list', true);
-                this.navigationContext.removeDrawerItem('room_list');
+                this.drawerNavigation.dangerouslyGetParent().closeDrawer();
+                this.drawerNavigationContext.removeDrawerItem('user_list', true);
+                this.drawerNavigationContext.removeDrawerItem('room_list');
             };
         }
 
-        this.navigationContext.addDrawerItem('connect', (<View key={'connect'}>
+        this.drawerNavigationContext.addDrawerItem('connect', (<View key={'connect'}>
             <Button
                 color={color}
                 title={text}
@@ -130,12 +136,11 @@ export class Chat extends Component {
     };
 
     updateUserList = () => {
-        const navigation = this.navigation;
-        this.navigationContext.addDrawerItem('user_list', (
+        this.drawerNavigationContext.addDrawerItem('user_list', (
             <View style={{flex:1}} key={'user_list'}>
                 <UserList userList={this.state.userList} onPress={
                     (user) => {
-                        navigation.closeDrawer();
+                        this.drawerNavigation.closeDrawer();
                         this.addTag(user.nickname);
                     }} />
             </View>
@@ -255,7 +260,7 @@ export class Chat extends Component {
                 this.setState({currentRoom: room});
                 this.addStatus(`Joined room ${room.name}`);
 
-                this.homeContext.addHeaderIcon('whos_online',['fal', 'users'], this.displayUserList);
+                this.navigationContext.addHeaderIcon('whos_online',['fal', 'users'], this.displayUserList);
                 this.renderRoomList();
             }
 
@@ -569,3 +574,6 @@ export class Chat extends Component {
         );
     }
 }
+
+const ChatScreen = withMembersNavigationContext(Chat);
+export default ChatScreen;

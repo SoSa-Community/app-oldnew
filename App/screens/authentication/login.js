@@ -58,7 +58,7 @@ class Login extends Component {
                     },
                     (json) => {
                         this.setState({'socialMediaError': ''});
-                        this.navigation.replace('MembersWrapper', {login: true});
+                        this.navigation.replace('MembersArea', {login: true});
                     }
                 );
             }else{
@@ -76,7 +76,7 @@ class Login extends Component {
                     (isLoading) => this.setState({loggingIn: isLoading}),
                     (error) => this.setState({loginError: error}),
                     (json) => {
-                        this.navigation.replace('MembersWrapper', {login: true});
+                        this.navigation.replace('MembersArea', {login: true});
                     }
                 );
             },
