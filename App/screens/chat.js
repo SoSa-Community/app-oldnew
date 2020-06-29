@@ -11,11 +11,11 @@ import Device from "../sosa/Device";
 
 import HTML from 'react-native-render-html';
 import Helpers from '../sosa/Helpers';
-import MessageInput from "../components/MessageInput";
-import UserList from "../components/chat/UserList";
+import {MessageInput} from "../components/MessageInput";
+import {UserList} from "../components/chat/UserList";
 
 import jwt from "react-native-pure-jwt";
-import RoomItem from "../components/chat/RoomItem";
+import {RoomItem} from "../components/chat/RoomItem";
 
 import withMembersNavigationContext from "./hoc/withMembersNavigationContext";
 

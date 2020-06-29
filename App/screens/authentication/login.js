@@ -7,9 +7,9 @@ import {Text, View, Linking, TouchableHighlight, KeyboardAvoidingView} from 'rea
 import Helpers from "../../sosa/Helpers";
 
 import ActivityButton from "../../components/ActivityButton";
-import IconTextInput from "../../components/IconTextInput";
+import {IconTextInput} from "../../components/IconTextInput";
 import SecureTextInput from "../../components/SecureTextInput";
-import FormError from "../../components/FormError";
+import {FormError} from "../../components/FormError";
 
 import {SoSaConfig} from "../../sosa/config";
 

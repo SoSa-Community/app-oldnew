@@ -4,9 +4,9 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {AppState, ImageBackground, Image, StatusBar, View, Linking} from "react-native";
 
 import LoginScreen from './App/screens/authentication/login';
+import RegistrationScreen from "./App/screens/authentication/register";
 import ForgotPassword from './App/screens/authentication/forgot_password';
 import ForgotPasswordCode from './App/screens/authentication/forgot_password_code';
-import RegistrationScreen from "./App/screens/authentication/register";
 import MembersDrawerWrapper from "./App/screens/MembersDrawerWrapper";
 import SettingsScreen from "./App/screens/settings";
 

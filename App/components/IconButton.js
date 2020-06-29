@@ -1,15 +1,11 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {TouchableHighlight} from 'react-native';
-import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
+import {Icon} from './Icon';
 
-export default class Icon extends Component {
-
-    render() {
-        return (
-            <TouchableHighlight onPress={this.props.onPress} style={{paddingVertical: 8}}>
-                <FontAwesomeIcon icon={this.props.icon}  style={this.props.style} size={this.props.size} />
-            </TouchableHighlight>
-        )
-    }
-
+export const IconButton = ({onPress, icon, style, size}) => {
+    return (
+        <TouchableHighlight onPress={onPress} style={{paddingVertical: 8}}>
+            <Icon icon={icon}  style={style} size={size} />
+        </TouchableHighlight>
+    )
 }

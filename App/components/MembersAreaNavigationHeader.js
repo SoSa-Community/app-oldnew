@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Keyboard, Text, View} from "react-native";
 
 import {StyleSheet} from 'react-native';
-import IconButton from "./IconButton";
+import {IconButton} from "./IconButton";
 import BaseStyles from "../screens/styles/base";
 
 const Styles = StyleSheet.create({

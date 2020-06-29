@@ -9,9 +9,9 @@ import {Linking, Text, View} from 'react-native';
 import Helpers from "../../sosa/Helpers";
 
 import SecureTextInput from "../../components/SecureTextInput";
-import IconTextInput from "../../components/IconTextInput";
-import ActivityButton from "../../components/ActivityButton";
-import FormError from "../../components/FormError";
+import {IconTextInput} from "../../components/IconTextInput";
+import {ActivityButton} from "../../components/ActivityButton";
+import {FormError} from "../../components/FormError";
 
 import SocialButton from "../../components/SocialButton";
 import withAppContext from "../hoc/withAppContext";

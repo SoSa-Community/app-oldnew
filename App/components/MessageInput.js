@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
+import React from 'react';
 
 import {TextInput, View, TouchableOpacity, Dimensions, Text, StyleSheet} from "react-native";
-import Icon from "./Icon";
+import {Icon} from './Icon';
 
 const Styles = StyleSheet.create({
     container: {
@@ -45,77 +45,73 @@ const Styles = StyleSheet.create({
     },
 
     icon: {color: '#fff'}
-})
+});
 
-export default class MessageInput extends Component {
-    fucking = false;
-    buttonLeft: 0;
-    text = '';
-    maxLength = 1000;
+export const MessageInput = ({canSend, sendAction, maxLength, lengthIndicatorShowPercentage, lengthWarningPercentage,
+    lengthDangerPercentage, onChangeText, selection, value, onSelectionChange, onBlur, onKeyPress, autoCorrect, fuckWith}) => {
 
-    render() {
-        let buttonBackgroundColor = this.props.canSend ? '#7ac256' : '#ccc';
-        let buttonStyles = {alignSelf:'center', backgroundColor:buttonBackgroundColor, height:42, width:42, borderRadius: 24, alignItems: 'center', justifyContent: 'center'};
+    let fucking = false;
+    let buttonLeft = 0;
+    let text = '';
+    if(!maxLength) maxLength = 1000;
 
-        if(this.props.fuckWith){
-            buttonStyles.position = 'absolute';
+    const buttonBackgroundColor = canSend ? '#7ac256' : '#ccc';
+    let buttonStyles = {alignSelf:'center', backgroundColor:buttonBackgroundColor, height:42, width:42, borderRadius: 24, alignItems: 'center', justifyContent: 'center'};
 
-            if(!this.fucking){
-                this.fucking = true;
-                this.buttonLeft = Math.floor(Math.random() * ((Math.round(Dimensions.get('window').width) - 42) + 1));
-            }
-            buttonStyles.left = this.buttonLeft;
+    if(fuckWith){
+        buttonStyles.position = 'absolute';
+
+        if(!fucking){
+            fucking = true;
+            buttonLeft = Math.floor(Math.random() * ((Math.round(Dimensions.get('window').width) - 42) + 1));
         }
-
-        let onPress = () => {
-            this.props.sendAction();
-            this.fucking = false;
-        };
-
-        if(this.props.maxLength) this.maxLength = this.props.maxLength;
-
-        let lengthIndicatorShowPercentage = (this.props.lengthIndicatorShowPercentage ? this.props.lengthIndicatorShowPercentage : 80);
-        let lengthWarningPercentage = (this.props.lengthWarningPercentage ? this.props.lengthWarningPercentage : 90);
-        let lengthDangerPercentage = (this.props.lengthDangerPercentage ? this.props.lengthDangerPercentage : 95);
-
-
-        let lengthIndicatorStyles = [Styles.lengthIndicator];
-        let lengthPercentage = ((this.text.length / this.maxLength) * 100);
-
-        if(lengthPercentage >= lengthDangerPercentage){
-            lengthIndicatorStyles.push(Styles.lengthIndicatorDanger);
-        }
-        else if(lengthPercentage >= lengthWarningPercentage){
-            lengthIndicatorStyles.push(Styles.lengthIndicatorWarning);
-        }
-
-        return (
-            <View style={Styles.container}>
-                <View style={Styles.innerContainer}>
-                    <TextInput
-                        selection={this.props.selection}
-                        style={Styles.textInput}
-                        placeholderTextColor = "#ccc"
-                        placeholder="Enter your message"
-                        onChangeText={(data) => {
-                            this.text = data;
-                            if(this.props.onChangeText) this.props.onChangeText(data);
-                        }}
-                        value={this.props.value}
-                        onSelectionChange={this.props.onSelectionChange}
-                        multiline={true}
-                        onBlur={this.props.onBlur}
-                        onKeyPress={this.props.onKeyPress}
-                        autoCorrect={this.props.autoCorrect}
-                        maxLength={this.maxLength}
-                    />
-                    { (lengthPercentage >= lengthIndicatorShowPercentage ? <Text style={[lengthIndicatorStyles]}>{`${this.text.length}/${this.maxLength}`}</Text> : null) }
-                </View>
-                <TouchableOpacity onPress={onPress} style={buttonStyles}>
-                    <Icon icon={['fal','paper-plane']}  style={Styles.icon} size={18}  />
-                </TouchableOpacity>
-            </View>
-        )
+        buttonStyles.left = buttonLeft;
     }
 
+    let onPress = () => {
+        sendAction();
+        fucking = false;
+    };
+
+    if(!lengthIndicatorShowPercentage) lengthIndicatorShowPercentage = 80;
+    if(!lengthWarningPercentage) lengthWarningPercentage = 90;
+    if(!lengthDangerPercentage) lengthDangerPercentage = 95;
+
+    let lengthIndicatorStyles = [Styles.lengthIndicator];
+    const lengthPercentage = ((text.length / maxLength) * 100);
+
+    if(lengthPercentage >= lengthDangerPercentage){
+        lengthIndicatorStyles.push(Styles.lengthIndicatorDanger);
+    }
+    else if(lengthPercentage >= lengthWarningPercentage){
+        lengthIndicatorStyles.push(Styles.lengthIndicatorWarning);
+    }
+
+    return (
+        <View style={Styles.container}>
+            <View style={Styles.innerContainer}>
+                <TextInput
+                    selection={selection}
+                    style={Styles.textInput}
+                    placeholderTextColor = "#ccc"
+                    placeholder="Enter your message"
+                    onChangeText={(data) => {
+                        text = data;
+                        if(onChangeText) onChangeText(data);
+                    }}
+                    value={value}
+                    onSelectionChange={onSelectionChange}
+                    multiline={true}
+                    onBlur={onBlur}
+                    onKeyPress={onKeyPress}
+                    autoCorrect={autoCorrect}
+                    maxLength={maxLength}
+                />
+                { (lengthPercentage >= lengthIndicatorShowPercentage ? <Text style={[lengthIndicatorStyles]}>{`${text.length}/${maxLength}`}</Text> : null) }
+            </View>
+            <TouchableOpacity onPress={onPress} style={buttonStyles}>
+                <Icon icon={['fal','paper-plane']}  style={Styles.icon} size={18}  />
+            </TouchableOpacity>
+        </View>
+    )
 }
