@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Text, View} from 'react-native';
-
+import {Text, View, Switch} from 'react-native';
+import {SettingsItem} from "../components/SettingsItem";
 
 class SettingsScreen extends Component {
     navigation = null;
@@ -19,7 +19,7 @@ class SettingsScreen extends Component {
 
         return (
           <View>
-            <Text>Hello I am the settings screen</Text>
+                <SettingsItem title="Fireworks when you send a message" description="Every time you send a message, it will display fireworks" settingName="send_message_fireworks" />
           </View>
         );
   }

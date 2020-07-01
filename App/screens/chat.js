@@ -18,6 +18,7 @@ import jwt from "react-native-pure-jwt";
 import {RoomItem} from "../components/chat/RoomItem";
 
 import withMembersNavigationContext from "./hoc/withMembersNavigationContext";
+import {Preferences} from "../sosa/Preferences";
 
 
 export class Chat extends Component {
@@ -47,6 +48,10 @@ export class Chat extends Component {
     bufferRenderTimer = null;
     bufferRenderRunning = false;
 
+    fireworksOnSend = false;
+
+    focusListener = null;
+
     state = {
         userList: [],
         messages: [],
@@ -64,12 +69,21 @@ export class Chat extends Component {
     constructor(props) {
         super();
 
-        this.session = Session.getInstance()
+        this.session = Session.getInstance();
 
         this.navigation = props.navigation;
         this.navigationContext = props.navigationContext;
         this.drawerNavigation = this.navigationContext.drawerNavigation;
-        this.drawerNavigationContext = props.navigationContext.drawerNavigationContext
+        this.drawerNavigationContext = props.navigationContext.drawerNavigationContext;
+        console.log('hello');
+        this.updatePreferences();
+    }
+
+    updatePreferences = () => {
+        Preferences.get('send_message_fireworks', (value) => {
+            console.log('value', value);
+            this.fireworksOnSend = value;
+        });
     }
 
     componentDidMount() {
@@ -77,6 +91,11 @@ export class Chat extends Component {
         this.updateUserList();
 
         let device = Device.getInstance();
+
+        this.focusListener = this.navigation.addListener('focus', () => {
+            console.log('hello2');
+            this.updatePreferences();
+        });
 
         this.client = new ChatClient(
             {
@@ -100,11 +119,17 @@ export class Chat extends Component {
             }
         );
         this.connect();
+
     }
 
     componentWillUnmount(): void {
         this.disconnect();
         this.client.middleware.clear();
+        try{
+            this.focusListener();
+        }catch (e) {
+            console.debug('Could not remove focus listener', e);
+        }
     }
 
     setupConnectButton = (disconnect: false) => {
@@ -220,7 +245,7 @@ export class Chat extends Component {
             />
         });
 
-        this.navigationContext.addDrawerItem('room_list', (
+        this.drawerNavigationContext.addDrawerItem('room_list', (
             <View style={{flex: 1}} key={'room_list'}>
                 <View style={{justifyContent:'center', alignItems:'center', marginVertical: 8}}>
                     <Text style={{justifyContent:'center', fontSize:16, color:'#fff'}}>Rooms</Text>
