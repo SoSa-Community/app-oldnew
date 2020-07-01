@@ -6,7 +6,7 @@ import Styles from '../styles/onboarding'
 import {Text, View, Linking, TouchableHighlight, KeyboardAvoidingView} from 'react-native';
 import Helpers from "../../sosa/Helpers";
 
-import ActivityButton from "../../components/ActivityButton";
+import {ActivityButton} from "../../components/ActivityButton";
 import {IconTextInput} from "../../components/IconTextInput";
 import SecureTextInput from "../../components/SecureTextInput";
 import {FormError} from "../../components/FormError";
@@ -14,7 +14,7 @@ import {FormError} from "../../components/FormError";
 import {SoSaConfig} from "../../sosa/config";
 
 import withAppContext from '../hoc/withAppContext';
-import SocialButton from "../../components/SocialButton";
+import {SocialButton} from "../../components/SocialButton";
 
 class Login extends Component {
     navigation = null;

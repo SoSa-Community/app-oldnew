@@ -13,6 +13,7 @@ const Styles = StyleSheet.create({
         paddingLeft: 12,
         paddingVertical: 12,
         borderTopColor: '#444442',
+        backgroundColor: '#121211',
         borderTopWidth: 0.15
     },
 
@@ -36,7 +37,7 @@ const Styles = StyleSheet.create({
     },
 });
 
-export const UserItem = ({key, onpress, user, slim}) => {
+export const UserItem = ({key, onPress, user, slim}) => {
 
     let userContainerStyle = [Styles.userContainer];
     let imageStyle = [Styles.image];

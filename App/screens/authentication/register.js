@@ -13,7 +13,7 @@ import {IconTextInput} from "../../components/IconTextInput";
 import {ActivityButton} from "../../components/ActivityButton";
 import {FormError} from "../../components/FormError";
 
-import SocialButton from "../../components/SocialButton";
+import {SocialButton} from "../../components/SocialButton";
 import withAppContext from "../hoc/withAppContext";
 
 class Register extends Component {

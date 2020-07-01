@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component} from 'react';
 import Styles from "../screens/styles/onboarding";
 import {TextInput, View} from "react-native";
 import {Icon} from './Icon';

@@ -10,8 +10,6 @@ import {createDrawerNavigator, DrawerContentScrollView} from '@react-navigation/
 import Session from "../sosa/Session";
 import Helpers from "../sosa/Helpers";
 
-import {useNavigation} from "@react-navigation/core";
-
 const DrawerL = createDrawerNavigator();
 const DrawerR = createDrawerNavigator();
 
