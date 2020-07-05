@@ -81,7 +81,6 @@ export class Chat extends Component {
 
     updatePreferences = () => {
         Preferences.get('send_message_fireworks', (value) => {
-            console.log('value', value);
             this.fireworksOnSend = value;
         });
     }
@@ -93,7 +92,6 @@ export class Chat extends Component {
         let device = Device.getInstance();
 
         this.focusListener = this.navigation.addListener('focus', () => {
-            console.log('hello2');
             this.updatePreferences();
         });
 

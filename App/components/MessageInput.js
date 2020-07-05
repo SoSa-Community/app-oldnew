@@ -47,12 +47,13 @@ const Styles = StyleSheet.create({
     icon: {color: '#fff'}
 });
 
+let fucking = false;
+let buttonLeft = 0;
+let text = '';
+
 export const MessageInput = ({canSend, sendAction, maxLength, lengthIndicatorShowPercentage, lengthWarningPercentage,
     lengthDangerPercentage, onChangeText, selection, value, onSelectionChange, onBlur, onKeyPress, autoCorrect, fuckWith}) => {
 
-    let fucking = false;
-    let buttonLeft = 0;
-    let text = '';
     if(!maxLength) maxLength = 1000;
 
     const buttonBackgroundColor = canSend ? '#7ac256' : '#ccc';
