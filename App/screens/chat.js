@@ -171,7 +171,7 @@ export class Chat extends Component {
                     message
                 );
 
-                this.setState({ messageInput: '' });
+                this.changeMessageInput('');
                 this.scrollToBottom();
             }
         }else{
@@ -389,8 +389,7 @@ export class Chat extends Component {
             }
             text = `${part1}${tag}${part2}`;
         }
-        this.setState({messageInput: text});
-
+        this.changeMessageInput(text);
     };
 
     isScrolled = () => {
@@ -456,8 +455,6 @@ export class Chat extends Component {
         let end = this.messageInputPosition.end;
         let atIndex = message.lastIndexOf('@', end);
 
-        console.log('Check for tags', message, this.messageInputPosition);
-
         let matches = [];
         this.tagPosition = {start: 0, end: 0};
         if(atIndex !== -1){
@@ -466,7 +463,6 @@ export class Chat extends Component {
 
             if(space >= end){
                 let part = message.substring(atIndex + 1, space).trim().toLowerCase();
-                console.log(part);
                 let searchArray = this.state.userList;
                 searchArray.forEach((user) => {
                     if(matches.length < 3 && user.nickname.toLowerCase().includes(part)){
@@ -477,6 +473,13 @@ export class Chat extends Component {
             }
         }
         this.setState({tagSearchData: matches});
+    }
+
+    changeMessageInput(data) {
+        console.log(data);
+        this.messageInput = data;
+        this.setState({ messageInput: data});
+        if(Platform.OS === 'ios') this.checkForTags();
     }
 
     render() {
@@ -557,11 +560,7 @@ export class Chat extends Component {
                         <UserList userList={this.state.tagSearchData} onPress={(user) => this.addTag(user.nickname, true)} slim={true}/>
                         <View style={Styles.footer}>
                             <MessageInput
-                                onChangeText={data => {
-                                    this.messageInput = data;
-                                    this.setState({ messageInput: data});
-                                    if(Platform.OS === 'ios') this.checkForTags();
-                                }}
+                                onChangeText={data => this.changeMessageInput(data)}
                                 sendAction={this.sendMessage}
                                 value={this.state.messageInput}
                                 onSelectionChange={(event) => {
