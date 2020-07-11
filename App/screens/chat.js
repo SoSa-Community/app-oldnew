@@ -357,7 +357,7 @@ export class Chat extends Component {
         let tag = `@${username}`;
 
         if(text.length === 0){
-            text = tag;
+            text = `${tag} `;
         }else{
             let textLength = text.length;
             let caretStart = this.messageInputPosition.start;
@@ -382,7 +382,11 @@ export class Chat extends Component {
 
                 if(part2.length >= 1) {
                     if (!/^\s+(.*)$/.test(part2)) part2 = ` ${part2}`;
+                }else{
+                    tag += ' ';
                 }
+
+
             }else{
                 part1 = text.substr(0, caretStart);
                 part2 = text.substr(caretEnd, textLength);
