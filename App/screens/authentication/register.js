@@ -77,16 +77,20 @@ class Register extends Component {
 
         if(SoSaConfig.features.register.credentials){
             let register = () => {
-                Helpers.handleRegister(
-                    this.state.usernameInput,
-                    this.state.passwordInput,
-                    this.state.emailInput,
-                    (isLoading) => this.setState({registering: isLoading}),
-                    (error) => this.setState({registerError: error}),
-                    (json) => {
-                        this.navigation.replace('MembersArea', {register: true});
-                    }
-                );
+                if(!this.state.usernameInput.length || !this.state.passwordInput.length || !this.state.emailInput.length){
+                    this.setState({registerError: 'Please provide a username, e-mail address and password', registering: false});
+                }else{
+                    Helpers.handleRegister(
+                        this.state.usernameInput,
+                        this.state.passwordInput,
+                        this.state.emailInput,
+                        (isLoading) => this.setState({registering: isLoading}),
+                        (error) => this.setState({registerError: error}),
+                        (json) => {
+                            this.navigation.replace('MembersArea', {register: true});
+                        }
+                    );
+                }
             };
 
             return <View>
