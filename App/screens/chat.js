@@ -85,6 +85,12 @@ export class Chat extends Component {
         });
     }
 
+    setMessageInput(data) {
+        this.messageInput = data;
+        this.setState({ messageInput: data});
+        if(Platform.OS === 'ios') this.checkForTags();
+    }
+
     componentDidMount() {
         this.setupConnectButton();
         this.updateUserList();
@@ -194,7 +200,7 @@ export class Chat extends Component {
                     message
                 );
 
-                this.setState({ messageInput: '' });
+                this.setMessageInput('');
                 this.scrollToBottom();
             }
         }else{
@@ -412,8 +418,7 @@ export class Chat extends Component {
             }
             text = `${part1}${tag}${part2}`;
         }
-        this.setState({messageInput: text});
-
+        this.setMessageInput(text);
     };
 
     isScrolled = () => {
@@ -576,11 +581,7 @@ export class Chat extends Component {
                         <UserList userList={this.state.tagSearchData} onPress={(user) => this.addTag(user.nickname, true)} slim={true}/>
                         <View style={Styles.footer}>
                             <MessageInput
-                                onChangeText={data => {
-                                    this.messageInput = data;
-                                    this.setState({ messageInput: data});
-                                    if(Platform.OS === 'ios') this.checkForTags();
-                                }}
+                                onChangeText={data => this.setMessageInput(data)}
                                 sendAction={this.sendMessage}
                                 value={this.state.messageInput}
                                 onSelectionChange={(event) => {
