@@ -8,7 +8,7 @@ import RegistrationScreen from "./App/screens/authentication/register";
 import ForgotPassword from './App/screens/authentication/forgot_password';
 import ForgotPasswordCode from './App/screens/authentication/forgot_password_code';
 import MembersDrawerWrapper from "./App/screens/MembersDrawerWrapper";
-import SettingsScreen from "./App/screens/settings";
+import SettingsScreen from "./App/screens/Settings";
 
 import BaseStyles from './App/screens/styles/base';
 import Helpers from "./App/sosa/Helpers";

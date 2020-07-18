@@ -6,9 +6,6 @@ class SettingsScreen extends Component {
     navigation = null;
     navigationContext = {};
 
-    state = {
-    };
-
     constructor(props) {
         super();
         this.navigation = props.navigation;
@@ -19,7 +16,7 @@ class SettingsScreen extends Component {
 
         return (
           <View>
-                <SettingsItem title="Fireworks when you send a message" description="Every time you send a message, it will display fireworks" settingName="send_message_fireworks" />
+                <SettingsItem title="Show Profile On Touch" description="Pressing a members face in chat will show their profile instead of tagging them " settingName="chat:touch_face_for_profile" />
           </View>
         );
   }

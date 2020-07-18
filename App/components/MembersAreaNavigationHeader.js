@@ -24,10 +24,7 @@ export default class MembersAreaNavigationHeader extends Component {
 
     constructor(props) {
         super();
-    }
-
-    componentDidMount(): void {
-        this.setState({headerIcons: this.props.icons});
+        this.state.headerIcons = props.icons;
     }
 
     addHeaderIcon = (id, icon, onPress) => {
