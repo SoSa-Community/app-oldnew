@@ -9,7 +9,6 @@ import {ChatClient, Message} from 'sosa-chat-client';
 import Session from "../sosa/Session";
 import Device from "../sosa/Device";
 
-import HTML from 'react-native-render-html';
 import Helpers from '../sosa/Helpers';
 import {MessageInput} from "../components/MessageInput";
 import {UserList} from "../components/chat/UserList";
@@ -19,7 +18,8 @@ import {RoomItem} from "../components/chat/RoomItem";
 
 import withMembersNavigationContext from "./hoc/withMembersNavigationContext";
 import {Preferences} from "../sosa/Preferences";
-
+import {ProfileModal} from "../components/ProfileModal";
+import {MessageItem} from "../components/chat/MessageItem";
 
 export class Chat extends Component {
     drawerNavigationContext = {};
@@ -78,12 +78,6 @@ export class Chat extends Component {
         this.drawerNavigationContext = props.navigationContext.drawerNavigationContext;
     }
 
-    setMessageInput(data) {
-        this.messageInput = data;
-        this.setState({ messageInput: data});
-        if(Platform.OS === 'ios') this.checkForTags();
-    }
-
     componentDidMount() {
         this.setupConnectButton();
         this.updateUserList();
@@ -118,6 +112,7 @@ export class Chat extends Component {
     componentWillUnmount(): void {
         this.disconnect();
         this.client.middleware.clear();
+
         try{
             this.focusListener();
         }catch (e) {
@@ -494,13 +489,33 @@ export class Chat extends Component {
         this.setState({tagSearchData: matches});
     }
 
+    setMessageInput(data) {
+        this.messageInput = data;
+        this.setState({ messageInput: data});
+        if(Platform.OS === 'ios') this.checkForTags();
+    }
+
+    onFacePress = (message) => {
+        Preferences.get('chat:touch_face_for_profile', (value) => {
+            if(!value){
+                this.addTag(message.nickname)
+            }else{
+                this.onLongFacePress();
+            }
+        });
+    }
+
+    onLongFacePress = (message) => {
+        this.selectedProfile = message;
+        this.setState({profileModalVisible: true});
+    }
+
     render() {
 
         return (
             this.buildWrapper(
-                <View style={{flex: 1, marginBottom: Platform.OS === 'ios' ? 24 : 0}}>
-                        <View style={{flex: 1, backgroundColor: '#2b2b2b', zIndex:1000}}>
-
+                <View style={Styles.container}>
+                        <View style={Styles.messageListContainer}>
                             <FlatList
                                 ref={(ref) => {this.scrollView = ref;}}
                                 onScroll={this.chatMessagesOnScroll}
@@ -512,57 +527,7 @@ export class Chat extends Component {
                                 renderItem={
                                     ({item}) => {
                                         if(item instanceof Message){
-
-                                            let containerStyles = [Styles.messageContainer];
-                                            if(item.mentions.length > 0 && item.mentions.indexOf(this.nickname) !== -1){
-                                                containerStyles.push(Styles.messageContainerWithMention);
-                                            }
-
-                                            if(!item.picture || item.picture.length === 0){
-                                                item.picture = 'https://picsum.photos/seed/picsum/300/300';
-                                            }
-
-                                            return  <View style={containerStyles}>
-                                                <View style={Styles.messageContainerInner}>
-                                                    <View style={{marginRight: 10}}>
-                                                        <TouchableOpacity
-                                                            onPress={() => {
-                                                                Preferences.get('chat:touch_face_for_profile', (value) => {
-                                                                    if(!value){
-                                                                        this.addTag(item.nickname)
-                                                                    }else{
-                                                                        this.selectedProfile = item;
-                                                                        this.setState({profileModalVisible: true});
-                                                                    }
-                                                                });
-                                                            }}
-                                                            onLongPress={() => {
-                                                                this.selectedProfile = item;
-                                                                this.setState({profileModalVisible: true});
-                                                            }}
-                                                        >
-                                                            <Image source={{uri : item.picture}} style={{width: 48, height: 48, borderRadius: 48/2}} />
-                                                        </TouchableOpacity>
-                                                    </View>
-                                                    <View style={{flex:1}}>
-                                                        <TouchableOpacity onPress={() => this.addTag(item.nickname)}>
-                                                            <Text style={Styles.message_username}>{item.nickname}</Text>
-                                                        </TouchableOpacity>
-                                                        <HTML html={item.parsed_content}
-                                                              tagsStyles={{ a: { color: '#7ac256' }}}
-                                                              baseFontStyle={{color:'#ffffff'}}
-                                                              onLinkPress={(evt, href) => Linking.openURL(href)}
-                                                              renderers={{
-                                                                  spoiler: {
-                                                                      wrapper: 'Text',
-                                                                      renderer: (htmlAttribs, children, convertedCSSStyles, passProps) => (
-                                                                          <Text> {children} </Text>
-                                                                      )
-                                                                  }
-                                                              }}/>
-                                                    </View>
-                                                </View>
-                                            </View>
+                                            return <MessageItem message={item} onFacePress={() => this.onFacePress(item)} onLongFacePress={() => this.onLongFacePress(item)} onUsernamePress={() => this.addTag(item.nickname)} />
                                         }else{
                                             return <Text style={Styles.status}>{item.message}</Text>
                                         }
@@ -574,13 +539,13 @@ export class Chat extends Component {
                             {
                                 this.state.newMessagesNotificationVisible &&
                                 <TouchableHighlight onPress={this.scrollToBottom} style={Styles.newMessageScrollNotifier}>
-                                    <Text style={{color: '#ffffff'}}>You have new messages waiting</Text>
+                                    <Text style={Styles.white}>You have new messages waiting</Text>
                                 </TouchableHighlight>
                             }
                             {
                                 this.state.slowDownNotifierVisible &&
                                 <TouchableHighlight onPress={() => this.setState({slowDownNotifierVisible: false})} style={Styles.slowDownNotifier}>
-                                    <Text style={{color: '#000'}}>Whoa slow down buddy!</Text>
+                                    <Text style={Styles.black}>Whoa slow down buddy!</Text>
                                 </TouchableHighlight>
                             }
                         </View>
@@ -598,25 +563,7 @@ export class Chat extends Component {
                                 canSend={this.state.canSend}
                             />
                         </View>
-                        <Modal
-                            animationType="slide"
-                            visible={this.state.profileModalVisible}
-                            transparent={true}
-                            hardwareAccelerated={true}
-                        >
-                            {this.state.profileModalVisible &&
-                            <View style={{flex:1, justifyContent:'flex-end', marginTop:48}}>
-                                <TouchableOpacity style={{backgroundColor:'#2b2b2b', opacity:0.8, flex:3}} onPress={() => this.setState({profileModalVisible: false})}></TouchableOpacity>
-                                <View style={{backgroundColor:'#121211', flex:1, padding:16, flexDirection:'row', alignItems:'center'}}>
-                                    <View style={{flex:1}}>
-                                        <Image source={{uri : this.selectedProfile.picture}} style={{width: 128, height: 128, borderRadius: 128/2}} />
-                                    </View>
-                                    <View style={{flex:1}}>
-                                        <Text style={{color:'#fff', fontSize:36, textAlign:'left'}}>{this.selectedProfile.nickname}</Text>
-                                    </View>
-                                </View>
-                            </View>}
-                        </Modal>
+                        <ProfileModal visible={this.state.profileModalVisible} profile={this.selectedProfile} dismissTouch={() => this.setState({profileModalVisible: false})} />
                 </View>
             )
         );
