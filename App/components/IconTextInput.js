@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
+import React from 'react';
 import Styles from "../screens/styles/onboarding";
 import {TextInput, View} from "react-native";
-import Icon from './Icon';
+import {Icon} from './Icon';
 
-export default class IconTextInput extends Component {
+export const IconTextInput = ({icon, placeholder, value, onChangeText, validateInput}) => {
 
-    displaySuccess = (errorString) => {
+    const displaySuccess = (errorString) => {
         if(errorString === null){
             return null;
         }else if(errorString.length === 0){
@@ -15,16 +15,13 @@ export default class IconTextInput extends Component {
         }
     };
 
-    render() {
-        return (
-            <View style={Styles.inputParentContainer}>
-                <View style={Styles.inputContainer}>
-                    <Icon icon={this.props.icon}  style={Styles.inputIcon} size={18}/>
-                    <TextInput placeholder={this.props.placeholder} placeholderTextColor="#ccc" value={this.props.value} style={Styles.input} onChangeText={this.props.onChangeText}/>
-                    { this.props.validateInput ? this.displaySuccess(this.props.validateInput()) : null }
-                </View>
+    return (
+        <View style={Styles.inputParentContainer}>
+            <View style={Styles.inputContainer}>
+                <Icon icon={icon}  style={Styles.inputIcon} size={18}/>
+                <TextInput placeholder={placeholder} placeholderTextColor="#ccc" value={value} style={Styles.input} onChangeText={onChangeText}/>
+                { validateInput && displaySuccess(validateInput()) }
             </View>
-        );
-    }
-
+        </View>
+    );
 }

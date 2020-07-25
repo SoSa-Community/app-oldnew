@@ -1,38 +1,39 @@
 import React, {Component} from 'react';
-import HomeScreen from './home';
-import {Button, View, Alert} from 'react-native';
+import {View, Alert} from 'react-native';
 
-import { NavigationContainer } from '@react-navigation/native';
-import { NavigationContext } from './context/NavigationContext';
+import { NavigationContainer} from '@react-navigation/native';
+import { DrawerNavigationContext } from './context/DrawerNavigationContext';
 
-import {
-    createDrawerNavigator,
-    DrawerContentScrollView
-} from '@react-navigation/drawer';
+import MembersNavigator from './MembersNavigator';
+
+import {createDrawerNavigator, DrawerContentScrollView} from '@react-navigation/drawer';
 import Session from "../sosa/Session";
 import Helpers from "../sosa/Helpers";
 
 const DrawerL = createDrawerNavigator();
 const DrawerR = createDrawerNavigator();
 
-export default class MembersWrapper extends Component {
+export default class MembersDrawerWrapper extends Component {
+    topBar = null;
+    appNavigation = null;
 
-    topNavigation = null;
     state = {
         leftDrawerItems:[],
-        rightDrawerItems:[]
+        rightDrawerItems:[],
+        headerIcons: [],
     };
 
     constructor(props) {
         super();
-        this.topNavigation = props.navigation;
+        this.appNavigation = props.navigation;
+        this.topBar = React.createRef();
     }
 
     logout = (sessionAutoExpired) => {
         let clearSession = () => {
             let session = Session.getInstance();
             session.logout(() => {
-                this.topNavigation.replace('Login', {logout: true})
+                this.appNavigation.replace('Login', {logout: true})
             });
         }
 
@@ -61,15 +62,7 @@ export default class MembersWrapper extends Component {
                 { cancelable: true }
             );
         }
-    }
-
-
-    componentDidMount(): void {
-
-        this.updateDrawerItem('logout', (<View style={{justifyContent: 'flex-end'}} key={'logout'}>
-            <Button color='#dc3545' title='Logout' onPress={this.logout} />
-        </View>),false, true);
-    }
+    };
 
     CustomDrawerContent = (props, state, scrollable) => {
         let items = [];
@@ -124,35 +117,39 @@ export default class MembersWrapper extends Component {
 
     addDrawerItem = (id, view, right, bottom) => {
         this.updateDrawerItem(id, view, right, bottom);
-    }
+    };
 
     removeDrawerItem = (id, right, bottom) => {
         this.updateDrawerItem(id, null, right, bottom,true);
-    }
+    };
 
     RightDrawer = () => {
         return (
-            <DrawerR.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.rightDrawerItems, true)} drawerPosition="right" drawerType="slide" edgeWidth={38}>
-                <DrawerR.Screen name="Home" component={HomeScreen}/>
-            </DrawerR.Navigator>
+            <View style={{flex:1}}>
+                <DrawerR.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.rightDrawerItems, true)} drawerPosition="right" drawerType="slide" edgeWidth={38} ref={this.rightDrawer}>
+                    <DrawerR.Screen name="LoggedInNavigationWrapper" component={MembersNavigator}/>
+                </DrawerR.Navigator>
+            </View>
         );
     }
 
     render() {
 
         return (
-            <NavigationContext.Provider value={{
+            <DrawerNavigationContext.Provider value={{
+                appNavigation: this.appNavigation,
                 addDrawerItem: this.addDrawerItem,
+                updateDrawerItem: this.updateDrawerItem,
                 removeDrawerItem: this.removeDrawerItem,
-                logout: this.logout
+                logout: this.logout,
             }}
             >
-                <NavigationContainer independent={true}>
-                    <DrawerL.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.leftDrawerItems, false)} drawerPosition="left" drawerType="slide" edgeWidth={38}>
-                        <DrawerL.Screen name="RightDrawer" component={this.RightDrawer}/>
+                <NavigationContainer independent={true} >
+                    <DrawerL.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.leftDrawerItems, false)} drawerPosition="left" drawerType="slide" edgeWidth={38} ref={this.leftDrawer} >
+                        <DrawerL.Screen name="RightDrawer" component={this.RightDrawer} />
                     </DrawerL.Navigator>
                 </NavigationContainer>
-            </NavigationContext.Provider>
+            </DrawerNavigationContext.Provider>
         );
   }
 

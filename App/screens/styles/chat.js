@@ -1,34 +1,8 @@
-import {StyleSheet} from 'react-native';
+import {Platform, StyleSheet} from 'react-native';
 
 const Styles = StyleSheet.create({
     message_list: {
         marginBottom: 10
-    },
-
-    messageContainer: {
-        marginTop:10
-    },
-
-    messageContainerWithMention: {
-        backgroundColor: '#000000'
-    },
-
-    messageContainerInner: {
-        flexDirection: 'row',
-        padding: 10
-    },
-
-    message: {
-        color: '#ffffff',
-        borderBottomColor: '#cccccc',
-        borderBottomWidth: 1,
-        paddingBottom: 10
-    },
-
-    message_username: {
-        color: '#ffffff',
-        paddingBottom: 3,
-        fontWeight: 'bold'
     },
 
     room: {
@@ -81,7 +55,12 @@ const Styles = StyleSheet.create({
         marginBottom:8,
         justifyContent:'center',
         backgroundColor: '#ccc', borderRadius:8
-    }
+    },
+
+    white: {color: '#ffffff'},
+    black: {color: '#000'},
+    container: {flex: 1, marginBottom: Platform.OS === 'ios' ? 24 : 0},
+    messageListContainer: {flex: 1, backgroundColor: '#2b2b2b', zIndex:1000}
 });
 
 export default Styles;

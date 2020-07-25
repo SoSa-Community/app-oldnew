@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Styles from './styles/chat'
-import {Image, FlatList, Text, View, Button, TouchableHighlight, TouchableOpacity, Linking, KeyboardAvoidingView, Platform, ScrollView, Keyboard} from 'react-native';
+import {Image, FlatList, Text, View, Button, TouchableHighlight, TouchableOpacity, Linking, KeyboardAvoidingView, Platform, ScrollView, Keyboard, Modal} from 'react-native';
 import io from "socket.io-client";
 
 import { SoSaConfig } from "../sosa/config";
@@ -9,19 +9,25 @@ import {ChatClient, Message} from 'sosa-chat-client';
 import Session from "../sosa/Session";
 import Device from "../sosa/Device";
 
-import HTML from 'react-native-render-html';
 import Helpers from '../sosa/Helpers';
-import MessageInput from "../components/MessageInput";
-import UserList from "../components/chat/UserList";
+import {MessageInput} from "../components/MessageInput";
+import {UserList} from "../components/chat/UserList";
 
 import jwt from "react-native-pure-jwt";
-import RoomItem from "../components/chat/RoomItem";
+import {RoomItem} from "../components/chat/RoomItem";
 
+import withMembersNavigationContext from "./hoc/withMembersNavigationContext";
+import {Preferences} from "../sosa/Preferences";
+import {ProfileModal} from "../components/ProfileModal";
+import {MessageItem} from "../components/chat/MessageItem";
 
 export class Chat extends Component {
+    drawerNavigationContext = {};
     navigationContext = {};
-    homeContext = {};
+
     navigation = {};
+    drawerNavigation = {};
+
     scrollOffset = {y:0, x:0};
     scrollView = null;
     username = '';
@@ -42,6 +48,10 @@ export class Chat extends Component {
     bufferRenderTimer = null;
     bufferRenderRunning = false;
 
+    focusListener = null;
+
+    selectedProfile = null;
+
     state = {
         userList: [],
         messages: [],
@@ -53,17 +63,19 @@ export class Chat extends Component {
         slowDownNotifierVisible: false,
         currentRoom: null,
         canSend: true,
-        fuckWith: false
+        fuckWith: false,
+        profileModalVisible: false
     };
 
     constructor(props) {
         super();
 
-        this.session = Session.getInstance()
+        this.session = Session.getInstance();
 
         this.navigation = props.navigation;
-        this.homeContext = props.homeContext;
         this.navigationContext = props.navigationContext;
+        this.drawerNavigation = this.navigationContext.drawerNavigation;
+        this.drawerNavigationContext = props.navigationContext.drawerNavigationContext;
     }
 
     componentDidMount() {
@@ -94,11 +106,18 @@ export class Chat extends Component {
             }
         );
         this.connect();
+
     }
 
     componentWillUnmount(): void {
         this.disconnect();
         this.client.middleware.clear();
+
+        try{
+            this.focusListener();
+        }catch (e) {
+            console.debug('Could not remove focus listener', e);
+        }
     }
 
     setupConnectButton = (disconnect: false) => {
@@ -106,7 +125,7 @@ export class Chat extends Component {
         let text = 'Connect';
         let func = () => {
             this.connect();
-            this.navigation.dangerouslyGetParent().closeDrawer();
+            this.drawerNavigation.dangerouslyGetParent().closeDrawer();
         };
 
         if(disconnect){
@@ -114,13 +133,13 @@ export class Chat extends Component {
             text = 'Disconnect';
             func = () => {
                 this.disconnect();
-                this.navigation.dangerouslyGetParent().closeDrawer();
-                this.navigationContext.removeDrawerItem('user_list', true);
-                this.navigationContext.removeDrawerItem('room_list');
+                this.drawerNavigation.dangerouslyGetParent().closeDrawer();
+                this.drawerNavigationContext.removeDrawerItem('user_list', true);
+                this.drawerNavigationContext.removeDrawerItem('room_list');
             };
         }
 
-        this.navigationContext.addDrawerItem('connect', (<View key={'connect'}>
+        this.drawerNavigationContext.addDrawerItem('connect', (<View key={'connect'}>
             <Button
                 color={color}
                 title={text}
@@ -130,12 +149,11 @@ export class Chat extends Component {
     };
 
     updateUserList = () => {
-        const navigation = this.navigation;
-        this.navigationContext.addDrawerItem('user_list', (
+        this.drawerNavigationContext.addDrawerItem('user_list', (
             <View style={{flex:1}} key={'user_list'}>
                 <UserList userList={this.state.userList} onPress={
                     (user) => {
-                        navigation.closeDrawer();
+                        this.drawerNavigation.closeDrawer();
                         this.addTag(user.nickname);
                     }} />
             </View>
@@ -149,29 +167,23 @@ export class Chat extends Component {
                 this.coolDown = true;
 
                 clearTimeout(this.coolDownTimer);
-                this.coolDownTimer = setTimeout(() => {
-                    this.coolDown = false;
-                }, this.slowDownCounter * 200);
-
                 clearTimeout(this.slowDownTimer);
+
+                this.coolDownTimer = setTimeout(() => this.coolDown = false, this.slowDownCounter * 200);
                 this.slowDownTimer = setTimeout(() => {
                     this.slowDownCounter = 0;
                     this.setState({slowDownNotifierVisible: false, canSend: true, fuckWith: false});
                 },5000);
-
                 this.slowDownCounter++;
 
                 this.client.rooms().send((err, message) => {
-                        if(!err){
-                            this.addMessage(message);
-                        }
+                        if(!err) this.addMessage(message);
                     },
                     this.state.currentRoom.community_id,
                     this.state.currentRoom.name,
                     message
                 );
-
-                this.changeMessageInput('');
+                this.setMessageInput('');
                 this.scrollToBottom();
             }
         }else{
@@ -220,7 +232,7 @@ export class Chat extends Component {
             />
         });
 
-        this.navigationContext.addDrawerItem('room_list', (
+        this.drawerNavigationContext.addDrawerItem('room_list', (
             <View style={{flex: 1}} key={'room_list'}>
                 <View style={{justifyContent:'center', alignItems:'center', marginVertical: 8}}>
                     <Text style={{justifyContent:'center', fontSize:16, color:'#fff'}}>Rooms</Text>
@@ -260,7 +272,7 @@ export class Chat extends Component {
                 this.setState({currentRoom: room});
                 this.addStatus(`Joined room ${room.name}`);
 
-                this.homeContext.addHeaderIcon('whos_online',['fal', 'users'], this.displayUserList);
+                this.navigationContext.addHeaderIcon('whos_online',['fal', 'users'], this.displayUserList);
                 this.renderRoomList();
             }
 
@@ -393,7 +405,7 @@ export class Chat extends Component {
             }
             text = `${part1}${tag}${part2}`;
         }
-        this.changeMessageInput(text);
+        this.setMessageInput(text);
     };
 
     isScrolled = () => {
@@ -451,7 +463,6 @@ export class Chat extends Component {
 
     messageInputSelectionChange = (event) => {
         this.messageInputPosition = event.nativeEvent.selection;
-        console.log('Selection Change', this.messageInputPosition);
     }
 
     checkForTags = () => {
@@ -479,20 +490,34 @@ export class Chat extends Component {
         this.setState({tagSearchData: matches});
     }
 
-    changeMessageInput(data) {
-        console.log(data);
+    setMessageInput(data) {
         this.messageInput = data;
         this.setState({ messageInput: data});
         if(Platform.OS === 'ios') this.checkForTags();
+    }
+
+
+    onFacePress = (message) => {
+        Preferences.get('chat:touch_face_for_profile', (value) => {
+            if(!value){
+                this.addTag(message.nickname)
+            }else{
+                this.onLongFacePress();
+            }
+        });
+    }
+
+    onLongFacePress = (message) => {
+        this.selectedProfile = message;
+        this.setState({profileModalVisible: true});
     }
 
     render() {
 
         return (
             this.buildWrapper(
-                <View style={{flex: 1, marginBottom: Platform.OS === 'ios' ? 24 : 0}}>
-                        <View style={{flex: 1, backgroundColor: '#2b2b2b', zIndex:1000}}>
-
+                <View style={Styles.container}>
+                        <View style={Styles.messageListContainer}>
                             <FlatList
                                 ref={(ref) => {this.scrollView = ref;}}
                                 onScroll={this.chatMessagesOnScroll}
@@ -504,42 +529,7 @@ export class Chat extends Component {
                                 renderItem={
                                     ({item}) => {
                                         if(item instanceof Message){
-
-                                            let containerStyles = [Styles.messageContainer];
-                                            if(item.mentions.length > 0 && item.mentions.indexOf(this.nickname) !== -1){
-                                                containerStyles.push(Styles.messageContainerWithMention);
-                                            }
-
-                                            if(!item.picture || item.picture.length === 0){
-                                                item.picture = 'https://picsum.photos/seed/picsum/300/300';
-                                            }
-
-                                            return  <View style={containerStyles}>
-                                                <View style={Styles.messageContainerInner}>
-                                                    <View style={{marginRight: 10}}>
-                                                        <TouchableOpacity onPress={() => this.addTag(item.nickname)}>
-                                                            <Image source={{uri : item.picture}} style={{width: 48, height: 48, borderRadius: 48/2}} />
-                                                        </TouchableOpacity>
-                                                    </View>
-                                                    <View style={{flex:1}}>
-                                                        <TouchableOpacity onPress={() => this.addTag(item.nickname)}>
-                                                            <Text style={Styles.message_username}>{item.nickname}</Text>
-                                                        </TouchableOpacity>
-                                                        <HTML html={item.parsed_content}
-                                                              tagsStyles={{ a: { color: '#7ac256' }}}
-                                                              baseFontStyle={{color:'#ffffff'}}
-                                                              onLinkPress={(evt, href) => {
-                                                                  Linking.openURL(href);
-                                                              }}
-                                                              renderers={{
-                                                                  spoiler: {renderer: (htmlAttribs, children, convertedCSSStyles, passProps) => (
-                                                                          <Text> {children} </Text>
-                                                                      )
-                                                                      , wrapper: 'Text'}
-                                                              }}/>
-                                                    </View>
-                                                </View>
-                                            </View>
+                                            return <MessageItem message={item} onFacePress={() => this.onFacePress(item)} onLongFacePress={() => this.onLongFacePress(item)} onUsernamePress={() => this.addTag(item.nickname)} />
                                         }else{
                                             return <Text style={Styles.status}>{item.message}</Text>
                                         }
@@ -551,20 +541,20 @@ export class Chat extends Component {
                             {
                                 this.state.newMessagesNotificationVisible &&
                                 <TouchableHighlight onPress={this.scrollToBottom} style={Styles.newMessageScrollNotifier}>
-                                    <Text style={{color: '#ffffff'}}>You have new messages waiting</Text>
+                                    <Text style={Styles.white}>You have new messages waiting</Text>
                                 </TouchableHighlight>
                             }
                             {
                                 this.state.slowDownNotifierVisible &&
                                 <TouchableHighlight onPress={() => this.setState({slowDownNotifierVisible: false})} style={Styles.slowDownNotifier}>
-                                    <Text style={{color: '#000'}}>Whoa slow down buddy!</Text>
+                                    <Text style={Styles.black}>Whoa slow down buddy!</Text>
                                 </TouchableHighlight>
                             }
                         </View>
                         <UserList userList={this.state.tagSearchData} onPress={(user) => this.addTag(user.nickname, true)} slim={true}/>
                         <View style={Styles.footer}>
                             <MessageInput
-                                onChangeText={data => this.changeMessageInput(data)}
+                                onChangeText={data => this.setMessageInput(data)}
                                 sendAction={this.sendMessage}
                                 value={this.state.messageInput}
                                 onSelectionChange={(event) => {
@@ -575,9 +565,12 @@ export class Chat extends Component {
                                 canSend={this.state.canSend}
                             />
                         </View>
-
+                        <ProfileModal visible={this.state.profileModalVisible} profile={this.selectedProfile} dismissTouch={() => this.setState({profileModalVisible: false})} />
                 </View>
             )
         );
     }
 }
+
+const ChatScreen = withMembersNavigationContext(Chat);
+export default ChatScreen;

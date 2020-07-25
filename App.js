@@ -1,26 +1,23 @@
 import React, {Component} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import {AppState, ImageBackground, Image, Text, View, Linking} from "react-native";
+import {AppState, ImageBackground, Image, StatusBar, View, Linking} from "react-native";
 
 import LoginScreen from './App/screens/authentication/login';
+import RegistrationScreen from "./App/screens/authentication/register";
 import ForgotPassword from './App/screens/authentication/forgot_password';
 import ForgotPasswordCode from './App/screens/authentication/forgot_password_code';
-import RegistrationScreen from "./App/screens/authentication/register";
-import MembersWrapper from "./App/screens/members_wrapper";
+import MembersDrawerWrapper from "./App/screens/MembersDrawerWrapper";
+import SettingsScreen from "./App/screens/Settings";
 
 import BaseStyles from './App/screens/styles/base';
-import Device from "./App/sosa/Device";
-import Session from "./App/sosa/Session";
 import Helpers from "./App/sosa/Helpers";
 
 import { AppContext } from "./App/screens/context/AppContext";
 
 const Stack = createStackNavigator();
 
-
 export default class SoSa extends Component {
-    navigation = React.createRef();
     coldBoot = true;
     state = {
         initializing: true,
@@ -42,7 +39,7 @@ export default class SoSa extends Component {
 
         Helpers.authCheck((device, session, error) => {
             let state = {initializing: false};
-            if(error === null) state.defaultScreen = 'MembersWrapper';
+            if(error === null) state.defaultScreen = 'MembersArea';
             setTimeout(() => this.setState(state), 3000);
         });
 
@@ -68,7 +65,6 @@ export default class SoSa extends Component {
                 this.fireDeeplinkListener(namespace, method, data);
             }
         }
-
     };
 
     _handleAppStateChange = nextAppState => {
@@ -119,6 +115,7 @@ export default class SoSa extends Component {
         if(initializing){
             return (
                 <View style={BaseStyles.container}>
+                    <StatusBar barStyle="light-content" backgroundColor="#121211" />
                     <ImageBackground source={require('./App/assets/splash.jpg')} style={{width: '100%', height: '100%', flex:1,justifyContent: 'center', alignItems: 'center'}}>
                         <Image source={require('./App/assets/splash_logo.png')} style={{width: '40%', resizeMode: 'contain'}} />
                     </ImageBackground>
@@ -128,14 +125,16 @@ export default class SoSa extends Component {
             return (
                 <View style={BaseStyles.container}>
                     <View style={{flex:1}}>
+                        <StatusBar barStyle="light-content" backgroundColor="#121211"/>
                         <AppContext.Provider value={{addDeeplinkListener: this.addDeeplinkListener, removeDeeplinkListener: this.removeDeeplinkListener}}>
-                            <NavigationContainer reg={this.navigation}>
+                            <NavigationContainer>
                                 <Stack.Navigator initialRouteName={this.state.defaultScreen} screenOptions={{headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle, headerTintColor: 'white', headerTitleContainerStyle: { left: 10 }}} >
                                     <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Welcome to SoSa' }}/>
                                     <Stack.Screen name="Register" component={RegistrationScreen} options={{ title: 'Join SoSa' }} />
                                     <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ title: 'Forgotten Password' }} />
                                     <Stack.Screen name="ForgotPasswordCode" component={ForgotPasswordCode} options={{title: 'Check your e-mail'}}/>
-                                    <Stack.Screen name="MembersWrapper" component={MembersWrapper} options={{headerShown:false}}/>
+                                    <Stack.Screen name="MembersArea" component={MembersDrawerWrapper} options={{headerShown:false}}/>
+                                    <Stack.Screen name="Settings" component={SettingsScreen} options={{title: 'Settings'}}/>
                                 </Stack.Navigator>
                             </NavigationContainer>
                         </AppContext.Provider>

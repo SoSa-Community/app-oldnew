@@ -5,10 +5,10 @@ import Styles from '../styles/onboarding'
 import {TouchableWithoutFeedback, Text, View} from 'react-native';
 
 import Helpers from "../../sosa/Helpers";
-import FormError from "../../components/FormError";
-import IconTextInput from "../../components/IconTextInput";
+import {FormError} from "../../components/FormError";
+import {IconTextInput} from "../../components/IconTextInput";
 import SecureTextInput from "../../components/SecureTextInput";
-import ActivityButton from "../../components/ActivityButton";
+import {ActivityButton} from "../../components/ActivityButton";
 
 
 export default class ForgotPasswordCode extends Component {

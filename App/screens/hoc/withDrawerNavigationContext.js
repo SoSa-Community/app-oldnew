@@ -1,20 +1,19 @@
 import React from 'react';
-import { NavigationContext } from '../context/NavigationContext'
+import { DrawerNavigationContext } from '../context/DrawerNavigationContext'
 
-const withNavigationContext = (WrappedComponent) => {
+const withDrawerNavigationContext = (WrappedComponent) => {
     class HOC extends React.Component {
 
         render() {
             return (
-                <NavigationContext.Consumer>
+                <DrawerNavigationContext.Consumer>
                     {context =>
                         <WrappedComponent navigationContext={context} {...this.props} />
                     }
-                </NavigationContext.Consumer>
+                </DrawerNavigationContext.Consumer>
             );
         }
     }
     return HOC;
 };
-
-export default withNavigationContext;
+export default withDrawerNavigationContext;

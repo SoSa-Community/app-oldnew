@@ -9,11 +9,11 @@ import {Linking, Text, View} from 'react-native';
 import Helpers from "../../sosa/Helpers";
 
 import SecureTextInput from "../../components/SecureTextInput";
-import IconTextInput from "../../components/IconTextInput";
-import ActivityButton from "../../components/ActivityButton";
-import FormError from "../../components/FormError";
+import {IconTextInput} from "../../components/IconTextInput";
+import {ActivityButton} from "../../components/ActivityButton";
+import {FormError} from "../../components/FormError";
 
-import SocialButton from "../../components/SocialButton";
+import {SocialButton} from "../../components/SocialButton";
 import withAppContext from "../hoc/withAppContext";
 
 class Register extends Component {
@@ -48,7 +48,7 @@ class Register extends Component {
                     },
                     (json) => {
                         this.setState({'socialMediaError': ''});
-                        this.navigation.replace('MembersWrapper', {login: true});
+                        this.navigation.replace('MembersArea', {login: true});
                     }
                 );
             }else{
@@ -87,11 +87,10 @@ class Register extends Component {
                         (isLoading) => this.setState({registering: isLoading}),
                         (error) => this.setState({registerError: error}),
                         (json) => {
-                            this.navigation.replace('MembersWrapper', {register: true});
+                            this.navigation.replace('MembersArea', {register: true});
                         }
                     );
                 }
-
             };
 
             return <View>

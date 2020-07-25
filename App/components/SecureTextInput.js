@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Styles from "../screens/styles/onboarding";
 import {TextInput, View} from "react-native";
-import Icon from "./Icon";
+import {Icon} from './Icon';
 
 export default class SecureTextInput extends Component {
 

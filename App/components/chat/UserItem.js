@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {Text, View, StyleSheet, Image, TouchableHighlight} from "react-native";
 
 const Styles = StyleSheet.create({
@@ -13,6 +13,7 @@ const Styles = StyleSheet.create({
         paddingLeft: 12,
         paddingVertical: 12,
         borderTopColor: '#444442',
+        backgroundColor: '#121211',
         borderTopWidth: 0.15
     },
 
@@ -36,28 +37,24 @@ const Styles = StyleSheet.create({
     },
 });
 
-export default class UserItem extends Component {
+export const UserItem = ({key, onPress, user, slim}) => {
 
-    render() {
-        let userContainerStyle = [Styles.userContainer];
-        let imageStyle = [Styles.image];
+    let userContainerStyle = [Styles.userContainer];
+    let imageStyle = [Styles.image];
 
-        if(this.props.slim){
-            userContainerStyle.push(Styles.slimUserContainer);
-            imageStyle.push(Styles.slimImage);
-        }
-
-        return (
-            <View key={this.props.key}>
-                <TouchableHighlight onPress={this.props.onPress}>
-                    <View style={userContainerStyle}>
-                        <Image source={{uri : 'https://picsum.photos/seed/picsum/300/300'}} style={imageStyle} />
-                        <Text style={Styles.itemText}>{this.props.user.nickname}</Text>
-                    </View>
-                </TouchableHighlight>
-            </View>
-        );
-
+    if(slim){
+        userContainerStyle.push(Styles.slimUserContainer);
+        imageStyle.push(Styles.slimImage);
     }
 
+    return (
+        <View key={key}>
+            <TouchableHighlight onPress={onPress}>
+                <View style={userContainerStyle}>
+                    <Image source={{uri : 'https://picsum.photos/seed/picsum/300/300'}} style={imageStyle} />
+                    <Text style={Styles.itemText}>{user.nickname}</Text>
+                </View>
+            </TouchableHighlight>
+        </View>
+    );
 }

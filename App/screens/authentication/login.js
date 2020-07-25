@@ -6,15 +6,15 @@ import Styles from '../styles/onboarding'
 import {Text, View, Linking, TouchableHighlight, KeyboardAvoidingView} from 'react-native';
 import Helpers from "../../sosa/Helpers";
 
-import ActivityButton from "../../components/ActivityButton";
-import IconTextInput from "../../components/IconTextInput";
+import {ActivityButton} from "../../components/ActivityButton";
+import {IconTextInput} from "../../components/IconTextInput";
 import SecureTextInput from "../../components/SecureTextInput";
-import FormError from "../../components/FormError";
+import {FormError} from "../../components/FormError";
 
 import {SoSaConfig} from "../../sosa/config";
 
 import withAppContext from '../hoc/withAppContext';
-import SocialButton from "../../components/SocialButton";
+import {SocialButton} from "../../components/SocialButton";
 
 class Login extends Component {
     navigation = null;
@@ -58,7 +58,7 @@ class Login extends Component {
                     },
                     (json) => {
                         this.setState({'socialMediaError': ''});
-                        this.navigation.replace('MembersWrapper', {login: true});
+                        this.navigation.replace('MembersArea', {login: true});
                     }
                 );
             }else{
@@ -76,7 +76,7 @@ class Login extends Component {
                     (isLoading) => this.setState({loggingIn: isLoading}),
                     (error) => this.setState({loginError: error}),
                     (json) => {
-                        this.navigation.replace('MembersWrapper', {login: true});
+                        this.navigation.replace('MembersArea', {login: true});
                     }
                 );
             },
