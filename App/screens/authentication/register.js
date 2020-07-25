@@ -119,7 +119,6 @@ class Register extends Component {
                 Helpers.handlePreauth(() => {
                 }, () => {
                 }, (json) => {
-                    console.log(json);
                     Linking.openURL(`${SoSaConfig.auth.server}/${network}/register?app=1&preauth=${json.response}`);
                 })
             };
@@ -129,6 +128,7 @@ class Register extends Component {
             let imgurButton = <SocialButton onPress={() => register('imgur')} icon={require(`${onboardingPath}imgur_icon.png`)} />;
             let redditButton = <SocialButton onPress={() => register('reddit')} icon={require(`${onboardingPath}reddit_icon.png`)} />
             let twitterButton = <SocialButton onPress={() => register('twitter')} icon={require(`${onboardingPath}twitter_icon.png`)} />
+            let facebookButton = <SocialButton onPress={() => register('facebook')} icon={require(`${onboardingPath}facebook_icon.png`)} />
 
             return <View>
                 <Text style={[Styles.subheader, {marginTop: 40}]}>Join using another platform</Text>
@@ -137,6 +137,7 @@ class Register extends Component {
                     {SoSaConfig.features.register.imgur ? imgurButton : null}
                     {SoSaConfig.features.register.reddit ? redditButton : null}
                     {SoSaConfig.features.register.twitter ? twitterButton : null}
+                    {SoSaConfig.features.register.facebook ? facebookButton : null}
                 </View>
             </View>;
         }

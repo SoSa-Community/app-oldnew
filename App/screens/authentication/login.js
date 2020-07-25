@@ -83,22 +83,25 @@ class Login extends Component {
             withImgur: () => {
                 this.setState({'socialMediaError': ''});
                 Helpers.handlePreauth(() => {}, () => {}, (json) => {
-                    console.log(json);
                     Linking.openURL(`${SoSaConfig.auth.server}/imgur/login?app=1&preauth=${json.response}`);
                 })
             },
             withReddit: () => {
                 this.setState({'socialMediaError': ''});
                 Helpers.handlePreauth(() => {}, () => {}, (json) => {
-                    console.log(json);
                     Linking.openURL(`${SoSaConfig.auth.server}/reddit/login?app=1&preauth=${json.response}`);
                 })
             },
             withTwitter: () => {
                 this.setState({'socialMediaError': ''});
                 Helpers.handlePreauth(() => {}, () => {}, (json) => {
-                    console.log(json);
                     Linking.openURL(`${SoSaConfig.auth.server}/twitter/login?app=1&preauth=${json.response}`);
+                })
+            },
+            withFacebook: () => {
+                this.setState({'socialMediaError': ''});
+                Helpers.handlePreauth(() => {}, () => {}, (json) => {
+                    Linking.openURL(`${SoSaConfig.auth.server}/facebook/login?app=1&preauth=${json.response}`);
                 })
             }
         }
@@ -143,6 +146,7 @@ class Login extends Component {
         let imgurButton = <SocialButton onPress={this.doLogin().withImgur} icon={require('../../assets/onboarding/imgur_icon.png')} />;
         let redditButton = <SocialButton onPress={this.doLogin().withReddit} icon={require('../../assets/onboarding/reddit_icon.png')} />
         let twitterButton = <SocialButton onPress={this.doLogin().withTwitter} icon={require('../../assets/onboarding/twitter_icon.png')} />
+        let facebookButton = <SocialButton onPress={this.doLogin().withFacebook} icon={require('../../assets/onboarding/facebook_icon.png')} />
 
         return <View>
             <FormError errorState={this.state.socialMediaError} />
@@ -150,6 +154,7 @@ class Login extends Component {
                 {SoSaConfig.features.login.imgur ? imgurButton : null}
                 {SoSaConfig.features.login.reddit ? redditButton : null}
                 {SoSaConfig.features.login.twitter ? twitterButton : null}
+                {SoSaConfig.features.login.facebook ? facebookButton : null}
             </View>
         </View>
     };
