@@ -67,50 +67,22 @@ class Login extends Component {
         }, true);
     }
 
-    doLogin = () => {
-        return {
-            withUsernameAndPassword: () => {
-                Helpers.handleLogin(
-                    this.state.usernameInput,
-                    this.state.passwordInput,
-                    (isLoading) => this.setState({loggingIn: isLoading}),
-                    (error) => this.setState({loginError: error}),
-                    (json) => {
-                        this.navigation.replace('MembersArea', {login: true});
-                    }
-                );
-            },
-            withImgur: () => {
-                this.setState({'socialMediaError': ''});
-                Helpers.handlePreauth(() => {}, () => {}, (json) => {
-                    Linking.openURL(`${SoSaConfig.auth.server}/imgur/login?app=1&preauth=${json.response}`);
-                })
-            },
-            withReddit: () => {
-                this.setState({'socialMediaError': ''});
-                Helpers.handlePreauth(() => {}, () => {}, (json) => {
-                    Linking.openURL(`${SoSaConfig.auth.server}/reddit/login?app=1&preauth=${json.response}`);
-                })
-            },
-            withTwitter: () => {
-                this.setState({'socialMediaError': ''});
-                Helpers.handlePreauth(() => {}, () => {}, (json) => {
-                    Linking.openURL(`${SoSaConfig.auth.server}/twitter/login?app=1&preauth=${json.response}`);
-                })
-            },
-            withFacebook: () => {
-                this.setState({'socialMediaError': ''});
-                Helpers.handlePreauth(() => {}, () => {}, (json) => {
-                    Linking.openURL(`${SoSaConfig.auth.server}/facebook/login?app=1&preauth=${json.response}`);
-                })
-            }
-        }
-    };
-
     CredentialLogin = () => {
 
-        let loginButton = <ActivityButton showActivity={this.state.loggingIn} onPress={this.doLogin().withUsernameAndPassword} text="Let me in!"/>
-        let forgotButton = <View>
+        const login = () => {
+            Helpers.handleLogin(
+                this.state.usernameInput,
+                this.state.passwordInput,
+                (isLoading) => this.setState({loggingIn: isLoading}),
+                (error) => this.setState({loginError: error}),
+                (json) => {
+                    this.navigation.replace('MembersArea', {login: true});
+                }
+            );
+        };
+
+        const loginButton = <ActivityButton showActivity={this.state.loggingIn} onPress={login} text="Let me in!"/>
+        const forgotButton = <View>
             <Text style={Styles.forgotButton} onPress={() => this.navigation.navigate('ForgotPassword', {})}>Forgotten Password</Text>
         </View>;
 
@@ -143,10 +115,17 @@ class Login extends Component {
 
     SocialLogin = () => {
 
-        let imgurButton = <SocialButton onPress={this.doLogin().withImgur} icon={require('../../assets/onboarding/imgur_icon.png')} />;
-        let redditButton = <SocialButton onPress={this.doLogin().withReddit} icon={require('../../assets/onboarding/reddit_icon.png')} />
-        let twitterButton = <SocialButton onPress={this.doLogin().withTwitter} icon={require('../../assets/onboarding/twitter_icon.png')} />
-        let facebookButton = <SocialButton onPress={this.doLogin().withFacebook} icon={require('../../assets/onboarding/facebook_icon.png')} />
+        let login = (network) => {
+            this.setState({'socialMediaError': ''});
+            Helpers.handlePreauth(() => {}, () => {}, (json) => {
+                Linking.openURL(`${SoSaConfig.auth.server}/${network}/login?app=1&preauth=${json.response}`);
+            });
+        };
+
+        let imgurButton = <SocialButton onPress={() => login('imgur')} icon={require('../../assets/onboarding/imgur_icon.png')} />;
+        let redditButton = <SocialButton onPress={() => login('reddit')} icon={require('../../assets/onboarding/reddit_icon.png')} />
+        let twitterButton = <SocialButton onPress={() => login('twitter')} icon={require('../../assets/onboarding/twitter_icon.png')} />
+        let facebookButton = <SocialButton onPress={() => login('facebook')} icon={require('../../assets/onboarding/facebook_icon.png')} />
 
         return <View>
             <FormError errorState={this.state.socialMediaError} />
