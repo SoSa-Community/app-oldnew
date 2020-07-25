@@ -126,12 +126,14 @@ class Login extends Component {
         let redditButton = <SocialButton onPress={() => login('reddit')} icon={require('../../assets/onboarding/reddit_icon.png')} />
         let twitterButton = <SocialButton onPress={() => login('twitter')} icon={require('../../assets/onboarding/twitter_icon.png')} />
         let facebookButton = <SocialButton onPress={() => login('facebook')} icon={require('../../assets/onboarding/facebook_icon.png')} />
+        let googleButton = <SocialButton onPress={() => login('google')} icon={require('../../assets/onboarding/google_icon.png')} />
 
         return <View>
             <FormError errorState={this.state.socialMediaError} />
             <View style={{marginTop: 20, flexDirection:'row', justifyContent: 'center'}}>
                 {SoSaConfig.features.login.imgur ? imgurButton : null}
                 {SoSaConfig.features.login.reddit ? redditButton : null}
+                {SoSaConfig.features.login.google ? googleButton : null}
                 {SoSaConfig.features.login.twitter ? twitterButton : null}
                 {SoSaConfig.features.login.facebook ? facebookButton : null}
             </View>
