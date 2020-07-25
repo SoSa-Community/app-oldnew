@@ -183,7 +183,6 @@ export class Chat extends Component {
                     this.state.currentRoom.name,
                     message
                 );
-
                 this.setMessageInput('');
                 this.scrollToBottom();
             }
@@ -398,6 +397,8 @@ export class Chat extends Component {
                 }else{
                     tag += ' ';
                 }
+
+
             }else{
                 part1 = text.substr(0, caretStart);
                 part2 = text.substr(caretEnd, textLength);
@@ -494,6 +495,7 @@ export class Chat extends Component {
         this.setState({ messageInput: data});
         if(Platform.OS === 'ios') this.checkForTags();
     }
+
 
     onFacePress = (message) => {
         Preferences.get('chat:touch_face_for_profile', (value) => {

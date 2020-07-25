@@ -32,7 +32,7 @@ class Register extends Component {
     constructor(props) {
         super();
         this.navigation = props.navigation;
-        console.log(props);
+
         if(props.appContext){
             this.addDeeplinkListener = props.appContext.addDeeplinkListener;
             this.removeDeeplinkListener = props.appContext.removeDeeplinkListener;
