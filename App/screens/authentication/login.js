@@ -31,63 +31,63 @@ class Login extends Component {
     constructor(props) {
         super();
 
-        this.navigation = props.navigation;
+        const {appContext, navigation, route: {params}} = props;
+        this.navigation = navigation;
 
-        if(props.route && props.route.params){
-            if(props.route.params.email){
-                this.state.usernameInput = props.route.params.email;
-            }
-            if(props.route.params.password){
-                this.state.passwordInput = props.route.params.password;
-            }
+        if(params){
+            const {email, password} = params;
+            if(email) this.state.usernameInput = email;
+            if(password) this.state.passwordInput = password;
         }
 
-        if(props.appContext){
-            this.addDeeplinkListener = props.appContext.addDeeplinkListener;
-            this.removeDeeplinkListener = props.appContext.removeDeeplinkListener;
+
+        if(appContext){
+            const {addDeeplinkListener, removeDeeplinkListener} = appContext;
+
+            this.addDeeplinkListener = addDeeplinkListener;
+            this.removeDeeplinkListener = removeDeeplinkListener;
         }
     }
 
-    componentDidMount(): void {
+    componentDidMount() {
         this.addDeeplinkListener('login', 'preauth', (data) => {
-
-            if(data.status === 'success'){
-                Helpers.deviceLogin(data.device_id, () => {},
-                    (error) => {
-                        this.setState({'socialMediaError': error});
-                    },
-                    (json) => {
-                        this.setState({'socialMediaError': ''});
+            const {status, device_id} = data;
+            if(status === 'success'){
+                Helpers.deviceLogin(device_id, () => {},
+                    (error) => this.setState({socialMediaError: error}),
+                    () => {
+                        this.setState({socialMediaError: ''});
                         this.navigation.replace('MembersArea', {login: true});
                     }
                 );
             }else{
-                this.setState({'socialMediaError': data.error});
+                this.setState({socialMediaError: data.error});
             }
         }, true);
     }
 
     CredentialLogin = () => {
+        const {navigation, state: {usernameInput, passwordInput, loggingIn, loginError}} = this;
 
         const login = () => {
             Helpers.handleLogin(
-                this.state.usernameInput,
-                this.state.passwordInput,
+                usernameInput,
+                passwordInput,
                 (isLoading) => this.setState({loggingIn: isLoading}),
                 (error) => this.setState({loginError: error}),
-                (json) => {
-                    this.navigation.replace('MembersArea', {login: true});
-                }
+                (json) => navigation.replace('MembersArea', {login: true})
             );
         };
 
-        const loginButton = <ActivityButton showActivity={this.state.loggingIn} onPress={login} text="Let me in!"/>
+        const loginButton = <ActivityButton showActivity={loggingIn} onPress={login} text="Let me in!"/>
         const forgotButton = <View>
-            <Text style={Styles.forgotButton} onPress={() => this.navigation.navigate('ForgotPassword', {})}>Forgotten Password</Text>
+            <Text style={Styles.forgotButton} onPress={() => navigation.navigate('ForgotPassword')}>Forgotten Password</Text>
         </View>;
 
+        const {forgotPassword, credentials} = SoSaConfig.features.login;
+
         let buttonContainer = null;
-        if(SoSaConfig.features.login.forgotPassword){
+        if(forgotPassword){
             buttonContainer =
                 <View style={{flexDirection: 'row', height:40}}>
                     <View style={{flex: 5}}>
@@ -101,15 +101,14 @@ class Login extends Component {
             buttonContainer = <View>{loginButton}</View>;
         }
 
-        if(SoSaConfig.features.login.credentials){
+        if(credentials){
             return <View>
-                <FormError errorState={this.state.loginError} />
-                <IconTextInput icon={['fal', 'user']} placeholder="Username or e-mail address" value={this.state.usernameInput} onChangeText={data => this.setState({ usernameInput: data})} />
-                <SecureTextInput icon={['fal', 'key']} placeholder="New Password" onChangeText={data => this.setState({ passwordInput: data})} value={this.state.passwordInput} />
+                <FormError errorState={loginError} />
+                <IconTextInput icon={['fal', 'user']} placeholder="Username or e-mail address" value={usernameInput} onChangeText={data => this.setState({ usernameInput: data})} />
+                <SecureTextInput icon={['fal', 'key']} placeholder="New Password" onChangeText={data => this.setState({ passwordInput: data})} value={passwordInput} />
                 {buttonContainer}
             </View>
         }
-
         return null;
     };
 
@@ -122,28 +121,26 @@ class Login extends Component {
             });
         };
 
-        let imgurButton = <SocialButton onPress={() => login('imgur')} icon={require('../../assets/onboarding/imgur_icon.png')} />;
-        let redditButton = <SocialButton onPress={() => login('reddit')} icon={require('../../assets/onboarding/reddit_icon.png')} />
-        let twitterButton = <SocialButton onPress={() => login('twitter')} icon={require('../../assets/onboarding/twitter_icon.png')} />
-        let facebookButton = <SocialButton onPress={() => login('facebook')} icon={require('../../assets/onboarding/facebook_icon.png')} />
-        let googleButton = <SocialButton onPress={() => login('google')} icon={require('../../assets/onboarding/google_icon.png')} />
+        const {social: {imgur, reddit, google, twitter, facebook}} = SoSaConfig.features.login;
+        const createSocialButton = (network, icon) => {
+            return <SocialButton onPress={() => login(network)} icon={icon} />;
+        };
 
+        const onboardingPath = '../../assets/onboarding/';
         return <View>
             <FormError errorState={this.state.socialMediaError} />
             <View style={{marginTop: 20, flexDirection:'row', justifyContent: 'center'}}>
-                {SoSaConfig.features.login.imgur ? imgurButton : null}
-                {SoSaConfig.features.login.reddit ? redditButton : null}
-                {SoSaConfig.features.login.google ? googleButton : null}
-                {SoSaConfig.features.login.twitter ? twitterButton : null}
-                {SoSaConfig.features.login.facebook ? facebookButton : null}
+                {imgur ? createSocialButton('imgur', require(`${onboardingPath}imgur_icon.png`)) : null}
+                {reddit ? createSocialButton('reddit', require(`${onboardingPath}reddit_icon.png`)) : null}
+                {google ? createSocialButton('google', require(`${onboardingPath}google_icon.png`)) : null}
+                {twitter ? createSocialButton('twitter', require(`${onboardingPath}twitter_icon.png`)) : null}
+                {facebook ? createSocialButton('facebook', require(`${onboardingPath}facebook_icon.png`)) : null}
             </View>
         </View>
     };
 
     RegisterButton = () => {
-        if(!SoSaConfig.features.general.canRegister){
-            return <View style={Styles.buttonBottom}></View>;
-        }
+        if(!SoSaConfig.features.general.canRegister) return <View style={Styles.buttonBottom}></View>;
 
         return <View style={Styles.buttonBottom}>
             <TouchableHighlight onPress={() => this.navigation.navigate('Register', {})} style={Styles.newToSoSaButton}>
