@@ -3,7 +3,7 @@ import Styles from "../screens/styles/onboarding";
 import {TextInput, View} from "react-native";
 import {Icon} from './Icon';
 
-export const IconTextInput = ({icon, placeholder, value, onChangeText, validateInput}) => {
+export const IconTextInput = ({icon, placeholder, value, onChangeText, validateInput, enabled}) => {
 
     const displaySuccess = (errorString) => {
         if(errorString === null){
@@ -15,11 +15,13 @@ export const IconTextInput = ({icon, placeholder, value, onChangeText, validateI
         }
     };
 
+    if(enabled !== true && enabled !== false) enabled = true;
+
     return (
         <View style={Styles.inputParentContainer}>
             <View style={Styles.inputContainer}>
                 <Icon icon={icon}  style={Styles.inputIcon} size={18}/>
-                <TextInput placeholder={placeholder} placeholderTextColor="#ccc" value={value} style={Styles.input} onChangeText={onChangeText}/>
+                <TextInput placeholder={placeholder} placeholderTextColor="#ccc" value={value} style={Styles.input} onChangeText={onChangeText} editable={enabled}/>
                 { validateInput && displaySuccess(validateInput()) }
             </View>
         </View>

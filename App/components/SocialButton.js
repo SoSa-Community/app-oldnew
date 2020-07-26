@@ -1,12 +1,14 @@
 import React from 'react';
-import {Image, TouchableOpacity} from 'react-native';
+import {Image, TouchableHighlight} from 'react-native';
 
 import Styles from "../screens/styles/onboarding";
 
-export const SocialButton = ({onPress, icon}) => {
+export const SocialButton = ({onPress, icon, enabled}) => {
+    if(enabled !== true && enabled !== false) enabled = true;
+
     return (
-        <TouchableOpacity activeOpacity={0.5} onPress={onPress}  style={Styles.socialButton}>
+        <TouchableHighlight onPress={onPress} style={[Styles.socialButton, {opacity: enabled ? 1 : 0.5}]} disabled={!enabled} >
             <Image source={icon} style={Styles.socialButtonIcon} />
-        </TouchableOpacity>
+        </TouchableHighlight>
     )
 }

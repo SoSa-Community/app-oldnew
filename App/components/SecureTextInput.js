@@ -31,12 +31,16 @@ export default class SecureTextInput extends Component {
     };
 
     render() {
+        let {icon, placeholder, onChangeText, value, enabled, validateInput} = this.props;
+
+        if(enabled !== true && enabled !== false) enabled = true;
+
         return (
             <View style={Styles.inputParentContainer}>
                 <View style={Styles.inputContainer}>
-                    { this.props.icon ? <Icon icon={this.props.icon}  style={Styles.inputIcon} size={18}/> : null }
-                    <TextInput placeholder={this.props.placeholder} placeholderTextColor="#ccc" style={Styles.input} secureTextEntry={this.state.hideInput} onChangeText={this.props.onChangeText} value={this.props.value}/>
-                    { this.props.validateInput ? this.displaySuccess(this.props.validateInput()) : null }
+                    { icon && <Icon icon={icon}  style={Styles.inputIcon} size={18}/> }
+                    <TextInput placeholder={placeholder} placeholderTextColor="#ccc" style={Styles.input} secureTextEntry={this.state.hideInput} onChangeText={onChangeText} value={value} editable={enabled}/>
+                    { validateInput && this.displaySuccess(validateInput())}
                     { this.displayViewInput() }
                 </View>
             </View>

@@ -17,7 +17,7 @@ export default class Helpers {
     };
 
     static fetchWithTimeout = (url, options, timeout) => {
-        if(typeof(timeout) === "undefined") timeout = 3000;
+        if(typeof(timeout) === "undefined") timeout = 10000;
 
         let fetchPromise = fetch(url, options);
         return new Promise((resolve, reject) => {

@@ -113,7 +113,7 @@ const Styles = StyleSheet.create({
     },
 
     socialButton: {
-        marginHorizontal: 5
+        marginHorizontal: 5,
     },
 
     socialButtonIcon: {

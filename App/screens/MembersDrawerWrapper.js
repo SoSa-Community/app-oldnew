@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Alert} from 'react-native';
+import {View, Alert, Platform} from 'react-native';
 
 import { NavigationContainer} from '@react-navigation/native';
 import { DrawerNavigationContext } from './context/DrawerNavigationContext';
@@ -83,7 +83,7 @@ export default class MembersDrawerWrapper extends Component {
         return (
             <TagName {...props} style={{flex: 1, backgroundColor: '#121211'}}>
                     { items }
-                    <View style={{ flex: 1, justifyContent: 'flex-end'}}>
+                    <View style={{ flex: 1, justifyContent: 'flex-end', paddingBottom:(Platform.OS === 'ios' ? 24 : 0), alignItems:'center'}}>
                         { bottomItems }
                     </View>
             </TagName>

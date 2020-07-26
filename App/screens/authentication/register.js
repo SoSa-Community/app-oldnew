@@ -39,15 +39,20 @@ class Register extends Component {
         }
     }
 
-    componentDidMount(): void {
+    componentDidMount() {
+        let resetState = setTimeout(() => {
+            this.setState({registering: false});
+        },5000);
+
         this.addDeeplinkListener('login', 'preauth', (data) => {
             if(data.status === 'success'){
                 Helpers.deviceLogin(data.device_id, () => {},
                     (error) => {
-                        this.setState({'socialMediaError': error});
+                        this.setState({socialMediaError: error, registering: false});
                     },
                     (json) => {
-                        this.setState({'socialMediaError': ''});
+                        clearTimeout(resetState);
+                        this.setState({socialMediaError: '', registering:false});
                         this.navigation.replace('MembersArea', {login: true});
                     }
                 );
@@ -96,11 +101,11 @@ class Register extends Component {
             return <View>
                 <FormError errorState={this.state.registerError} />
 
-                <IconTextInput icon={['fal', 'user']} placeholder="Username" value={this.state.usernameInput} onChangeText={data => this.setState({ usernameInput: data})} />
-                <IconTextInput icon={['fal', 'envelope']} placeholder="E-mail" value={this.state.emailInput} onChangeText={data => this.setState({ emailInput: data})} />
+                <IconTextInput icon={['fal', 'user']} placeholder="Username" value={this.state.usernameInput} onChangeText={data => this.setState({ usernameInput: data})} enabled={!this.state.registering}/>
+                <IconTextInput icon={['fal', 'envelope']} placeholder="E-mail" value={this.state.emailInput} onChangeText={data => this.setState({ emailInput: data})} enabled={!this.state.registering}/>
 
                 <FormError errorState={this.state.passwordError} />
-                <SecureTextInput placeholder="Choose a password" onChangeText={data => this.setState({ passwordInput: data})} validateInput={() => this.validatePassword()} />
+                <SecureTextInput placeholder="Choose a password" onChangeText={data => this.setState({ passwordInput: data})} validateInput={() => this.validatePassword()} enabled={!this.state.registering} />
 
                 <View style={{height:40}}>
                     <ActivityButton showActivity={this.state.registering} onPress={register} text="Let me in!" />
@@ -113,9 +118,9 @@ class Register extends Component {
 
     SocialRegister = () => {
 
-        if(SoSaConfig.features.register.imgur || SoSaConfig.features.register.reddit){
+        if(SoSaConfig.features.register.social.imgur || SoSaConfig.features.register.social.reddit){
             let register = (network) => {
-                this.setState({'socialMediaError': ''});
+                this.setState({socialMediaError: '', registering: true});
                 Helpers.handlePreauth(() => {
                 }, () => {
                 }, (json) => {
@@ -125,21 +130,21 @@ class Register extends Component {
 
             let onboardingPath = '../../assets/onboarding/';
 
-            let imgurButton = <SocialButton onPress={() => register('imgur')} icon={require(`${onboardingPath}imgur_icon.png`)} />;
-            let redditButton = <SocialButton onPress={() => register('reddit')} icon={require(`${onboardingPath}reddit_icon.png`)} />
-            let twitterButton = <SocialButton onPress={() => register('twitter')} icon={require(`${onboardingPath}twitter_icon.png`)} />
-            let facebookButton = <SocialButton onPress={() => register('facebook')} icon={require(`${onboardingPath}facebook_icon.png`)} />
-            let googleButton = <SocialButton onPress={() => register('google')} icon={require(`${onboardingPath}google_icon.png`)} />
+            let imgurButton = <SocialButton onPress={() => register('imgur')} icon={require(`${onboardingPath}imgur_icon.png`)} enabled={!this.state.registering}/>;
+            let redditButton = <SocialButton onPress={() => register('reddit')} icon={require(`${onboardingPath}reddit_icon.png`)} enabled={!this.state.registering}/>
+            let twitterButton = <SocialButton onPress={() => register('twitter')} icon={require(`${onboardingPath}twitter_icon.png`)} enabled={!this.state.registering}/>
+            let facebookButton = <SocialButton onPress={() => register('facebook')} icon={require(`${onboardingPath}facebook_icon.png`)} enabled={!this.state.registering}/>
+            let googleButton = <SocialButton onPress={() => register('google')} icon={require(`${onboardingPath}google_icon.png`)} enabled={!this.state.registering}/>
 
             return <View>
                 <Text style={[Styles.subheader, {marginTop: 40}]}>Join using another platform</Text>
                 <FormError errorState={this.state.socialMediaError} />
                 <View style={{marginTop: 20, flexDirection:'row', justifyContent: 'center'}}>
-                    {SoSaConfig.features.register.imgur ? imgurButton : null}
-                    {SoSaConfig.features.register.reddit ? redditButton : null}
-                    {SoSaConfig.features.register.google ? googleButton : null}
-                    {SoSaConfig.features.register.twitter ? twitterButton : null}
-                    {SoSaConfig.features.register.facebook ? facebookButton : null}
+                    {SoSaConfig.features.register.social.imgur ? imgurButton : null}
+                    {SoSaConfig.features.register.social.reddit ? redditButton : null}
+                    {SoSaConfig.features.register.social.google ? googleButton : null}
+                    {SoSaConfig.features.register.social.twitter ? twitterButton : null}
+                    {SoSaConfig.features.register.social.facebook ? facebookButton : null}
                 </View>
             </View>;
         }

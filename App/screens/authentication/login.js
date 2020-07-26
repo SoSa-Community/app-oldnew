@@ -50,13 +50,19 @@ class Login extends Component {
     }
 
     componentDidMount() {
+        let resetState = setTimeout(() => {
+            this.setState({loggingIn: false});
+        },5000);
+
         this.addDeeplinkListener('login', 'preauth', (data) => {
             const {status, device_id} = data;
             if(status === 'success'){
                 Helpers.deviceLogin(device_id, () => {},
-                    (error) => this.setState({socialMediaError: error}),
+                    (error) => this.setState({socialMediaError: error, loggingIn:false}),
                     () => {
-                        this.setState({socialMediaError: ''});
+                        clearTimeout(resetState);
+
+                        this.setState({socialMediaError: '', loggingIn:false});
                         this.navigation.replace('MembersArea', {login: true});
                     }
                 );
@@ -104,8 +110,8 @@ class Login extends Component {
         if(credentials){
             return <View>
                 <FormError errorState={loginError} />
-                <IconTextInput icon={['fal', 'user']} placeholder="Username or e-mail address" value={usernameInput} onChangeText={data => this.setState({ usernameInput: data})} />
-                <SecureTextInput icon={['fal', 'key']} placeholder="New Password" onChangeText={data => this.setState({ passwordInput: data})} value={passwordInput} />
+                <IconTextInput icon={['fal', 'user']} placeholder="Username or e-mail address" value={usernameInput} onChangeText={data => this.setState({ usernameInput: data})} enabled={!this.state.loggingIn}/>
+                <SecureTextInput icon={['fal', 'key']} placeholder="New Password" onChangeText={data => this.setState({ passwordInput: data})} value={passwordInput} enabled={!this.state.loggingIn}/>
                 {buttonContainer}
             </View>
         }
@@ -115,7 +121,7 @@ class Login extends Component {
     SocialLogin = () => {
 
         let login = (network) => {
-            this.setState({'socialMediaError': ''});
+            this.setState({loginError: '', socialMediaError: '', loggingIn: true});
             Helpers.handlePreauth(() => {}, () => {}, (json) => {
                 Linking.openURL(`${SoSaConfig.auth.server}/${network}/login?app=1&preauth=${json.response}`);
             });
@@ -123,7 +129,7 @@ class Login extends Component {
 
         const {social: {imgur, reddit, google, twitter, facebook}} = SoSaConfig.features.login;
         const createSocialButton = (network, icon) => {
-            return <SocialButton onPress={() => login(network)} icon={icon} />;
+            return <SocialButton onPress={() => login(network)} icon={icon} enabled={!this.state.loggingIn} />;
         };
 
         const onboardingPath = '../../assets/onboarding/';

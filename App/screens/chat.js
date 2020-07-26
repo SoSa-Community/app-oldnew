@@ -455,7 +455,7 @@ export class Chat extends Component {
 
     buildWrapper = (component) => {
         if(Platform.OS === 'ios'){
-            return  (<KeyboardAvoidingView style={{flex: 1}} behavior="padding">{component}</KeyboardAvoidingView>);
+            return  (<KeyboardAvoidingView style={{flex: 1, backgroundColor: '#121111'}} behavior="padding">{component}</KeyboardAvoidingView>);
         }else {
             return (<View style={{flex: 1}} behavior="padding">{component}</View>);
         }
@@ -502,7 +502,7 @@ export class Chat extends Component {
             if(!value){
                 this.addTag(message.nickname)
             }else{
-                this.onLongFacePress();
+                this.onLongFacePress(message);
             }
         });
     }
