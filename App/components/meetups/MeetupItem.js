@@ -3,9 +3,93 @@ import {Image, ImageBackground, Text, View, TouchableHighlight} from "react-nati
 
 import {StyleSheet} from 'react-native';
 import {ActivityButton} from "../ActivityButton";
+import {Icon} from "../Icon";
 
 const Styles = StyleSheet.create({
+    container: {flex:1, margin:16},
+    attendeeImageContainer: {
+        justifyContent:'center',
+        marginRight:-18
+    },
+    attendeeImage: {width: 36, height: 36, borderRadius: 36/2, borderWidth: 0.25, borderColor:'#121111'},
 
+    image: {
+        width: '100%',
+        height: 175,
+        flex:1
+    },
+
+    imageOverlay: {
+        backgroundColor: 'rgba(27, 27, 26, 0.90)',
+        position:'absolute',
+        top:0,
+        left: 0,
+        height:175,
+        width:'100%',
+        borderTopLeftRadius: 8,
+        borderTopRightRadius: 8
+    },
+
+    imageTitleContainer: {
+        flex: 1,
+        justifyContent:'flex-start'
+    },
+
+    imageTitleInnerContainer: {
+        marginTop: 8,
+        marginHorizontal: 8
+    },
+
+    title: {
+        color:'#fff',
+        fontSize: 24,
+        fontWeight:'bold'
+    },
+
+    meetupDate: {
+        color:'#ccc',
+        textAlignVertical:'center',
+        fontWeight:'bold'
+    },
+
+    imageBottomContainer: {
+        flex: 1,
+        justifyContent:'flex-end'
+    },
+
+    imageBottomInnerContainer: {
+        flexDirection:'row',
+        marginBottom: 4,
+        height:40
+    },
+
+    attendeesContainer: {
+        flex: 1,
+        flexDirection:'row',
+        marginLeft:8,
+        justifyContent:'flex-start',
+        alignItems:'center'
+    },
+
+    infoIconContainer: {
+        flex: 1,
+        flexDirection:'row',
+        marginRight:8,
+        justifyContent:'flex-end',
+        alignItems:'center'
+    },
+
+    buttonContainer: {
+        flexDirection:'row',
+        paddingVertical:8
+    },
+
+    viewButtonContainer: {
+        flex: 1,
+        justifyContent:'center'
+    },
+
+    viewButtonText: {textAlign:'center', color:'#fff'}
 });
 
 export const MeetupItem = ({meetup, onChange}) =>{
@@ -21,19 +105,12 @@ export const MeetupItem = ({meetup, onChange}) =>{
             setSaving(false);
             meetup.going = !meetup.going;
 
-            if(meetup.going && !hasAttendees){
-                meetup.attendees = [ {picture: 'https://picsum.photos/seed/picsum/300/300'} ];
-            }
+            if(meetup.going && !hasAttendees) meetup.attendees = [ {picture: `https://picsum.photos/300/300?seed=${Math.random()}`} ];
+            if(meetup.going && hasAttendees) meetup.attendees.push({picture: `https://picsum.photos/300/300?seed=${Math.random()}`});
+            if(!meetup.going) meetup.attendees.pop();
+            if(onChange) onChange(meetup);
 
-            if(!meetup.going && hasAttendees && meetup.attendees.length === 1){
-                meetup.attendees = [];
-            }
-
-            if(onChange){
-                onChange(meetup);
-            }
-
-        }, 500);
+        }, 100);
     };
 
     const nth = function(d) {
@@ -53,30 +130,35 @@ export const MeetupItem = ({meetup, onChange}) =>{
     const da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(dateTime);
 
     const attendees = meetup.attendees.map((attendee) => {
-        return <View style={{justifyContent:'center'}}><Image source={{uri : attendee.picture}} style={{width: 36, height: 36, borderRadius: 36/2, borderWidth: 0.25, borderColor:'#121111'}}  /></View>
+        return <View style={Styles.attendeeImageContainer}><Image source={{uri : attendee.picture}} style={Styles.attendeeImage}  /></View>
     });
 
-    return  <View style={{flex:1, margin:16}}>
-        <ImageBackground source={{uri : meetup.picture}} style={{width: '100%', height: 175, flex:1}} imageStyle={{ borderTopLeftRadius: 16, borderTopRightRadius: 16 }}>
-            <View style={{backgroundColor: 'rgba(0,0,0,0.7)', position:'absolute', top:0, left: 0, height:175, width:'100%', borderTopLeftRadius: 8, borderTopRightRadius: 8}} />
-            <View style={{flex: 1, justifyContent:'flex-start'}}>
-                <View style={{marginTop: 8, marginHorizontal: 8}}>
-                    <Text style={{color:'#fff', fontSize: 22, fontWeight:'bold'}}>{meetup.title}</Text>
-                    <Text style={{color:'#ccc', textAlignVertical:'center', fontWeight:'bold'}}>{`${wd}, ${da}${nth(da)} ${mo} ${ye}` }</Text>
+    return  <View style={Styles.container}>
+        <ImageBackground source={{uri : meetup.picture}} style={Styles.image} imageStyle={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }}>
+            <View style={Styles.imageOverlay} />
+            <View style={Styles.imageTitleContainer}>
+                <View style={Styles.imageTitleInnerContainer}>
+                    <Text style={Styles.title}>{meetup.title}</Text>
+                    <Text style={Styles.meetupDate}>{`${wd}, ${da}${nth(da)} ${mo} ${ye}` }</Text>
                 </View>
             </View>
-            <View style={{flex: 1, justifyContent:'flex-end'}}>
-                { hasAttendees &&
-                <View style={{flexDirection:'row', marginBottom: 16, marginHorizontal: 8}}>
-                    { attendees }
-                </View>}
+            <View style={Styles.imageBottomContainer}>
+                <View style={Styles.imageBottomInnerContainer}>
+                    { hasAttendees &&
+                    <View style={Styles.attendeesContainer}>
+                        { attendees }
+                    </View>}
+                    <View style={Styles.infoIconContainer}>
+                        <Icon icon={meetup.virtual ? ['fas', 'trees'] : ['far', 'wifi']} style={{opacity: 0.95}} size={28} color='#cccccc' />
+                    </View>
+                </View>
             </View>
 
         </ImageBackground>
-        <View style={{flexDirection:'row', paddingVertical:8}}>
-            <View style={{flex: 1, justifyContent:'center'}}>
+        <View style={Styles.buttonContainer}>
+            <View style={Styles.viewButtonContainer}>
                 <TouchableHighlight>
-                    <Text style={{textAlign:'center', color:'#fff'}}>Tell me more</Text>
+                    <Text style={Styles.viewButtonText}>Tell me more</Text>
                 </TouchableHighlight>
             </View>
             <View style={{flex:1}}>

@@ -36,21 +36,23 @@ export class Meetups extends Component {
             {
                 id: 1,
                 picture: 'https://secure.meetupstatic.com/photos/event/5/a/e/e/600_490223278.jpeg',
-                title: 'SoSa Plays - Team Fortress 2',
+                title: 'Terraria',
                 start_timestamp: 1595863949,
                 going: false,
+                virtual: false,
                 attendees: [
-                    {picture: 'https://picsum.photos/seed/picsum/300/300'},
-                    {picture: 'https://picsum.photos/seed/picsum/300/300'},
-                    {picture: 'https://picsum.photos/seed/picsum/300/300'},
-                    {picture: 'https://picsum.photos/seed/picsum/300/300'},
-                    {picture: 'https://picsum.photos/seed/picsum/300/300'},
+                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
+                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
+                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
+                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
+                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
                 ]
             },
             {
                 id: 2,
-                picture: 'https://secure.meetupstatic.com/photos/event/5/a/e/e/600_490223278.jpeg',
-                title: 'SoSa Plays - Team Fortress 2',
+                picture: 'https://i.ytimg.com/vi/N7ZafWA2jd8/maxresdefault.jpg',
+                title: 'Team Fortress 2',
+                virtual: true,
                 start_timestamp: 1595863949,
                 going: false,
                 attendees: [
@@ -59,16 +61,17 @@ export class Meetups extends Component {
             },
             {
                 id: 3,
-                picture: 'https://secure.meetupstatic.com/photos/event/5/a/e/e/600_490223278.jpeg',
-                title: 'SoSa Plays - Team Fortress 2',
+                picture: 'https://steamcdn-a.akamaihd.net/steam/apps/434170/capsule_616x353.jpg?t=1581354185',
+                title: 'Jackbox Party',
+                virtual: false,
                 start_timestamp: 1595863949,
                 going: false,
                 attendees: [
-                    {picture: 'https://picsum.photos/seed/picsum/300/300'},
-                    {picture: 'https://picsum.photos/seed/picsum/300/300'},
-                    {picture: 'https://picsum.photos/seed/picsum/300/300'},
-                    {picture: 'https://picsum.photos/seed/picsum/300/300'},
-                    {picture: 'https://picsum.photos/seed/picsum/300/300'}
+                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
+                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
+                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
+                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
+                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`}
                 ]
             },
         ]

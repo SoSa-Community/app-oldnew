@@ -42,7 +42,7 @@ export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePr
     }
 
     if(!message.picture || message.picture.length === 0){
-        message.picture = 'https://picsum.photos/seed/picsum/300/300';
+        message.picture = `https://picsum.photos/300/300?seed=${Math.random()}`;
     }
 
     return  <View style={containerStyles}>

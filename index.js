@@ -6,11 +6,13 @@ import 'react-native-gesture-handler';
 import {AppRegistry} from 'react-native';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUsers as fasUsers, faCampfire as fasCampfire, faInfoCircle as fasInfoCircle, faCheck as fasCheck } from '@fortawesome/pro-solid-svg-icons';
+import { faUsers as fasUsers, faCampfire as fasCampfire, faInfoCircle as fasInfoCircle, faCheck as fasCheck, faTrees as fasTrees } from '@fortawesome/pro-solid-svg-icons';
 import { faUsers as falUsers, faBars as falBars, faCampfire as falCampfire, faArrowAltLeft as falArrowAltLeft,
     faUser as falUser, faKey as falKey, faEye as falEye, faEyeSlash as falEyeSlash, faEnvelope as falEnvelope, faPaperPlane as falPaperPlane} from '@fortawesome/pro-light-svg-icons'
 
-library.add(fasUsers, falUsers, falBars, fasCampfire, falCampfire, falArrowAltLeft, falUser, falKey, fasInfoCircle, fasCheck, falEye, falEyeSlash, falEnvelope, falPaperPlane);
+import {faWifi as farWifi} from '@fortawesome/pro-regular-svg-icons';
+
+library.add(fasUsers, falUsers, falBars, fasCampfire, falCampfire, falArrowAltLeft, falUser, falKey, fasInfoCircle, fasCheck, falEye, falEyeSlash, falEnvelope, falPaperPlane, fasTrees, farWifi);
 
 /**
  * Object.prototype.forEach() polyfill
