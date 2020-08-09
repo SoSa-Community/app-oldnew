@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Image, Text, View} from "react-native";
+import {Image, Text, View, TouchableHighlight} from "react-native";
 
 import {StyleSheet} from 'react-native';
 const Styles = StyleSheet.create({
@@ -14,6 +14,7 @@ export const CommentItem = ({comment, depth}) =>{
     const colors = ['#c0392B','#2ECC71','#3498DB','#9B59B6','#D35400','#1ABC9C','#34495E','#8E44AD','#F1C40F','#ECF0F1','#2C3E50','#2980B9','#E74C3C','#C0392B','#2ECC71','#3498DB','#9B59B6','#D35400','#1ABC9C','#34495E'];
     const [getSaving, setSaving] = useState(false);
     const [getShowingFull, setShowingFull] = useState(false);
+    const [getShowingChildren, setShowingChildren] = useState(false);
 
     const contentSplit = content.split(' ');
     const excerpt = contentSplit.slice(0,30).join(' ');
@@ -27,13 +28,11 @@ export const CommentItem = ({comment, depth}) =>{
     }
 
     let childrenViews = null;
-
     if(children){
-        childrenViews = <View style={{flex:1}}>{children.map((comment) => {
+        childrenViews = children.map((comment) => {
             return <CommentItem comment={comment} depth={depth + 1} />;
-        })}</View>;
+        });
     }
-
 
     return  <View style={{flex:1}}>
                 <View style={[{flex:1, paddingLeft: 8, paddingVertical: 8, backgroundColor:'#2b2b2b', marginTop:6, borderRadius:6}, depthStyles]}>
@@ -43,6 +42,7 @@ export const CommentItem = ({comment, depth}) =>{
                     </View>
                     <View style={{flexDirection:'row', flexWrap:'wrap'}}>
                         <Text style={[{color:'#fff', paddingRight:6},heightStyles]}>{getContent} <Text onPress={() => {
+                            setShowingChildren(!getShowingChildren);
                             if(getShowingFull){
                                 setContent(excerpt);
                             }else{
@@ -53,7 +53,10 @@ export const CommentItem = ({comment, depth}) =>{
                             <Text style={{color: '#5cb85c'}}>{getShowingFull ? 'show less' : 'show more'}</Text>
                         </Text></Text>
                     </View>
+                    { children && <View>
+                        <TouchableHighlight onPress={() => setShowingChildren(!getShowingChildren)}><Text style={{color: '#5cb85c'}}>Toggle Children</Text></TouchableHighlight>
+                    </View> }
                 </View>
-                { childrenViews }
+                { getShowingChildren && <View style={{flex:1}}>{childrenViews}</View> }
             </View>
 };
