@@ -9,6 +9,8 @@ import ForgotPassword from './App/screens/authentication/forgot_password';
 import ForgotPasswordCode from './App/screens/authentication/forgot_password_code';
 import MembersDrawerWrapper from "./App/screens/MembersDrawerWrapper";
 import SettingsScreen from "./App/screens/Settings";
+import MeetupsScreen from './App/screens/Meetups';
+import MeetupScreen from './App/screens/Meetup';
 
 import BaseStyles from './App/screens/styles/base';
 import Helpers from "./App/sosa/Helpers";
@@ -21,7 +23,7 @@ export default class SoSa extends Component {
     coldBoot = true;
     state = {
         initializing: true,
-        defaultScreen: 'Login',
+        defaultScreen: 'Meetup',
         appState: AppState.currentState
     }
 
@@ -133,8 +135,10 @@ export default class SoSa extends Component {
                                     <Stack.Screen name="Register" component={RegistrationScreen} options={{ title: 'Join SoSa' }} />
                                     <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ title: 'Forgotten Password' }} />
                                     <Stack.Screen name="ForgotPasswordCode" component={ForgotPasswordCode} options={{title: 'Check your e-mail'}}/>
-                                    <Stack.Screen name="MembersArea" component={MembersDrawerWrapper} options={{headerShown:false}}/>
+                                    <Stack.Screen name="MembersArea" component={MembersDrawerWrapper} options={{title:'', headerShown:false}}/>
                                     <Stack.Screen name="Settings" component={SettingsScreen} options={{title: 'Settings'}}/>
+                                    <Stack.Screen name="Meetups" component={MeetupsScreen} options={{title: 'Meetups'}}/>
+                                    <Stack.Screen name="Meetup" component={MeetupScreen} options={{title: 'Meetup'}}/>
                                 </Stack.Navigator>
                             </NavigationContainer>
                         </AppContext.Provider>
