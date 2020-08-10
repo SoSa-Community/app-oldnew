@@ -84,12 +84,14 @@ const Styles = StyleSheet.create({
 
     buttonContainer: {
         flexDirection:'row',
-        alignItems:'center'
+        alignItems:'center',
+        paddingBottom: Platform.OS === 'ios' ? 32 : 0,
+        paddingRight: 14
     },
 
     viewButtonContainer: {
         flex: 1,
-        justifyContent:'center',
+        justifyContent:'flex-start',
     },
 
     viewButtonText: {textAlign:'center', color:'#fff'}
