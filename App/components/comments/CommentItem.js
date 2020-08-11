@@ -36,24 +36,28 @@ export const CommentItem = ({comment, depth}) =>{
 
     return  <View style={{flex:1}}>
                 <View style={[{flex:1, paddingLeft: 8, paddingVertical: 8, backgroundColor:'#2b2b2b', marginTop:6, borderRadius:6}, depthStyles]}>
-                    <View style={{flexDirection:'row', alignItems:'center', paddingBottom: 8}}>
-                        <Image source={{uri: picture}} style={{width: 36, height: 36, borderRadius: 36/2, borderWidth: 0.25, borderColor:'#121111', marginRight: 8}}/>
-                        <Text style={{color:'#fff'}}>{nickname}</Text>
-                    </View>
                     <View style={{flexDirection:'row', flexWrap:'wrap'}}>
-                        <Text style={[{color:'#fff', paddingRight:6},heightStyles]}>{getContent} <Text onPress={() => {
-                            setShowingChildren(!getShowingChildren);
-                            if(getShowingFull){
-                                setContent(excerpt);
-                            }else{
-                                setContent(content);
-                            }
-                            setShowingFull(!getShowingFull);
-                        }}>
-                            <Text style={{color: '#5cb85c'}}>{getShowingFull ? 'show less' : 'show more'}</Text>
-                        </Text></Text>
+                        <View style={{flex: 0}}>
+                            <Image source={{uri: picture}} style={{width: 36, height: 36, borderRadius: 36/2, borderWidth: 0.25, borderColor:'#121111', marginRight: 8}}/>
+                        </View>
+                        <View style={{flex:1}}>
+                            <Text style={[{color:'#fff', paddingRight:6},heightStyles]}>
+                                <Text style={{color:'#5cb85c'}}>{nickname} </Text>
+                                {getContent}
+                                <Text onPress={() => {
+                                    setShowingChildren(!getShowingChildren);
+                                    if(getShowingFull){
+                                        setContent(excerpt);
+                                    }else{
+                                        setContent(content);
+                                    }
+                                    setShowingFull(!getShowingFull);
+                                }} style={{color: '#5cb85c'}}> {getShowingFull ? 'show less' : 'show more'}</Text>
+                            </Text>
+                        </View>
                     </View>
-                    { children && <View>
+
+                    { children && <View style={{flex: 1}}>
                         <TouchableHighlight onPress={() => setShowingChildren(!getShowingChildren)}><Text style={{color: '#5cb85c'}}>Toggle Children</Text></TouchableHighlight>
                     </View> }
                 </View>
