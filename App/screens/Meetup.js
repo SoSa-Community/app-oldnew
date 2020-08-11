@@ -118,11 +118,11 @@ export class Meetup extends Component {
                 start_timestamp: 1595863949,
                 going: false,
                 attendees: [
-                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
+                    {id:1, picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
+                    {id:2, picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
+                    {id:3, picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
+                    {id:4, picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
+                    {id:5, picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
                 ],
                 comments: [
                     {entity:2, context:'meetup', id: 1, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.',
@@ -170,7 +170,7 @@ export class Meetup extends Component {
         const da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(dateTime);
 
         const attendees = meetup.attendees.map((attendee) => {
-            return <View style={Styles.attendeeImageContainer}><Image source={{uri : attendee.picture}} style={Styles.attendeeImage}  /></View>
+            return <View style={Styles.attendeeImageContainer} key={attendee.id}><Image source={{uri : attendee.picture}} style={Styles.attendeeImage}  /></View>
         });
 
         return (

@@ -17,6 +17,7 @@ class SettingsScreen extends Component {
         return (
           <View>
                 <SettingsItem title="Show Profile On Touch" description="Pressing a members face in chat will show their profile instead of tagging them " settingName="chat:touch_face_for_profile" />
+                <SettingsItem title="Hide Profile Picture on Comments" description="Some people prefer this, especially useful on smaller screens" settingName="comments:hide_profile_picture" />
           </View>
         );
   }
