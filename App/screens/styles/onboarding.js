@@ -50,7 +50,8 @@ const Styles = StyleSheet.create({
     },
 
     input:{
-        flex: 1
+        flex: 1,
+        color: '#121111'
     },
 
     inputIcon:{color: '#ccc', marginHorizontal:4, marginTop: 11},
