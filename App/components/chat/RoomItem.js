@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View} from "react-native";
+import {Text, View, TouchableHighlight} from "react-native";
 import {Icon} from '../Icon';
 
 import {StyleSheet} from 'react-native';
@@ -23,9 +23,11 @@ export const RoomItem = ({room, roomActive, onPress}) =>{
         let color =  '#ccc';
         if(roomActive) color = '#fff';
 
-        return  <View style={Styles.room} onPress={onPress}>
-                    <Icon icon={['fal', 'campfire']} size={18} style={{marginRight:14, color}}/>
-                    <Text style={{flex: 1, fontSize: 16, color}}>{room.title}</Text>
-                </View>
+        return  <TouchableHighlight onPress={onPress}>
+            <View style={Styles.room}>
+                <Icon icon={['fal', 'campfire']} size={18} style={{marginRight:14, color}}/>
+                <Text style={{flex: 1, fontSize: 16, color}}>{room.title}</Text>
+            </View>
+        </TouchableHighlight>
 
 }

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Alert, Platform} from 'react-native';
+import {View, Alert, Platform, Text, ScrollView} from 'react-native';
 
 import { NavigationContainer} from '@react-navigation/native';
 import { DrawerNavigationContext } from './context/DrawerNavigationContext';
@@ -9,6 +9,7 @@ import MembersNavigator from './MembersNavigator';
 import {createDrawerNavigator, DrawerContentScrollView} from '@react-navigation/drawer';
 import Session from "../sosa/Session";
 import Helpers from "../sosa/Helpers";
+import {Icon} from "../components/Icon";
 
 const DrawerL = createDrawerNavigator();
 const DrawerR = createDrawerNavigator();

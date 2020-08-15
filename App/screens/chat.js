@@ -79,7 +79,6 @@ export class Chat extends Component {
     }
 
     componentDidMount() {
-        this.setupConnectButton();
         this.updateUserList();
 
         let device = Device.getInstance();
@@ -119,34 +118,6 @@ export class Chat extends Component {
             console.debug('Could not remove focus listener', e);
         }
     }
-
-    setupConnectButton = (disconnect: false) => {
-        let color = '#28a745';
-        let text = 'Connect';
-        let func = () => {
-            this.connect();
-            this.drawerNavigation.dangerouslyGetParent().closeDrawer();
-        };
-
-        if(disconnect){
-            color = '#dc3545';
-            text = 'Disconnect';
-            func = () => {
-                this.disconnect();
-                this.drawerNavigation.dangerouslyGetParent().closeDrawer();
-                this.drawerNavigationContext.removeDrawerItem('user_list', true);
-                this.drawerNavigationContext.removeDrawerItem('room_list');
-            };
-        }
-
-        this.drawerNavigationContext.addDrawerItem('connect', (<View key={'connect'}>
-            <Button
-                color={color}
-                title={text}
-                onPress={func}
-            />
-        </View>), false, true);
-    };
 
     updateUserList = () => {
         this.drawerNavigationContext.addDrawerItem('user_list', (
@@ -224,8 +195,11 @@ export class Chat extends Component {
         let roomViews = rooms.map((room) => {
             return <RoomItem key={room.id}
                              onPress={() => {
-                                 this.joinRoom('sosa', room.name);
-                                 this.navigation.closeDrawer();
+                                 if(!this.state.currentRoom || this.state.currentRoom.name !== room.name) {
+                                     this.joinRoom('sosa', room.name);
+                                 }
+                                 this.navigation.navigate('Chat');
+                                 this.drawerNavigation.dangerouslyGetParent().closeDrawer();
                              }}
                              room={room}
                              roomActive={(this.state.currentRoom !== null && room.id === this.state.currentRoom.id)}
@@ -234,8 +208,8 @@ export class Chat extends Component {
 
         this.drawerNavigationContext.addDrawerItem('room_list', (
             <View style={{flex: 1}} key={'room_list'}>
-                <View style={{justifyContent:'center', alignItems:'center', marginVertical: 8}}>
-                    <Text style={{justifyContent:'center', fontSize:16, color:'#fff'}}>Rooms</Text>
+                <View style={{margin: 8}}>
+                    <Text style={{fontSize:16, color:'#fff'}}>Rooms</Text>
                 </View>
                 <ScrollView style={{flex:1}}>
                     { roomViews }
@@ -307,8 +281,6 @@ export class Chat extends Component {
                 this.addStatus(`Connected to server with nickname: ${chat.session.nickname}`);
                 this.setupBufferRenderTimer();
 
-                this.setupConnectButton(true);
-
                 this.updateRoomList();
 
                 if(this.state.currentRoom !== null){
@@ -320,7 +292,6 @@ export class Chat extends Component {
             },
             'disconnected': (message, client) => {
                 this.addStatus('Disconnected from server');
-                this.setupConnectButton();
 
                 return message;
             },
@@ -529,7 +500,7 @@ export class Chat extends Component {
                                 renderItem={
                                     ({item}) => {
                                         if(item instanceof Message){
-                                            return <MessageItem message={item} onFacePress={() => this.onFacePress(item)} onLongFacePress={() => this.onLongFacePress(item)} onUsernamePress={() => this.addTag(item.nickname)} />
+                                            return <MessageItem message={item} onFacePress={() => this.onFacePress(item)} onLongFacePress={() => this.onLongFacePress(item)} onUsernamePress={() => this.addTag(item.nickname)} myNickname={this.nickname} />
                                         }else{
                                             return <Text style={Styles.status}>{item.message}</Text>
                                         }

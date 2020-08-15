@@ -82,8 +82,8 @@ export class Meetups extends Component {
 
         this.navigation = props.navigation;
         this.navigationContext = props.navigationContext;
-        //this.drawerNavigation = this.navigationContext.drawerNavigation;
-        //this.drawerNavigationContext = props.navigationContext.drawerNavigationContext;
+        this.drawerNavigation = this.navigationContext.drawerNavigation;
+        this.drawerNavigationContext = props.navigationContext.drawerNavigationContext;
     }
 
     render() {

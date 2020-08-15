@@ -6,7 +6,7 @@ import HTML from 'react-native-render-html';
 
 const Styles = StyleSheet.create({
     container: {
-        marginTop:10
+        marginTop:12
     },
 
     containerWithMention: {
@@ -15,7 +15,7 @@ const Styles = StyleSheet.create({
 
     inner: {
         flexDirection: 'row',
-        padding: 10
+        paddingHorizontal: 4
     },
 
     message: {
@@ -31,13 +31,13 @@ const Styles = StyleSheet.create({
         fontWeight: 'bold'
     },
 
-    picture: {width: 48, height: 48, borderRadius: 48/2}
+    picture: {width: 42, height: 42, borderRadius: 48/2}
 });
 
-export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePress}) =>{
+export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePress, myNickname}) =>{
 
     let containerStyles = [Styles.container];
-    if(message.mentions.length > 0 && message.mentions.indexOf(this.nickname) !== -1){
+    if(message.mentions.length > 0 && message.mentions.indexOf(myNickname) !== -1){
         containerStyles.push(Styles.containerWithMention);
     }
 
@@ -48,7 +48,7 @@ export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePr
     return  <View style={containerStyles}>
         <View style={Styles.inner}>
             <View style={{marginRight: 10}}>
-                <TouchableOpacity onPress={onFacePress} onLongPress={onLongFacePress}>
+                <TouchableOpacity onPress={onFacePress} onLongPress={onLongFacePress} style={{backgroundColor: '#444442', padding: 4, borderRadius: 100/2}}>
                     <Image source={{uri : message.picture}} style={Styles.picture} />
                 </TouchableOpacity>
             </View>

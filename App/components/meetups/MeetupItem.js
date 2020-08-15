@@ -92,7 +92,7 @@ const Styles = StyleSheet.create({
     viewButtonText: {textAlign:'center', color:'#fff'}
 });
 
-export const MeetupItem = ({meetup, onChange}) =>{
+export const MeetupItem = ({meetup, onChange, onTellMeMorePress}) =>{
 
     let hasAttendees = false;
     if(meetup.attendees && meetup.attendees.length) hasAttendees = true;
@@ -157,7 +157,7 @@ export const MeetupItem = ({meetup, onChange}) =>{
         </ImageBackground>
         <View style={Styles.buttonContainer}>
             <View style={Styles.viewButtonContainer}>
-                <TouchableHighlight>
+                <TouchableHighlight onPress={onTellMeMorePress}>
                     <Text style={Styles.viewButtonText}>Tell me more</Text>
                 </TouchableHighlight>
             </View>

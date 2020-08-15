@@ -49,21 +49,12 @@ export const CommentItem = ({comment, depth}) =>{
                                 <Text style={{color:'#5cb85c'}}>{nickname} </Text>
                                 {getContent}
                                 <Text onPress={() => {
-                                    setShowingChildren(!getShowingChildren);
-                                    if(getShowingFull){
-                                        setContent(excerpt);
-                                    }else{
-                                        setContent(content);
-                                    }
+                                    setContent((getShowingFull ? excerpt : content));
                                     setShowingFull(!getShowingFull);
                                 }} style={{color: '#5cb85c'}}> {getShowingFull ? 'show less' : 'show more'}</Text>
                             </Text>
                         </View>
                     </View>
-
-                    { children && <View style={{flex: 1}}>
-                        <TouchableHighlight onPress={() => setShowingChildren(!getShowingChildren)}><Text style={{color: '#5cb85c'}}>Toggle Children</Text></TouchableHighlight>
-                    </View> }
                 </View>
                 { getShowingChildren && <View style={{flex:1}}>{childrenViews}</View> }
             </View>
