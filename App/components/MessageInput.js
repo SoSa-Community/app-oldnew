@@ -2,6 +2,9 @@ import React from 'react';
 
 import {TextInput, View, TouchableOpacity, Dimensions, Text, StyleSheet} from "react-native";
 import {Icon} from './Icon';
+import {parseString as parseXMLString} from "react-native-xml2js";
+import ImagePicker from "react-native-image-picker";
+import {SoSaConfig} from "../sosa/config";
 
 const Styles = StyleSheet.create({
     container: {
@@ -52,9 +55,11 @@ let buttonLeft = 0;
 let text = '';
 
 export const MessageInput = ({canSend, sendAction, maxLength, lengthIndicatorShowPercentage, lengthWarningPercentage,
-    lengthDangerPercentage, onChangeText, selection, value, onSelectionChange, onBlur, onKeyPress, autoCorrect, fuckWith}) => {
+    lengthDangerPercentage, onChangeText, selection, value, onSelectionChange, onBlur, onKeyPress, autoCorrect, fuckWith, uploadComplete, uploadAction, uploading}) => {
 
     if(!maxLength) maxLength = 1000;
+
+    if(uploading) canSend = false;
 
     const buttonBackgroundColor = canSend ? '#7ac256' : '#ccc';
     let buttonStyles = {alignSelf:'center', backgroundColor:buttonBackgroundColor, height:42, width:42, borderRadius: 24, alignItems: 'center', justifyContent: 'center'};
@@ -88,8 +93,15 @@ export const MessageInput = ({canSend, sendAction, maxLength, lengthIndicatorSho
         lengthIndicatorStyles.push(Styles.lengthIndicatorWarning);
     }
 
+
+
     return (
         <View style={Styles.container}>
+            {
+                SoSaConfig.features.general.canUpload && <TouchableOpacity onPress={() => uploadAction(uploadComplete)} style={{alignSelf:'center', backgroundColor: '#444442', height:48, width:42, borderRadius:16, alignItems: 'center', justifyContent: 'center', marginRight: 8}}>
+                    <Icon icon={['fal','image']}  style={Styles.icon} size={24}  />
+                </TouchableOpacity>
+            }
             <View style={Styles.innerContainer}>
                 <TextInput
                     selection={selection}

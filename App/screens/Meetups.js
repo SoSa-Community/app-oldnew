@@ -100,7 +100,7 @@ export class Meetups extends Component {
                                 let meetups = this.state.meetups;
                                 meetups[index] = meetup;
                                 this.setState({meetups: meetups});
-                            }} />;
+                            }} onTellMeMorePress={() => this.navigation.navigate('Meetup')}/>;
                         }
                     }
                     style={{flex: 1, backgroundColor: '#121111'}}

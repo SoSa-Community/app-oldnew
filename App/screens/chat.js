@@ -21,6 +21,10 @@ import {Preferences} from "../sosa/Preferences";
 import {ProfileModal} from "../components/ProfileModal";
 import {MessageItem} from "../components/chat/MessageItem";
 
+import {parseString as parseXMLString} from "react-native-xml2js";
+
+import ImagePicker from "react-native-image-picker";
+
 export class Chat extends Component {
     drawerNavigationContext = {};
     navigationContext = {};
@@ -64,7 +68,8 @@ export class Chat extends Component {
         currentRoom: null,
         canSend: true,
         fuckWith: false,
-        profileModalVisible: false
+        profileModalVisible: false,
+        uploading:false
     };
 
     constructor(props) {
@@ -476,12 +481,96 @@ export class Chat extends Component {
                 this.onLongFacePress(message);
             }
         });
-    }
+    };
 
     onLongFacePress = (message) => {
         this.selectedProfile = message;
         this.setState({profileModalVisible: true});
-    }
+    };
+
+    uploadFile = (callback) => {
+
+        const doUpload = (file) => {
+            const formData = new FormData();
+
+            this.client.emit(
+                'content/prepareUpload',
+                {community_id: 'sosa'},
+                (error, response) => {
+                    if(error) {
+                        callback(new Error(error));
+                    }else{
+                        let data = response.post;
+
+                        console.debug(data);
+                        for(let key in data) formData.append(key, data[key]);
+
+                        formData.append('file', file);
+
+                        fetch('https://sosamedia.s3.amazonaws.com', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {"Content-Type": "multipart/form-data"}
+                        })
+                              .then((response) => response.text())
+                              .then((response) => {
+                                  parseXMLString(response, function (err, result) {
+                                      const {Error: error} = result;
+                                      console.debug(result);
+
+                                      if(error){
+                                          callback(new Error(error));
+                                      }else{
+                                          const {PostResponse: {ETag, Key, Location}} = result;
+                                          try{
+                                              callback(null, Location, Key, ETag);
+                                          }catch(e){
+                                              console.debug(e);
+                                          }
+                                      }
+                                  });
+                              })
+                              .catch((error) => {
+                                  console.error('Error:', error);
+                              });
+                    }
+                }
+            );
+        };
+
+
+        const chooseImage = async () => {
+
+            let options = {
+                title: 'Upload Prescription',
+                takePhotoButtonTitle: 'Take a Photo',
+                chooseFromLibraryButtonTitle: 'Select From Gallery',
+                storageOptions: {
+                    skipBackup: true
+                },
+            };
+
+            ImagePicker.showImagePicker(options, async (response) => {
+                if (response.didCancel) {
+                    console.log('User cancelled image picker');
+                } else if (response.error) {
+                    console.log('ImagePicker Error: ', response.error);
+                } else if (response.customButton) {
+                    console.log('User tapped custom button: ', response.customButton);
+                    alert(response.customButton);
+                } else {
+                    const file = {
+                        uri: response.uri,
+                        name: response.fileName,
+                        type: response.type
+                    };
+                    doUpload(file);
+                }
+            });
+        };
+
+        chooseImage();
+    };
 
     render() {
 
@@ -534,6 +623,20 @@ export class Chat extends Component {
                                 }}
                                 fuckWith={this.state.fuckWith}
                                 canSend={this.state.canSend}
+                                uploading={this.state.uploading}
+                                uploadAction={this.uploadFile}
+                                uploadComplete={(error, locations, key, etag) => {
+                                    console.log(error, locations);
+                                    if(!error && Array.isArray(locations)){
+                                        this.client.rooms().send((err, message) => {
+                                                  if(!err) this.addMessage(message);
+                                              },
+                                              this.state.currentRoom.community_id,
+                                              this.state.currentRoom.name,
+                                              locations.join(" ")
+                                        );
+                                    }
+                                }}
                             />
                         </View>
                         <ProfileModal visible={this.state.profileModalVisible} profile={this.selectedProfile} dismissTouch={() => this.setState({profileModalVisible: false})} />
