@@ -125,8 +125,8 @@ export default class SoSa extends Component {
         }else{
             return (
                 <View style={BaseStyles.container}>
+                    <StatusBar barStyle="light-content" backgroundColor="#121211"/>
                     <View style={{flex:1}}>
-                        <StatusBar barStyle="light-content" backgroundColor="#121211"/>
                         <AppContext.Provider value={{addDeeplinkListener: this.addDeeplinkListener, removeDeeplinkListener: this.removeDeeplinkListener}}>
                             <NavigationContainer>
                                 <Stack.Navigator initialRouteName={this.state.defaultScreen} screenOptions={{headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle, headerTintColor: 'white', headerTitleContainerStyle: { left: 10 }}} >
