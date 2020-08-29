@@ -6,7 +6,17 @@ import HTML from 'react-native-render-html';
 
 const Styles = StyleSheet.create({
     container: {
-        marginTop:12
+        paddingTop:12,
+    },
+
+    containerSeparator: {
+        paddingVertical:12,
+        borderTopColor: '#444442',
+        borderTopWidth: 0.5
+    },
+
+    containerSeparatorSlim: {
+        paddingVertical:6,
     },
 
     containerWithMention: {
@@ -34,7 +44,7 @@ const Styles = StyleSheet.create({
     picture: {width: 42, height: 42, borderRadius: 48/2}
 });
 
-export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePress, myNickname}) =>{
+export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePress, myNickname, showSeparator, showSlimSeparator}) =>{
 
     let containerStyles = [Styles.container];
     if(message.mentions.length > 0 && message.mentions.indexOf(myNickname) !== -1){
@@ -43,6 +53,13 @@ export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePr
 
     if(!message.picture || message.picture.length === 0){
         message.picture = `https://picsum.photos/300/300?seed=${Math.random()}`;
+    }
+
+    if(showSeparator) {
+        containerStyles.push(Styles.containerSeparator);
+        if(showSlimSeparator){
+            containerStyles.push(Styles.containerSeparatorSlim);
+        }
     }
 
     const renderMessage = () => {
@@ -90,9 +107,9 @@ export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePr
                 <TouchableOpacity onPress={onUsernamePress}>
                     <Text style={Styles.username}>{message.nickname}</Text>
                 </TouchableOpacity>
-                <View style={{marginTop: 8}}>
+                <View>
                     {renderMessage()}
-                    <View style={{flexDirection: 'row'}}>
+                    <View style={{flexDirection: 'row', marginTop: 8}}>
                         {renderEmbeds()}
                     </View>
                 </View>
