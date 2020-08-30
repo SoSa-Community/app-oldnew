@@ -58,12 +58,16 @@ class Login extends Component {
             const {status, device_id} = data;
             if(status === 'success'){
                 Helpers.deviceLogin(device_id, () => {},
-                    (error) => this.setState({socialMediaError: error, loggingIn:false}),
-                    () => {
+                    (error, json) => {
                         clearTimeout(resetState);
 
-                        this.setState({socialMediaError: '', loggingIn:false});
-                        this.navigation.replace('MembersArea', {login: true});
+                        let state = {registering: false};
+                        if(error){
+                            state.socialMediaError = error.message;
+                        }else{
+                            this.navigation.replace('MembersArea', {login: true});
+                        }
+                        this.setState(state);
                     }
                 );
             }else{
@@ -80,8 +84,13 @@ class Login extends Component {
                 usernameInput,
                 passwordInput,
                 (isLoading) => this.setState({loggingIn: isLoading}),
-                (error) => this.setState({loginError: error}),
-                (json) => navigation.replace('MembersArea', {login: true})
+                (error, json) => {
+                    if(error){
+                        this.setState({loginError: error.message})
+                    }else{
+                        navigation.replace('MembersArea', {login: true});
+                    }
+                }
             );
         };
 
@@ -122,8 +131,15 @@ class Login extends Component {
 
         let login = (network) => {
             this.setState({loginError: '', socialMediaError: '', loggingIn: true});
-            Helpers.handlePreauth(() => {}, () => {}, (json) => {
-                Linking.openURL(`${SoSaConfig.auth.server}/${network}/login?app=1&preauth=${json.response}`);
+
+            Helpers.handlePreauth(() => {}, (error, json) => {
+                let state = {loggingIn: true};
+                if(error){
+                    state.socialMediaError = error.message;
+                }else{
+                    Linking.openURL(`${SoSaConfig.auth.server}/${network}/login?app=1&preauth=${json.response}`);
+                }
+                this.setState(state);
             });
         };
 

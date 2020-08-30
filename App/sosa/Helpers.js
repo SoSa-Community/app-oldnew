@@ -30,8 +30,9 @@ export default class Helpers {
         let session = Session.getInstance();
 
         let uri = `${SoSaConfig.auth.server}/${namespace}`;
-        console.log('Request URI', uri);
-        console.log('Request Data', data);
+        console.debug('Request URI', uri);
+        console.debug('Request Data', data);
+
         let headers = {
             method: post?'POST':'GET',
             headers: {
@@ -39,7 +40,6 @@ export default class Helpers {
                 'Content-Type': 'application/json',
             }
         };
-
 
         let doRequest = () => {
 
@@ -54,18 +54,18 @@ export default class Helpers {
             }
 
             return Helpers.fetchWithTimeout(uri, headers).then((response) => {
-                console.log('Response', response);
+                console.debug('Response', response);
                 try {
                     return response.json();
                 }catch (e) {
-                    console.log(e);
+                    console.debug('Response Error', e);
                 }
             }).then((json) => {
-                console.log('JSON', json);
+                console.debug('JSON', json);
                 if(json.session)    session.fromJSON(json.session);
 
                 return json;
-            });
+            })
         };
 
         if(['login'].indexOf(namespace) === -1){
@@ -150,15 +150,15 @@ export default class Helpers {
             });
     }
 
-    static handleLogin(username, password, setIsLoading, onErrorCallback, onSuccessCallback){
-        this.handleLoginRegister(username, password, null, setIsLoading, onErrorCallback, onSuccessCallback);
+    static handleLogin(username, password, setIsLoading, callback){
+        this.handleLoginRegister(username, password, null, setIsLoading, callback);
     }
 
-    static handleRegister(username, password, email, setIsLoading, onErrorCallback, onSuccessCallback){
-        this.handleLoginRegister(username, password, email, setIsLoading, onErrorCallback, onSuccessCallback);
+    static handleRegister(username, password, email, setIsLoading, callback){
+        this.handleLoginRegister(username, password, email, setIsLoading, callback);
     }
 
-    static handleLoginRegister(username, password, email, loadingCallback, onErrorCallback, onSuccessCallback){
+    static handleLoginRegister(username, password, email, loadingCallback, callback){
         let deviceInstance = Device.getInstance();
         let sessionInstance = Session.getInstance();
 
@@ -180,77 +180,16 @@ export default class Helpers {
                 data.login = true;
             }
 
-            Helpers.request(namespace, data)
-                .then((json) => {
-                    let error = '';
-                    if(json.error){
-                        error = json.error.message;
-                        onErrorCallback(error);
-                    }
-                    else{
-                        deviceInstance.setId(json.response.device_id);
-                        deviceInstance.save();
-
-                        sessionInstance.fromJSON(json.response.session);
-                        sessionInstance.username = json.response.user.username;
-                        sessionInstance.nickname = json.response.user.nickname;
-
-                        onSuccessCallback(json);
-                    }
-                })
-                .catch((e) => {
-                    console.log(e);
-                    onErrorCallback(e.message);
-                })
-                .finally(() => {
-                    loadingCallback(false);
-                });
+            this.handleAuthRequest(namespace, data, loadingCallback, callback);
 
         }catch(e){
             loadingCallback(false);
+            callback(e, null);
         }
     };
 
-    static handlePreauth(loadingCallback, onErrorCallback, onSuccessCallback){
+    static deviceLogin(deviceId, loadingCallback, callback){
         let deviceInstance = Device.getInstance();
-
-        loadingCallback(true);
-        try{
-            let namespace = 'preauth/create';
-
-            let data = {
-                device_secret: deviceInstance.getSecret(),
-                device_name: deviceInstance.getName(),
-                device_platform: deviceInstance.getPlatform()
-            };
-
-            Helpers.request(namespace, data)
-                .then((json) => {
-                    let error = '';
-                    if(json.error){
-                        error = json.error.message;
-                        onErrorCallback(error);
-                    }
-                    else{
-                        onSuccessCallback(json);
-                    }
-                })
-                .catch((e) => {
-                    console.log(e);
-                    onErrorCallback(e.message);
-                })
-                .finally(() => {
-                    loadingCallback(false);
-                });
-
-        }catch(e){
-            loadingCallback(false);
-        }
-    };
-
-    static deviceLogin(deviceId, loadingCallback, onErrorCallback, onSuccessCallback){
-        let deviceInstance = Device.getInstance();
-        let sessionInstance = Session.getInstance();
 
         loadingCallback(true);
         try{
@@ -263,35 +202,90 @@ export default class Helpers {
                         device_id: deviceId,
                         token: token
                     };
-                    console.log(data);
+                    this.handleAuthRequest(namespace, data, loadingCallback, callback);
 
-                    Helpers.request(namespace, data)
-                        .then((json) => {
-                            console.log(json);
-                            let error = '';
-                            if(json.error){
-                                error = json.error.message;
-                                onErrorCallback(error);
-                            }
-                            else{
-                                deviceInstance.setId(deviceId);
-                                deviceInstance.save();
-
-                                sessionInstance.fromJSON(json.response.session);
-                                sessionInstance.username = json.response.user.username;
-                                sessionInstance.nickname = json.response.user.nickname;
-                                onSuccessCallback(json);
-                            }
-                        })
-                        .catch((e) => {
-                            console.log(e);
-                            onErrorCallback(e.message);
-                        })
-                        .finally(() => {
-                            loadingCallback(false);
-                        });
                 }) // token as the only argument
-                .catch(console.error); // possible errors
+                .catch((e) => {
+                    console.debug('Device JWT Error', e);
+                    callback(new Error(e));
+                }); // possible errors
+        }catch(e){
+            loadingCallback(false);
+            callback(e);
+        }
+    };
+
+    static handleAuthRequest(namespace, data, loadingCallback, callback){
+        let deviceInstance = Device.getInstance();
+        let sessionInstance = Session.getInstance();
+
+        let errorResponse = null;
+        let jsonResponse = null;
+
+        Helpers.request(namespace, data)
+              .then((json) => {
+                  console.debug('Device login', json);
+
+                  if(json.error){
+                      errorResponse = new Error(json.error.message);
+                  }
+                  else{
+                      jsonResponse = json;
+
+                      const {response: {device_id, session, user: {username, nickname}} } = json;
+
+                      deviceInstance.setId(device_id);
+                      deviceInstance.save();
+
+                      sessionInstance.fromJSON(session);
+                      sessionInstance.username = username;
+                      sessionInstance.nickname = nickname;
+                  }
+              })
+              .catch((e) => {
+                  console.debug('Device Login Error', e);
+                  errorResponse = new Error(e);
+              })
+              .finally(() => {
+                  loadingCallback(false);
+                  callback(errorResponse, jsonResponse);
+              });
+    }
+
+    static handlePreauth(loadingCallback, callback){
+        let deviceInstance = Device.getInstance();
+
+        loadingCallback(true);
+        try{
+            let namespace = 'preauth/create';
+
+            let data = {
+                device_secret: deviceInstance.getSecret(),
+                device_name: deviceInstance.getName(),
+                device_platform: deviceInstance.getPlatform()
+            };
+
+            let errorResponse = null;
+            let jsonResponse = null;
+
+            Helpers.request(namespace, data)
+                  .then((json) => {
+                      if(json.error){
+                          errorResponse = new Error(json.error.message);
+                      }
+                      else{
+                          jsonResponse = json;
+                      }
+                  })
+                  .catch((e) => {
+                      console.debug('Preauth Error', e);
+                      errorResponse = new Error(e);
+                  })
+                  .finally(() => {
+                      loadingCallback(false);
+                      callback(errorResponse, jsonResponse);
+                  });
+
         }catch(e){
             loadingCallback(false);
         }

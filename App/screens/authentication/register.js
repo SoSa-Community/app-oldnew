@@ -47,13 +47,16 @@ class Register extends Component {
         this.addDeeplinkListener('login', 'preauth', (data) => {
             if(data.status === 'success'){
                 Helpers.deviceLogin(data.device_id, () => {},
-                    (error) => {
-                        this.setState({socialMediaError: error, registering: false});
-                    },
-                    (json) => {
+                    (error, json) => {
                         clearTimeout(resetState);
-                        this.setState({socialMediaError: '', registering:false});
-                        this.navigation.replace('MembersArea', {login: true});
+
+                        let state = {registering: false};
+                        if(error){
+                            state.socialMediaError = error.message;
+                        }else{
+                            this.navigation.replace('MembersArea', {login: true});
+                        }
+                        this.setState(state);
                     }
                 );
             }else{
@@ -90,9 +93,12 @@ class Register extends Component {
                         this.state.passwordInput,
                         this.state.emailInput,
                         (isLoading) => this.setState({registering: isLoading}),
-                        (error) => this.setState({registerError: error}),
-                        (json) => {
-                            this.navigation.replace('MembersArea', {register: true});
+                        (error, json) => {
+                            if(error){
+                                this.setState({registerError: error})
+                            }else{
+                                this.navigation.replace('MembersArea', {register: true});
+                            }
                         }
                     );
                 }
@@ -121,10 +127,17 @@ class Register extends Component {
         if(SoSaConfig.features.register.social.imgur || SoSaConfig.features.register.social.reddit){
             let register = (network) => {
                 this.setState({socialMediaError: '', registering: true});
-                Helpers.handlePreauth(() => {
-                }, () => {
-                }, (json) => {
-                    Linking.openURL(`${SoSaConfig.auth.server}/${network}/register?app=1&preauth=${json.response}`);
+
+                Helpers.handlePreauth(
+               () => {},
+               (error, json) => {
+                    let state = {registering: false};
+                    if(error){
+                        state.socialMediaError = error.message;
+                    }else{
+                        Linking.openURL(`${SoSaConfig.auth.server}/${network}/register?app=1&preauth=${json.response}`);
+                    }
+                    this.setState(state);
                 })
             };
 
