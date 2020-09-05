@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Styles from './styles/chat'
-import {Image, FlatList, Text, View, Button, TouchableHighlight, TouchableOpacity, Linking, KeyboardAvoidingView, Platform, ScrollView, Keyboard, Modal} from 'react-native';
+import {FlatList, Text, View, TouchableHighlight, KeyboardAvoidingView, Platform, ScrollView, Keyboard} from 'react-native';
 import io from "socket.io-client";
 
 import { SoSaConfig } from "../sosa/config";
@@ -17,7 +17,7 @@ import jwt from "react-native-pure-jwt";
 import {RoomItem} from "../components/chat/RoomItem";
 
 import withMembersNavigationContext from "./hoc/withMembersNavigationContext";
-import {Preferences} from "../sosa/Preferences";
+
 import {ProfileModal} from "../components/ProfileModal";
 import {MessageItem} from "../components/chat/MessageItem";
 
@@ -70,8 +70,13 @@ export class Chat extends Component {
 		fuckWith: false,
 		profileModalVisible: false,
 		uploading:false,
+		preferences: {
+			touch_face_for_profile: false,
+			show_separators: false,
+			show_slim_separators: false
+		},
 		messageSeparator: false,
-		messageSeparatorSlim:false
+		messageSeparatorSlim:false,
 	};
 
 	constructor(props) {
@@ -83,10 +88,10 @@ export class Chat extends Component {
 		this.navigationContext = props.navigationContext;
 		this.drawerNavigation = this.navigationContext.drawerNavigation;
 		this.drawerNavigationContext = props.navigationContext.drawerNavigationContext;
+		this.navigationContext.addListener('settings_update', (preferences) => this.preferencesChanged(preferences));
 	}
 
 	componentDidMount() {
-		console.log('hello');
 		this.updateUserList();
 
 		let device = Device.getInstance();
@@ -112,26 +117,33 @@ export class Chat extends Component {
 				authFailed: () => this.navigationContext.logout(true)
 			}
 		);
+		this.preferencesChanged(this.navigationContext.preferences);
 		this.connect();
 
-		Preferences.get('chat:show_separators', (value) => {
-			this.setState({messageSeparator: value});
-		});
-
-		Preferences.get('chat:show_slim_separators', (value) => {
-			this.setState({messageSeparatorSlim: value});
-		});
 	}
 
 	componentWillUnmount(): void {
 		this.disconnect();
 		this.client.middleware.clear();
+	}
 
-		try{
-			this.focusListener();
-		}catch (e) {
-			console.debug('Could not remove focus listener', e);
+	preferencesChanged(preferences){
+		let stateChanges = this.state.preferences;
+		let updateState = false;
+
+		for(let key in preferences){
+			if(preferences.hasOwnProperty(key)){
+				let value = preferences[key];
+				if(key.startsWith('chat:')){
+					key = key.replace('chat:','');
+					if(!stateChanges.hasOwnProperty(key) || value !== stateChanges[key]){
+						updateState = true;
+						stateChanges[key] = value;
+					}
+				}
+			}
 		}
+		if(updateState) this.setState(stateChanges);
 	}
 
 	updateUserList = () => {
@@ -484,13 +496,7 @@ export class Chat extends Component {
 
 
 	onFacePress = (message) => {
-		Preferences.get('chat:touch_face_for_profile', (value) => {
-			if(!value){
-				this.addTag(message.nickname)
-			}else{
-				this.onLongFacePress(message);
-			}
-		});
+		!this.state.preferences.touch_face_for_profile ? this.addTag(message.nickname) : this.onLongFacePress(message);
 	};
 
 	onLongFacePress = (message) => {
@@ -605,8 +611,8 @@ export class Chat extends Component {
 											onLongFacePress={() => this.onLongFacePress(item)}
 											onUsernamePress={() => this.addTag(item.nickname)}
 											myNickname={this.nickname}
-											showSeparator={this.state.messageSeparator}
-											showSlimSeparator={this.state.messageSeparatorSlim}
+											showSeparator={this.state.preferences.show_separators}
+											showSlimSeparator={this.state.preferences.show_slim_separators}
 
 										/>
 									}else{

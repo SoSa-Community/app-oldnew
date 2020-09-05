@@ -26,5 +26,36 @@ export const Preferences = {
         } catch (e) {
             console.debug('ouch', e);
         }
+    },
+
+    getAll : (callback) => {
+        AsyncStorage.getAllKeys().then((keys, error) => {
+
+            if(!error && Array.isArray(keys)){
+                let mappedKeys = [];
+
+                keys.forEach(key => {
+                    if(key.startsWith('setting:')) mappedKeys.push(key);
+                });
+
+                if(mappedKeys.length > 0){
+                    AsyncStorage.multiGet(mappedKeys, (err, stores) => {
+                        let preferences = {};
+                        stores.forEach(([key, value]) => {
+                            let parsedValue = null;
+                            if (typeof (value) === "string") {
+                                parsedValue = JSON.parse(value);
+                            }
+                            preferences[key.replace('setting:','')] = parsedValue;
+                        });
+                        callback(preferences);
+                    });
+                }else{
+                    callback({});
+                }
+            }else{
+                callback({});
+            }
+        });
     }
 };

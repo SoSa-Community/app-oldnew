@@ -15,6 +15,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {Icon} from "../components/Icon";
 import MeetupsScreen from "./Meetups";
 import MeetupScreen from "./Meetup";
+import {Preferences} from "../sosa/Preferences";
 
 
 const Stack = createStackNavigator();
@@ -27,8 +28,11 @@ class WrapperComponent extends Component {
     stackNavigation = null;
 
     state = {
-        headerIcons: []
-    }
+        headerIcons: [],
+        preferences: {}
+    };
+
+    eventListeners = {};
 
     constructor(props) {
         super();
@@ -37,10 +41,39 @@ class WrapperComponent extends Component {
         this.appNavigation = this.drawerNavigationContext.appNavigation;
         this.topBar = React.createRef();
         this.stackNavigation = React.createRef();
+
+        Preferences.getAll((preferences) => {
+            this.setState({preferences});
+            this.triggerListener('settings_update', preferences);
+        });
     }
 
     showSettings = () => {
         this.appNavigation.navigate('Settings');
+
+        const unsubscribe = this.appNavigation.addListener('focus', () => {
+            Preferences.getAll((preferences) => {
+                this.triggerListener('settings_update', preferences);
+            });
+            unsubscribe();
+        });
+    };
+
+    addListener = (event, callback) => {
+        if(!this.eventListeners[event]) this.eventListeners[event] = [];
+        this.eventListeners[event].push(callback);
+    };
+
+    triggerListener = (event, data) => {
+        if(this.eventListeners[event]){
+            this.eventListeners[event].forEach((callback) => {
+                try{
+                    callback(data);
+                }catch (e) {
+                    console.debug('Callback error', e);
+                }
+            })
+        }
     };
 
     showMeetups = () => {
@@ -88,7 +121,9 @@ class WrapperComponent extends Component {
                 addHeaderIcon: this.addHeaderIcon,
                 drawerNavigation: this.drawerNavigation,
                 drawerNavigationContext: this.drawerNavigationContext,
-                navigate: this.navigate
+                navigate: this.navigate,
+                addListener: this.addListener,
+                preferences: this.state.preferences
             }}
             >
                 <View style={BaseStyles.container} >
