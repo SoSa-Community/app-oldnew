@@ -94,7 +94,7 @@ class Register extends Component {
                         (isLoading) => this.setState({registering: isLoading}),
                         (error, json) => {
                             if(error){
-                                this.setState({registerError: error})
+                                this.setState({registerError: error.message});
                             }else{
                                 this.navigation.replace('MembersArea', {register: true});
                             }
