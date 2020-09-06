@@ -44,7 +44,7 @@ class Register extends Component {
             this.setState({registering: false});
         },5000);
 
-        this.addDeeplinkListener('login', 'preauth', (data) => {
+        this.addDeeplinkListener('register', 'preauth', (data) => {
             if(data.status === 'success'){
                 Helpers.deviceLogin(data.device_id, () => {},
                     (error, json) => {
@@ -60,11 +60,10 @@ class Register extends Component {
                     }
                 );
             }else{
-                this.setState({'socialMediaError': data.error});
+                this.setState({registering:false, socialMediaError: data.error});
             }
         }, true);
     }
-
 
     setLoading = (isLoading) => {
         this.setState({registering: isLoading});

@@ -55,6 +55,7 @@ class Login extends Component {
         },5000);
 
         this.addDeeplinkListener('login', 'preauth', (data) => {
+            console.log('Data', data);
             const {status, device_id} = data;
             if(status === 'success'){
                 Helpers.deviceLogin(device_id, () => {},
@@ -71,7 +72,7 @@ class Login extends Component {
                     }
                 );
             }else{
-                this.setState({socialMediaError: data.error});
+                this.setState({loggingIn:false, socialMediaError: data.error});
             }
         }, true);
     }

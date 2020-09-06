@@ -52,8 +52,6 @@ export class Chat extends Component {
 	bufferRenderTimer = null;
 	bufferRenderRunning = false;
 
-	focusListener = null;
-
 	selectedProfile = null;
 
 	state = {
@@ -407,9 +405,8 @@ export class Chat extends Component {
 	};
 
 	isScrolled = () => {
-		if(this.scrollOffset.y > 35) return true;
-		return false;
-	}
+		return this.scrollOffset.y > 35;
+	};
 
 	chatMessagesOnScroll = (event) => {
 		this.scrollOffset = event.nativeEvent.contentOffset;
