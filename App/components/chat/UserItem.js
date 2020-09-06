@@ -37,7 +37,7 @@ const Styles = StyleSheet.create({
     },
 });
 
-export const UserItem = ({key, onPress, user, slim}) => {
+export const UserItem = ({onPress, user, slim}) => {
 
     let userContainerStyle = [Styles.userContainer];
     let imageStyle = [Styles.image];
@@ -48,13 +48,11 @@ export const UserItem = ({key, onPress, user, slim}) => {
     }
 
     return (
-        <View key={key}>
-            <TouchableHighlight onPress={onPress}>
-                <View style={userContainerStyle}>
-                    <Image source={{uri : 'https://picsum.photos/seed/picsum/300/300'}} style={imageStyle} />
-                    <Text style={Styles.itemText}>{user.nickname}</Text>
-                </View>
-            </TouchableHighlight>
-        </View>
+        <TouchableHighlight onPress={onPress}>
+            <View style={userContainerStyle}>
+                <Image source={{uri : 'https://picsum.photos/seed/picsum/300/300'}} style={imageStyle} />
+                <Text style={Styles.itemText}>{user.nickname}</Text>
+            </View>
+        </TouchableHighlight>
     );
 }
