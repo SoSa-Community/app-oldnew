@@ -6,17 +6,16 @@ import HTML from 'react-native-render-html';
 
 const Styles = StyleSheet.create({
     container: {
-        paddingTop:12,
+        paddingVertical:12,
     },
 
     containerSeparator: {
-        paddingVertical:12,
         borderTopColor: '#444442',
         borderTopWidth: 0.5
     },
 
-    containerSeparatorSlim: {
-        paddingVertical:6,
+    containerSlim: {
+        paddingVertical: 6,
     },
 
     containerWithMention: {
@@ -44,7 +43,7 @@ const Styles = StyleSheet.create({
     picture: {width: 42, height: 42, borderRadius: 48/2}
 });
 
-export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePress, myNickname, showSeparator, showSlimSeparator}) =>{
+export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePress, myNickname, showSeparator, showSlim}) =>{
 
     let containerStyles = [Styles.container];
     if(message.mentions.length > 0 && message.mentions.indexOf(myNickname) !== -1){
@@ -55,12 +54,8 @@ export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePr
         message.picture = `https://picsum.photos/300/300?seed=${Math.random()}`;
     }
 
-    if(showSeparator) {
-        containerStyles.push(Styles.containerSeparator);
-        if(showSlimSeparator){
-            containerStyles.push(Styles.containerSeparatorSlim);
-        }
-    }
+    if(showSlim) containerStyles.push(Styles.containerSlim);
+    if(showSeparator)  containerStyles.push(Styles.containerSeparator);
 
     const renderMessage = () => {
         if(typeof(message.parsed_content) === 'string' && message.parsed_content.length > 0){

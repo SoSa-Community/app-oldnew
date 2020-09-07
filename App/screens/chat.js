@@ -71,10 +71,8 @@ export class Chat extends Component {
 		preferences: {
 			touch_face_for_profile: false,
 			show_separators: false,
-			show_slim_separators: false
-		},
-		messageSeparator: false,
-		messageSeparatorSlim:false,
+			show_slim: false
+		}
 	};
 
 	constructor(props) {
@@ -609,8 +607,7 @@ export class Chat extends Component {
 											onUsernamePress={() => this.addTag(item.nickname)}
 											myNickname={this.nickname}
 											showSeparator={this.state.preferences.show_separators}
-											showSlimSeparator={this.state.preferences.show_slim_separators}
-
+											showSlim={this.state.preferences.show_slim}
 										/>
 									}else{
 										return <Text style={Styles.status}>{item.message}</Text>
