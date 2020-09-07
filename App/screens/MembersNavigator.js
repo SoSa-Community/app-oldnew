@@ -115,11 +115,11 @@ class WrapperComponent extends Component {
         ));
 
         this.drawerNavigationContext.updateDrawerItem('options', (<View style={{justifyContent: 'flex-end', flexDirection:'row', marginBottom: 16}} key={'options'}>
-            <TouchableHighlight onPress={this.showSettings}>
-                    <Icon icon={['fal', 'cogs']} size={28} style={{marginRight:14, color:'#fff', alignSelf:'center'}}/>
+            <TouchableHighlight onPress={this.showSettings} style={{paddingHorizontal:14}}>
+                    <Icon icon={['fal', 'cogs']} size={28} style={{color:'#fff', alignSelf:'center'}}/>
             </TouchableHighlight>
-            <TouchableHighlight onPress={this.drawerNavigationContext.logout}>
-                <Icon icon={['fal', 'sign-out-alt']} size={28} style={{marginRight:14, color:'#fff', alignSelf:'center'}}/>
+            <TouchableHighlight onPress={this.drawerNavigationContext.logout} style={{paddingHorizontal:14}}>
+                <Icon icon={['fal', 'sign-out-alt']} size={28} style={{color:'#fff', alignSelf:'center'}}/>
             </TouchableHighlight>
         </View>),false, true);
 
@@ -149,6 +149,8 @@ class WrapperComponent extends Component {
         if(this.menuStack.length > 1){
             this.menuStack.pop();
             this.setState({menu: this.menuStack[this.menuStack.length - 1]});
+        }else{
+            this.setState({menu: this.menuDefaults});
         }
     };
 
