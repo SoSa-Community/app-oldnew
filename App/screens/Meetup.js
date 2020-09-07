@@ -85,7 +85,7 @@ const Styles = StyleSheet.create({
     buttonContainer: {
         flexDirection:'row',
         alignItems:'center',
-        paddingBottom: Platform.OS === 'ios' ? 32 : 0,
+        paddingBottom: Platform.OS === 'ios' ? 32 : 8,
         paddingRight: 14
     },
 
