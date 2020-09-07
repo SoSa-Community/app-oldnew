@@ -53,6 +53,8 @@ export class Chat extends Component {
 	bufferRenderRunning = false;
 
 	selectedProfile = null;
+	componentMounted = false;
+
 
 	state = {
 		userList: [],
@@ -88,6 +90,7 @@ export class Chat extends Component {
 	}
 
 	componentDidMount() {
+		this.componentMounted = true;
 		this.updateUserList();
 
 		let device = Device.getInstance();
@@ -119,6 +122,7 @@ export class Chat extends Component {
 	}
 
 	componentWillUnmount(): void {
+		this.componentMounted = false;
 		this.disconnect();
 		this.client.middleware.clear();
 	}
@@ -197,18 +201,20 @@ export class Chat extends Component {
 	};
 
 	addMessage = (item) => {
-		if(!item.id){
-			if(item.uuid){item.id = item.uuid;}
-			else if(item._id){
-				item.id = item._id;
-			}else{
-				item.id = Helpers.generateId();
+		if(this.componentMounted){
+			if(!item.id){
+				if(item.uuid){item.id = item.uuid;}
+				else if(item._id){
+					item.id = item._id;
+				}else{
+					item.id = Helpers.generateId();
+				}
 			}
-		}
-		this.messageBuffer.push(item);
+			this.messageBuffer.push(item);
 
-		if(this.isScrolled()){
-			this.setState({newMessagesNotificationVisible: true});
+			if(this.isScrolled()){
+				this.setState({newMessagesNotificationVisible: true});
+			}
 		}
 	};
 

@@ -146,6 +146,8 @@ export class Meetup extends Component {
         this.navigationContext = props.navigationContext;
         this.drawerNavigation = this.navigationContext.drawerNavigation;
         this.drawerNavigationContext = props.navigationContext.drawerNavigationContext;
+
+        this.navigationContext.setMenuOptions({showLeft:true, showRight: false, leftMode: 'back', title: this.state.meetup.title});
     }
 
     render() {

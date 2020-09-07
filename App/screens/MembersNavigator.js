@@ -27,12 +27,24 @@ class WrapperComponent extends Component {
     topBar = null;
     stackNavigation = null;
 
-    state = {
-        headerIcons: [],
-        preferences: {}
+    menuDefaults = {
+        title: 'SoSa',
+        leftMode: 'menu',
+        showLeft: true,
+        showRight: true
     };
 
+    state = {
+        headerIcons: [],
+        preferences: {},
+        showTopBar: true,
+        menu: this.menuDefaults
+    };
+
+    menuStack = [this.menuDefaults];
+
     eventListeners = {};
+    navigationStateChangeListener = null;
 
     constructor(props) {
         super();
@@ -81,7 +93,7 @@ class WrapperComponent extends Component {
         this.stackNavigation.current.navigate('Meetups');
     };
 
-    componentDidMount(): void {
+    componentDidMount() {
 
         this.drawerNavigationContext.addDrawerItem('community', (
             <View style={{marginBottom: 16}} key={'community'}>
@@ -110,12 +122,47 @@ class WrapperComponent extends Component {
                 <Icon icon={['fal', 'sign-out-alt']} size={28} style={{marginRight:14, color:'#fff', alignSelf:'center'}}/>
             </TouchableHighlight>
         </View>),false, true);
+
+        this.navigationStateChangeListener = this.stackNavigation?.current?.addListener('state', (e) => {
+            if(e?.data?.state){
+                let showTopBar = true;
+                const {index, routeNames} = e.data.state;
+            }
+        });
+    }
+
+    setMenuOptions = (options, resetOnBack) => {
+        let currentState = Object.assign({}, this.state.menu);
+        let updateState = false;
+        for(let key in options){
+            let option = options[key];
+            if(currentState.hasOwnProperty(key) && currentState[key] !== option){
+                updateState = true;
+                currentState[key] = option;
+            }
+        }
+        if(updateState) this.setState({menu: currentState});
+        this.menuStack.push(currentState);
+    };
+
+    popMenuStack = () => {
+        if(this.menuStack.length > 1){
+            this.menuStack.pop();
+            this.setState({menu: this.menuStack[this.menuStack.length - 1]});
+        }
+    };
+
+    componentWillUnmount(){
+        try{this.navigationStateChangeListener();}
+        catch (e) {
+            console.debug('Could remove state change listener', e);
+        }
     }
 
     addHeaderIcon = (id, icon, onPress) => {this.topBar.current.addHeaderIcon(id, icon, onPress);};
 
     render() {
-
+        const {title, leftMode, showLeft, showRight} = this.state.menu;
         return (
             <MembersNavigationContext.Provider value={{
                 addHeaderIcon: this.addHeaderIcon,
@@ -123,16 +170,17 @@ class WrapperComponent extends Component {
                 drawerNavigationContext: this.drawerNavigationContext,
                 navigate: this.navigate,
                 addListener: this.addListener,
-                preferences: this.state.preferences
+                preferences: this.state.preferences,
+                setMenuOptions: this.setMenuOptions
             }}
             >
                 <View style={BaseStyles.container} >
-                    <MembersAreaNavigationHeader drawerNavigation={this.drawerNavigation} icons={this.state.headerIcons} ref={this.topBar}/>
-                    <NavigationContainer independent={true} ref={this.stackNavigation}>
+                    <MembersAreaNavigationHeader title={title} leftMenuMode={leftMode} showLeftMenu={showLeft} showRightMenu={showRight} drawerNavigation={this.drawerNavigation} membersNavigation={this.stackNavigation} icons={this.state.headerIcons} ref={this.topBar} onBack={this.popMenuStack}/>
+                    <NavigationContainer independent={true} ref={this.stackNavigation} onStateChange={(state) => {if (!state) return; console.log("hello2");}}>
                         <Stack.Navigator>
                             <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: false }}/>
                             <Stack.Screen name="Meetups" component={MeetupsScreen} options={{ headerShown: false}}/>
-                            <Stack.Screen name="Meetup" component={MeetupScreen} options={{ headerShown: false }}/>
+                            <Stack.Screen name="Meetup" component={MeetupScreen} options={{ headerShown: false}} />
                         </Stack.Navigator>
                     </NavigationContainer>
                 </View>
