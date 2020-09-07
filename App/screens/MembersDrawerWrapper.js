@@ -82,7 +82,7 @@ export default class MembersDrawerWrapper extends Component {
         const TagName = (!scrollable ? View : DrawerContentScrollView);
 
         return (
-            <TagName {...props} style={{flex: 1, backgroundColor: '#222540',paddingTop:(Platform.OS === 'ios' ? 32 : 0)}}>
+            <TagName {...props} style={{flex: 1, backgroundColor: '#444442',paddingTop:(Platform.OS === 'ios' ? 32 : 0)}}>
                     { items }
                     <View style={{ flex: 1, justifyContent: 'flex-end', paddingBottom:(Platform.OS === 'ios' ? 24 : 0), alignItems:'center'}}>
                         { bottomItems }
