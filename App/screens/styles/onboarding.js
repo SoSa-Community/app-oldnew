@@ -57,7 +57,7 @@ const Styles = StyleSheet.create({
 
     inputIcon:{color: '#ccc', marginHorizontal:4},
     viewPasswordIcon: {
-        marginTop: 10
+
     },
 
     forgotButton: {color: '#7ac256', padding:8, textAlign:'center'},

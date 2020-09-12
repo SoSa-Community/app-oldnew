@@ -76,8 +76,8 @@ class Welcome extends Component {
 							</View> }
 						</View>
 					</View>
-					<View style={{justifyContent:'flex-end', flex:1}}>
-						<View style={{flexDirection: 'row', height:40}}>
+					<View style={{justifyContent:'flex-end', flex:1, marginBottom: Platform.OS === 'ios' ? 16 : 6}}>
+						<View style={{flexDirection: 'row', height:40, marginHorizontal:8}}>
 							<View style={{flex: 1, paddingHorizontal: 4}}>
 								<TouchableOpacity onPress={this.appContext.logout}>
 									<View style={{paddingVertical: 8, borderRadius: 4, flex: 0, justifyContent: 'center', alignItems:'center', backgroundColor: '#dc3545'}}>
