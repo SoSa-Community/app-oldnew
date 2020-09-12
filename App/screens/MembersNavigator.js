@@ -51,6 +51,8 @@ class WrapperComponent extends Component {
         this.drawerNavigation = props.navigation;
         this.drawerNavigationContext = props.navigationContext;
         this.appNavigation = this.drawerNavigationContext.appNavigation;
+        this.appContext = this.drawerNavigationContext.appContext;
+
         this.topBar = React.createRef();
         this.stackNavigation = React.createRef();
 
@@ -118,7 +120,7 @@ class WrapperComponent extends Component {
             <TouchableHighlight onPress={this.showSettings} style={{paddingHorizontal:14}}>
                     <Icon icon={['fal', 'cogs']} size={28} style={{color:'#fff', alignSelf:'center'}}/>
             </TouchableHighlight>
-            <TouchableHighlight onPress={this.drawerNavigationContext.logout} style={{paddingHorizontal:14}}>
+            <TouchableHighlight onPress={this.appContext.logout} style={{paddingHorizontal:14}}>
                 <Icon icon={['fal', 'sign-out-alt']} size={28} style={{color:'#fff', alignSelf:'center'}}/>
             </TouchableHighlight>
         </View>),false, true);

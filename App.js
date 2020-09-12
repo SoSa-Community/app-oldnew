@@ -1,13 +1,14 @@
 import React, {Component} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import {AppState, ImageBackground, Image, StatusBar, View, Linking} from "react-native";
+import {AppState, StatusBar, View, Linking, Alert} from "react-native";
 
+import SplashScreen from "./App/screens/Splash";
 import LoginScreen from './App/screens/authentication/login';
 import RegistrationScreen from "./App/screens/authentication/register";
 import ForgotPassword from './App/screens/authentication/forgot_password';
 import ForgotPasswordCode from './App/screens/authentication/forgot_password_code';
-import MembersDrawerWrapper from "./App/screens/MembersDrawerWrapper";
+import MembersArea from "./App/screens/MembersDrawerWrapper";
 import SettingsScreen from "./App/screens/Settings";
 
 
@@ -15,139 +16,182 @@ import BaseStyles from './App/screens/styles/base';
 import Helpers from "./App/sosa/Helpers";
 
 import { AppContext } from "./App/screens/context/AppContext";
+import WelcomeScreen from "./App/screens/Welcome";
+import Session from "./App/sosa/Session";
 
 const Stack = createStackNavigator();
 
 export default class SoSa extends Component {
-    coldBoot = true;
-    state = {
-        initializing: true,
-        defaultScreen: 'Login',
-        appState: AppState.currentState
-    }
+	coldBoot = true;
+	appNavigation = null;
 
-    constructor() {
-        super();
-        Linking.getInitialURL().then((result) => {
-            this.handleDeepLink({url: result}, true);
-        });
-    }
+	state = {
+		initializing: false,
+		defaultScreen: 'Splash',
+		appState: AppState.currentState
+	};
 
+	constructor() {
+		super();
 
-    componentDidMount(): void {
-        AppState.addEventListener("change", this._handleAppStateChange);
-        Linking.addEventListener('url', this.handleDeepLink);
+		this.appNavigation = React.createRef();
+		Linking.getInitialURL().then((result) => {
+			this.handleDeepLink({url: result}, true);
+		});
+	}
 
-        Helpers.authCheck((device, session, error) => {
-            let state = {initializing: false};
-            if(error === null) state.defaultScreen = 'MembersArea';
-            setTimeout(() => this.setState(state), 3000);
-        });
+	resetRoot = (name, params) => {
+		this.appNavigation?.current?.resetRoot({
+			index: 0,
+			routes: [{ name, params }],
+		});
+	};
 
-        this.coldBoot = false;
+	logout = (sessionAutoExpired) => {
+		let clearSession = () => {
+			let session = Session.getInstance();
+			session.logout(() => {
+				this.resetRoot('Login', {logout: true})
+			});
+		};
 
-    }
-
-    componentWillUnmount(): void {
-        AppState.removeEventListener("change", this._handleAppStateChange);
-        Linking.removeEventListener('url', this.handleDeepLink);
-    }
-
-    handleDeepLink = ({url}, coldBoot = false) => {
-        if(url !== null){
-            url = url.replace('sosa://','').split('/');
-            console.log('Deep link', url, coldBoot);
-
-            if(url.length > 0){
-                let namespace = url[0];
-                let method = url[1];
-                let data = JSON.parse(Helpers.base64Decode(url[2]));
-
-                this.fireDeeplinkListener(namespace, method, data);
-            }
-        }
-    };
-
-    _handleAppStateChange = nextAppState => {
-        if (
-            this.state.appState.match(/inactive|background/) &&
-            nextAppState === "active"
-        ) {
-            console.log("App has come to the foreground!");
-        }
-        this.setState({ appState: nextAppState });
-    };
-
-    deepLinkingListeners = {};
-
-    addDeeplinkListener = (namespace='', method='', callback, onlyOneAllowed=false) => {
-        if(!this.deepLinkingListeners[namespace]) this.deepLinkingListeners[namespace] = {};
-        if(!this.deepLinkingListeners[namespace][method]) this.deepLinkingListeners[namespace][method] = [];
-
-        if(onlyOneAllowed){
-            this.deepLinkingListeners[namespace][method] = [callback];
-        }else{
-            this.deepLinkingListeners[namespace][method].push(callback);
-        }
-
-    }
-
-    removeDeeplinkListener = (namespace='', method='') => {
-        if(this.deepLinkingListeners[namespace] && this.deepLinkingListeners[namespace][method]){
-               delete this.deepLinkingListeners[namespace][method];
-        }
-    };
-
-    fireDeeplinkListener = (namespace='', method='', data) => {
-        if(this.deepLinkingListeners[namespace] && this.deepLinkingListeners[namespace][method]){
-            this.deepLinkingListeners[namespace][method].forEach((listener) => {
-                try{
-                    listener(data);
-                }catch (e) {
-                    console.log(e);
-                }
-            })
-        }
-    }
+		if(sessionAutoExpired === true){
+			clearSession();
+			Alert.alert("Oooof", "Sorry you were logged out, please login again!",
+				[{text: "Sure!",style: "cancel"}],
+				{ cancelable: true }
+			);
+		}
+		else{
+			Alert.alert("Are you sure?", "Are you sure you want to logout?",
+				[
+					{
+						text: "Cancel",
+						style: "cancel"
+					},
+					{
+						text: "OK",
+						onPress: () => {
+							Helpers.logout(clearSession);
+						}
+					}
+				],
+				{ cancelable: true }
+			);
+		}
+	};
 
 
+	componentDidMount(): void {
+		AppState.addEventListener("change", this._handleAppStateChange);
+		Linking.addEventListener('url', this.handleDeepLink);
 
-    renderDisplay = (initializing) => {
-        if(initializing){
-            return (
-                <View style={BaseStyles.container}>
-                    <StatusBar barStyle="light-content" backgroundColor="#121211" />
-                    <ImageBackground source={require('./App/assets/splash.jpg')} style={{width: '100%', height: '100%', flex:1,justifyContent: 'center', alignItems: 'center'}}>
-                        <Image source={require('./App/assets/splash_logo.png')} style={{width: '40%', resizeMode: 'contain'}} />
-                    </ImageBackground>
+		Helpers.authCheck((error, device, session, user) => {
+			if(error === null){
+				if(user.welcome){
+					this.resetRoot('Welcome', {user, welcome: user.welcome});
+				}else{
+					this.resetRoot('MembersArea', {device, session, user});
+				}
+			}else{
+				this.resetRoot('Login', {});
+			}
+		});
 
-                </View>);
-        }else{
-            return (
-                <View style={BaseStyles.container}>
-                    <StatusBar barStyle="light-content" backgroundColor="#121211"/>
-                    <View style={{flex:1}}>
-                        <AppContext.Provider value={{addDeeplinkListener: this.addDeeplinkListener, removeDeeplinkListener: this.removeDeeplinkListener}}>
-                            <NavigationContainer>
-                                <Stack.Navigator initialRouteName={this.state.defaultScreen} screenOptions={{headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle, headerTintColor: 'white', headerTitleContainerStyle: { left: 10 }}} >
-                                    <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Welcome to SoSa' }}/>
-                                    <Stack.Screen name="Register" component={RegistrationScreen} options={{ title: 'Join SoSa' }} />
-                                    <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ title: 'Forgotten Password' }} />
-                                    <Stack.Screen name="ForgotPasswordCode" component={ForgotPasswordCode} options={{title: 'Check your e-mail'}}/>
-                                    <Stack.Screen name="MembersArea" component={MembersDrawerWrapper} options={{title:'', headerShown:false}}/>
-                                    <Stack.Screen name="Settings" component={SettingsScreen} options={{title: 'Settings'}}/>
-                                </Stack.Navigator>
-                            </NavigationContainer>
-                        </AppContext.Provider>
-                    </View>
-                </View>
-            );
-        }
-    };
+		this.coldBoot = false;
 
-    render() {
-        return this.renderDisplay(this.state.initializing);
-    }
+	}
+
+	componentWillUnmount(): void {
+		AppState.removeEventListener("change", this._handleAppStateChange);
+		Linking.removeEventListener('url', this.handleDeepLink);
+	}
+
+	handleDeepLink = ({url}, coldBoot = false) => {
+		if(url !== null){
+			url = url.replace('sosa://','').split('/');
+			console.log('Deep link', url, coldBoot);
+
+			if(url.length > 0){
+				let namespace = url[0];
+				let method = url[1];
+				let data = JSON.parse(Helpers.base64Decode(url[2]));
+
+				this.fireDeeplinkListener(namespace, method, data);
+			}
+		}
+	};
+
+	_handleAppStateChange = nextAppState => {
+		if (
+			this.state.appState.match(/inactive|background/) &&
+			nextAppState === "active"
+		) {
+			console.log("App has come to the foreground!");
+		}
+		this.setState({ appState: nextAppState });
+	};
+
+	deepLinkingListeners = {};
+
+	addDeeplinkListener = (namespace='', method='', callback, onlyOneAllowed=false) => {
+		if(!this.deepLinkingListeners[namespace]) this.deepLinkingListeners[namespace] = {};
+		if(!this.deepLinkingListeners[namespace][method]) this.deepLinkingListeners[namespace][method] = [];
+
+		if(onlyOneAllowed){
+			this.deepLinkingListeners[namespace][method] = [callback];
+		}else{
+			this.deepLinkingListeners[namespace][method].push(callback);
+		}
+
+	}
+
+	removeDeeplinkListener = (namespace='', method='') => {
+		if(this.deepLinkingListeners[namespace] && this.deepLinkingListeners[namespace][method]){
+			delete this.deepLinkingListeners[namespace][method];
+		}
+	};
+
+	fireDeeplinkListener = (namespace='', method='', data) => {
+		if(this.deepLinkingListeners[namespace] && this.deepLinkingListeners[namespace][method]){
+			this.deepLinkingListeners[namespace][method].forEach((listener) => {
+				try{
+					listener(data);
+				}catch (e) {
+					console.log(e);
+				}
+			})
+		}
+	};
+
+	renderDisplay = (initializing) => {
+
+		return (
+			<View style={BaseStyles.container}>
+				<StatusBar barStyle="light-content" backgroundColor="#121211"/>
+				<View style={{flex:1}}>
+					<AppContext.Provider value={{addDeeplinkListener: this.addDeeplinkListener, removeDeeplinkListener: this.removeDeeplinkListener, logout: this.logout}}>
+						<NavigationContainer ref={this.appNavigation}>
+							<Stack.Navigator initialRouteName={this.state.defaultScreen} screenOptions={{headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle, headerTintColor: 'white', headerTitleContainerStyle: { left: 10 }}} >
+								<Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }}/>
+								<Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Login To SoSa' }}/>
+								<Stack.Screen name="Register" component={RegistrationScreen} options={{ title: 'Join SoSa' }} />
+								<Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ title: 'Forgotten Password' }} />
+								<Stack.Screen name="ForgotPasswordCode" component={ForgotPasswordCode} options={{title: 'Check your e-mail'}}/>
+								<Stack.Screen name="MembersArea" component={MembersArea} options={{title:'', headerShown:false}}/>
+								<Stack.Screen name="Settings" component={SettingsScreen} options={{title: 'Settings'}}/>
+								<Stack.Screen name="Welcome" component={WelcomeScreen} options={{title: 'Welcome To SoSa!'}}/>
+							</Stack.Navigator>
+						</NavigationContainer>
+					</AppContext.Provider>
+				</View>
+			</View>
+		);
+	};
+
+	render() {
+		return this.renderDisplay(this.state.initializing);
+	}
 }
 
 

@@ -515,7 +515,7 @@ export class Chat extends Component {
 				{community_id: 'sosa'},
 				(error, response) => {
 					if(error) {
-						callback(new Error(error));
+						callback(new APIError(error));
 					}else{
 						let data = response.post;
 
@@ -536,7 +536,7 @@ export class Chat extends Component {
 									console.debug(result);
 
 									if(error){
-										callback(new Error(error));
+										callback(new APIError(error));
 									}else{
 										const {PostResponse: {ETag, Key, Location}} = result;
 										try{
