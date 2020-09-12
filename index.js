@@ -1,5 +1,6 @@
 /**
  * @format
+ * @flow strict-local
  */
 
 import 'react-native-gesture-handler';
