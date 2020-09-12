@@ -301,12 +301,20 @@ export default class Helpers {
 
 	static confirmWelcome(callback, username, email){
 		let errors = null;
+		let jsonResponse = null;
+		let sessionInstance = Session.getInstance();
 
 		Helpers.request('login/welcome', {username, email}, true)
 			.then((json) => {
+				jsonResponse = json;
 				if(Array.isArray(json?.errors)){
 					errors = [];
 					json?.errors.forEach((error) => errors.push(APIError.fromJSON(error)));
+				}else{
+					const {response: {user: {username, nickname}} } = json;
+
+					sessionInstance.username = username;
+					sessionInstance.nickname = nickname;
 				}
 			})
 			.catch((e) => {
@@ -314,7 +322,7 @@ export default class Helpers {
 				errors = [e];
 			})
 			.finally(() => {
-				callback(errors);
+				callback(errors, jsonResponse);
 			});
 	}
 
