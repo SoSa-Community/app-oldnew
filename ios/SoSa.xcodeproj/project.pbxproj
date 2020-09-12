@@ -290,7 +290,7 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 1150;
 				ORGANIZATIONNAME = SoSa;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
@@ -691,6 +691,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B93BB1EF84B35B2B629D25A2 /* Pods-SoSa-SoSaTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -714,6 +715,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4F0AA3453DF86FD2C9CA01F7 /* Pods-SoSa-SoSaTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = SoSaTests/Info.plist;
@@ -734,6 +736,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EA2FC8BECDEDA88519E918D1 /* Pods-SoSa.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 8;
 				DEAD_CODE_STRIPPING = NO;
@@ -758,6 +761,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E93F2B890BC13AEB67128C4A /* Pods-SoSa.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = D772SU73Q8;
@@ -891,6 +895,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -944,6 +949,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
