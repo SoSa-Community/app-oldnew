@@ -94,7 +94,7 @@ class Login extends Component {
                 passwordInput,
                 (isLoading) => this.setState({loggingIn: isLoading}),
                 (error, json) => {
-                    this.completeLogin(json, 'loginError');
+                    this.completeLogin(error, json, 'loginError');
                 }
             );
         };
