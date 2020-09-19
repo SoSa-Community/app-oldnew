@@ -53,6 +53,8 @@ export class Chat extends Component {
 	bufferRenderRunning = false;
 
 	selectedProfile = null;
+	componentMounted = false;
+
 
 	state = {
 		userList: [],
@@ -71,10 +73,8 @@ export class Chat extends Component {
 		preferences: {
 			touch_face_for_profile: false,
 			show_separators: false,
-			show_slim_separators: false
-		},
-		messageSeparator: false,
-		messageSeparatorSlim:false,
+			show_slim: false
+		}
 	};
 
 	constructor(props) {
@@ -90,6 +90,7 @@ export class Chat extends Component {
 	}
 
 	componentDidMount() {
+		this.componentMounted = true;
 		this.updateUserList();
 
 		let device = Device.getInstance();
@@ -121,6 +122,7 @@ export class Chat extends Component {
 	}
 
 	componentWillUnmount(): void {
+		this.componentMounted = false;
 		this.disconnect();
 		this.client.middleware.clear();
 	}
@@ -199,18 +201,20 @@ export class Chat extends Component {
 	};
 
 	addMessage = (item) => {
-		if(!item.id){
-			if(item.uuid){item.id = item.uuid;}
-			else if(item._id){
-				item.id = item._id;
-			}else{
-				item.id = Helpers.generateId();
+		if(this.componentMounted){
+			if(!item.id){
+				if(item.uuid){item.id = item.uuid;}
+				else if(item._id){
+					item.id = item._id;
+				}else{
+					item.id = Helpers.generateId();
+				}
 			}
-		}
-		this.messageBuffer.push(item);
+			this.messageBuffer.push(item);
 
-		if(this.isScrolled()){
-			this.setState({newMessagesNotificationVisible: true});
+			if(this.isScrolled()){
+				this.setState({newMessagesNotificationVisible: true});
+			}
 		}
 	};
 
@@ -511,7 +515,7 @@ export class Chat extends Component {
 				{community_id: 'sosa'},
 				(error, response) => {
 					if(error) {
-						callback(new Error(error));
+						callback(new APIError(error));
 					}else{
 						let data = response.post;
 
@@ -532,7 +536,7 @@ export class Chat extends Component {
 									console.debug(result);
 
 									if(error){
-										callback(new Error(error));
+										callback(new APIError(error));
 									}else{
 										const {PostResponse: {ETag, Key, Location}} = result;
 										try{
@@ -609,8 +613,7 @@ export class Chat extends Component {
 											onUsernamePress={() => this.addTag(item.nickname)}
 											myNickname={this.nickname}
 											showSeparator={this.state.preferences.show_separators}
-											showSlimSeparator={this.state.preferences.show_slim_separators}
-
+											showSlim={this.state.preferences.show_slim}
 										/>
 									}else{
 										return <Text style={Styles.status}>{item.message}</Text>

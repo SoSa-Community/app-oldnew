@@ -9,7 +9,7 @@ import {Linking, Text, View} from 'react-native';
 import Helpers from "../../sosa/Helpers";
 
 import SecureTextInput from "../../components/SecureTextInput";
-import {IconTextInput} from "../../components/IconTextInput";
+import {IconInput} from "../../components/IconInput";
 import {ActivityButton} from "../../components/ActivityButton";
 import {FormError} from "../../components/FormError";
 
@@ -40,23 +40,11 @@ class Register extends Component {
     }
 
     componentDidMount() {
-        let resetState = setTimeout(() => {
-            this.setState({registering: false});
-        },5000);
-
         this.addDeeplinkListener('register', 'preauth', (data) => {
             if(data.status === 'success'){
                 Helpers.deviceLogin(data.device_id, () => {},
                     (error, json) => {
-                        clearTimeout(resetState);
-
-                        let state = {registering: false};
-                        if(error){
-                            state.socialMediaError = error.message;
-                        }else{
-                            this.navigation.replace('MembersArea', {login: true});
-                        }
-                        this.setState(state);
+                        this.completeLogin(error, json, 'socialMediaError');
                     }
                 );
             }else{
@@ -65,8 +53,24 @@ class Register extends Component {
         }, true);
     }
 
-    setLoading = (isLoading) => {
-        this.setState({registering: isLoading});
+    completeLogin = (error, json, errorField) => {
+        let state = {registering: false};
+        if(error){
+            state[errorField] = error.message;
+            this.setState(state);
+        }else{
+            this.setState(state);
+            const {navigation} = this;
+
+            const {response: {user}} = json;
+            const {welcome} = user;
+
+            if(welcome){
+                navigation.replace('Welcome', {user, welcome});
+            }else{
+                navigation.replace('MembersArea', {login: true});
+            }
+        }
     };
 
     validatePassword = () => {
@@ -93,11 +97,7 @@ class Register extends Component {
                         this.state.emailInput,
                         (isLoading) => this.setState({registering: isLoading}),
                         (error, json) => {
-                            if(error){
-                                this.setState({registerError: error})
-                            }else{
-                                this.navigation.replace('MembersArea', {register: true});
-                            }
+                            this.completeLogin(error, json, 'registerError');
                         }
                     );
                 }
@@ -106,8 +106,8 @@ class Register extends Component {
             return <View>
                 <FormError errorState={this.state.registerError} />
 
-                <IconTextInput icon={['fal', 'user']} placeholder="Username" value={this.state.usernameInput} onChangeText={data => this.setState({ usernameInput: data})} enabled={!this.state.registering}/>
-                <IconTextInput icon={['fal', 'envelope']} placeholder="E-mail" value={this.state.emailInput} onChangeText={data => this.setState({ emailInput: data})} enabled={!this.state.registering}/>
+                <IconInput icon={['fal', 'user']} placeholder="Username" value={this.state.usernameInput} onChangeText={data => this.setState({ usernameInput: data})} enabled={!this.state.registering}/>
+                <IconInput icon={['fal', 'envelope']} placeholder="E-mail" value={this.state.emailInput} onChangeText={data => this.setState({ emailInput: data})} enabled={!this.state.registering}/>
 
                 <FormError errorState={this.state.passwordError} />
                 <SecureTextInput placeholder="Choose a password" onChangeText={data => this.setState({ passwordInput: data})} validateInput={() => this.validatePassword()} enabled={!this.state.registering} />
@@ -135,6 +135,9 @@ class Register extends Component {
                         state.socialMediaError = error.message;
                     }else{
                         Linking.openURL(`${SoSaConfig.auth.server}/${network}/register?app=1&preauth=${json.response}`);
+                        setTimeout(() => {
+                            this.setState({registering: false});
+                        },5000);
                     }
                     this.setState(state);
                 })

@@ -17,9 +17,9 @@
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* SoSaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* SoSaTests.m */; };
+		48BB908A9625B73CE862527C /* libPods-SoSa-SoSaTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C5B1ACA577EB8973AB469605 /* libPods-SoSa-SoSaTests.a */; };
 		7F7C76B5F7ACF623EC04E37D /* libPods-SoSa-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 335948F868E90C9721DD3664 /* libPods-SoSa-tvOSTests.a */; };
 		A66E9CDFE56327E16C8DFF6D /* libPods-SoSa.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 026207F7302D76A7C8AF49F4 /* libPods-SoSa.a */; };
-		DA4E443887D2DE7F92368234 /* libPods-SoSaTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CBAD0621716ADEE7A2B1A488 /* libPods-SoSaTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,16 +53,19 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = SoSa/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = SoSa/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = SoSa/main.m; sourceTree = "<group>"; };
+		2233D937250D304B00952863 /* SoSa-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SoSa-Bridging-Header.h"; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* SoSa-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SoSa-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* SoSa-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SoSa-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		335948F868E90C9721DD3664 /* libPods-SoSa-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SoSa-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		42B93906B0AFEE2A4B0BA749 /* Pods-SoSa-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoSa-tvOS.release.xcconfig"; path = "Target Support Files/Pods-SoSa-tvOS/Pods-SoSa-tvOS.release.xcconfig"; sourceTree = "<group>"; };
+		4F0AA3453DF86FD2C9CA01F7 /* Pods-SoSa-SoSaTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoSa-SoSaTests.release.xcconfig"; path = "Target Support Files/Pods-SoSa-SoSaTests/Pods-SoSa-SoSaTests.release.xcconfig"; sourceTree = "<group>"; };
 		57D7BB8572C3725EDD76E98B /* Pods-SoSa-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoSa-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-SoSa-tvOSTests/Pods-SoSa-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		78E98D5489FFE0C419EFDC60 /* Pods-SoSa-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoSa-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-SoSa-tvOSTests/Pods-SoSa-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		8EC3A56B8B60DE483CB02E46 /* Pods-SoSa-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoSa-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-SoSa-tvOS/Pods-SoSa-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		AC1DFE43448DE3BF9012493C /* Pods-SoSaTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoSaTests.debug.xcconfig"; path = "Target Support Files/Pods-SoSaTests/Pods-SoSaTests.debug.xcconfig"; sourceTree = "<group>"; };
+		B93BB1EF84B35B2B629D25A2 /* Pods-SoSa-SoSaTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoSa-SoSaTests.debug.xcconfig"; path = "Target Support Files/Pods-SoSa-SoSaTests/Pods-SoSa-SoSaTests.debug.xcconfig"; sourceTree = "<group>"; };
+		C5B1ACA577EB8973AB469605 /* libPods-SoSa-SoSaTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SoSa-SoSaTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6B425F30DF78D0A5B1C816E /* Pods-SoSaTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoSaTests.release.xcconfig"; path = "Target Support Files/Pods-SoSaTests/Pods-SoSaTests.release.xcconfig"; sourceTree = "<group>"; };
-		CBAD0621716ADEE7A2B1A488 /* libPods-SoSaTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SoSaTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E93F2B890BC13AEB67128C4A /* Pods-SoSa.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoSa.release.xcconfig"; path = "Target Support Files/Pods-SoSa/Pods-SoSa.release.xcconfig"; sourceTree = "<group>"; };
 		EA2FC8BECDEDA88519E918D1 /* Pods-SoSa.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SoSa.debug.xcconfig"; path = "Target Support Files/Pods-SoSa/Pods-SoSa.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -74,7 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DA4E443887D2DE7F92368234 /* libPods-SoSaTests.a in Frameworks */,
+				48BB908A9625B73CE862527C /* libPods-SoSa-SoSaTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,6 +135,7 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				2233D937250D304B00952863 /* SoSa-Bridging-Header.h */,
 			);
 			name = SoSa;
 			sourceTree = "<group>";
@@ -144,7 +148,7 @@
 				026207F7302D76A7C8AF49F4 /* libPods-SoSa.a */,
 				0C9B5E6206FEBD411AFBECA9 /* libPods-SoSa-tvOS.a */,
 				335948F868E90C9721DD3664 /* libPods-SoSa-tvOSTests.a */,
-				CBAD0621716ADEE7A2B1A488 /* libPods-SoSaTests.a */,
+				C5B1ACA577EB8973AB469605 /* libPods-SoSa-SoSaTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -160,6 +164,8 @@
 				78E98D5489FFE0C419EFDC60 /* Pods-SoSa-tvOSTests.release.xcconfig */,
 				AC1DFE43448DE3BF9012493C /* Pods-SoSaTests.debug.xcconfig */,
 				C6B425F30DF78D0A5B1C816E /* Pods-SoSaTests.release.xcconfig */,
+				B93BB1EF84B35B2B629D25A2 /* Pods-SoSa-SoSaTests.debug.xcconfig */,
+				4F0AA3453DF86FD2C9CA01F7 /* Pods-SoSa-SoSaTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -208,6 +214,7 @@
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
+				C5F0D934DFE96A106C4E70D2 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -285,8 +292,8 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0940;
-				ORGANIZATIONNAME = Facebook;
+				LastUpgradeCheck = 1150;
+				ORGANIZATIONNAME = SoSa;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
@@ -294,6 +301,7 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = D772SU73Q8;
+						LastSwiftMigration = 1150;
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -472,7 +480,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-SoSaTests-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-SoSa-SoSaTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -502,6 +510,7 @@
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
@@ -521,10 +530,61 @@
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SoSa/Pods-SoSa-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C5F0D934DFE96A106C4E70D2 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SoSa-SoSaTests/Pods-SoSa-SoSaTests-resources.sh",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Feather.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Foundation.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AntDesign.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Entypo.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EvilIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Feather.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Brands.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Regular.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Solid.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Fontisto.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Foundation.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Ionicons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialCommunityIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SoSa-SoSaTests/Pods-SoSa-SoSaTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -632,7 +692,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AC1DFE43448DE3BF9012493C /* Pods-SoSaTests.debug.xcconfig */;
+			baseConfigurationReference = B93BB1EF84B35B2B629D25A2 /* Pods-SoSa-SoSaTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -655,7 +715,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C6B425F30DF78D0A5B1C816E /* Pods-SoSaTests.release.xcconfig */;
+			baseConfigurationReference = 4F0AA3453DF86FD2C9CA01F7 /* Pods-SoSa-SoSaTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -677,13 +737,16 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EA2FC8BECDEDA88519E918D1 /* Pods-SoSa.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 8;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 9;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = D772SU73Q8;
 				INFOPLIST_FILE = SoSa/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0.7;
+				MARKETING_VERSION = 1.0.8;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -691,6 +754,9 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediacake.sosa;
 				PRODUCT_NAME = SoSa;
+				SWIFT_OBJC_BRIDGING_HEADER = "SoSa-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -700,12 +766,15 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E93F2B890BC13AEB67128C4A /* Pods-SoSa.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 8;
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = D772SU73Q8;
 				INFOPLIST_FILE = SoSa/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0.7;
+				MARKETING_VERSION = 1.0.8;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -713,6 +782,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mediacake.sosa;
 				PRODUCT_NAME = SoSa;
+				SWIFT_OBJC_BRIDGING_HEADER = "SoSa-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -832,6 +903,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -885,6 +957,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;

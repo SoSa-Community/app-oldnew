@@ -46,7 +46,8 @@ const Styles = StyleSheet.create({
         marginBottom: 4,
         flex: 1,
         flexDirection: 'row',
-        paddingHorizontal: 4
+        paddingHorizontal: 4,
+        alignItems: 'center'
     },
 
     input:{
@@ -54,9 +55,9 @@ const Styles = StyleSheet.create({
         color: '#121111'
     },
 
-    inputIcon:{color: '#ccc', marginHorizontal:4, marginTop: 11},
+    inputIcon:{color: '#ccc', marginHorizontal:4},
     viewPasswordIcon: {
-        marginTop: 10
+
     },
 
     forgotButton: {color: '#7ac256', padding:8, textAlign:'center'},

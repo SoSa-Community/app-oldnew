@@ -7,7 +7,7 @@ import {Text, View, Linking, TouchableHighlight, KeyboardAvoidingView} from 'rea
 import Helpers from "../../sosa/Helpers";
 
 import {ActivityButton} from "../../components/ActivityButton";
-import {IconTextInput} from "../../components/IconTextInput";
+import {IconInput} from "../../components/IconInput";
 import SecureTextInput from "../../components/SecureTextInput";
 import {FormError} from "../../components/FormError";
 
@@ -50,25 +50,13 @@ class Login extends Component {
     }
 
     componentDidMount() {
-        let resetState = setTimeout(() => {
-            this.setState({loggingIn: false});
-        },5000);
-
         this.addDeeplinkListener('login', 'preauth', (data) => {
             console.log('Data', data);
             const {status, device_id} = data;
             if(status === 'success'){
                 Helpers.deviceLogin(device_id, () => {},
                     (error, json) => {
-                        clearTimeout(resetState);
-
-                        let state = {registering: false};
-                        if(error){
-                            state.socialMediaError = error.message;
-                        }else{
-                            this.navigation.replace('MembersArea', {login: true});
-                        }
-                        this.setState(state);
+                        this.completeLogin(error, json, 'socialMediaError');
                     }
                 );
             }else{
@@ -76,6 +64,26 @@ class Login extends Component {
             }
         }, true);
     }
+
+    completeLogin = (error, json, errorField) => {
+        let state = {loggingIn: false};
+        if(error){
+            state[errorField] = error.message;
+            this.setState(state);
+        }else{
+            this.setState(state);
+            const {navigation} = this;
+
+            const {response: {user}} = json;
+            const {welcome} = user;
+
+            if(welcome){
+                navigation.replace('Welcome', {user, welcome});
+            }else{
+                navigation.replace('MembersArea', {login: true});
+            }
+        }
+    };
 
     CredentialLogin = () => {
         const {navigation, state: {usernameInput, passwordInput, loggingIn, loginError}} = this;
@@ -86,11 +94,7 @@ class Login extends Component {
                 passwordInput,
                 (isLoading) => this.setState({loggingIn: isLoading}),
                 (error, json) => {
-                    if(error){
-                        this.setState({loginError: error.message})
-                    }else{
-                        navigation.replace('MembersArea', {login: true});
-                    }
+                    this.completeLogin(error, json, 'loginError');
                 }
             );
         };
@@ -120,7 +124,7 @@ class Login extends Component {
         if(credentials){
             return <View>
                 <FormError errorState={loginError} />
-                <IconTextInput icon={['fal', 'user']} placeholder="Username or e-mail address" value={usernameInput} onChangeText={data => this.setState({ usernameInput: data})} enabled={!this.state.loggingIn}/>
+                <IconInput icon={['fal', 'user']} placeholder="Username or e-mail address" value={usernameInput} onChangeText={data => this.setState({ usernameInput: data})} enabled={!this.state.loggingIn}/>
                 <SecureTextInput icon={['fal', 'key']} placeholder="New Password" onChangeText={data => this.setState({ passwordInput: data})} value={passwordInput} enabled={!this.state.loggingIn}/>
                 {buttonContainer}
             </View>
@@ -139,6 +143,9 @@ class Login extends Component {
                     state.socialMediaError = error.message;
                 }else{
                     Linking.openURL(`${SoSaConfig.auth.server}/${network}/login?app=1&preauth=${json.response}`);
+                    setTimeout(() => {
+                        this.setState({loggingIn: false});
+                    },1000);
                 }
                 this.setState(state);
             });
@@ -182,7 +189,6 @@ class Login extends Component {
             >
                 <View style={BaseStyles.container}>
                     <View style={{marginTop: 20, paddingHorizontal:20, flex: 1}}>
-                        <Text style={Styles.header}>Login</Text>
                         <View style={[Styles.content_container]}>
                             <this.CredentialLogin />
                             <this.SocialLogin />

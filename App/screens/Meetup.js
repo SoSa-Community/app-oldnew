@@ -85,7 +85,7 @@ const Styles = StyleSheet.create({
     buttonContainer: {
         flexDirection:'row',
         alignItems:'center',
-        paddingBottom: Platform.OS === 'ios' ? 32 : 0,
+        paddingBottom: Platform.OS === 'ios' ? 32 : 8,
         paddingRight: 14
     },
 
@@ -146,6 +146,8 @@ export class Meetup extends Component {
         this.navigationContext = props.navigationContext;
         this.drawerNavigation = this.navigationContext.drawerNavigation;
         this.drawerNavigationContext = props.navigationContext.drawerNavigationContext;
+
+        this.navigationContext.setMenuOptions({showLeft:true, showRight: false, leftMode: 'back', title: this.state.meetup.title});
     }
 
     render() {

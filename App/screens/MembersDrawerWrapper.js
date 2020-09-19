@@ -10,13 +10,15 @@ import {createDrawerNavigator, DrawerContentScrollView} from '@react-navigation/
 import Session from "../sosa/Session";
 import Helpers from "../sosa/Helpers";
 import {Icon} from "../components/Icon";
+import withAppContext from "./hoc/withAppContext";
 
 const DrawerL = createDrawerNavigator();
 const DrawerR = createDrawerNavigator();
 
-export default class MembersDrawerWrapper extends Component {
+class MembersDrawerWrapper extends Component {
     topBar = null;
     appNavigation = null;
+    appContext = null;
 
     state = {
         leftDrawerItems:[],
@@ -27,43 +29,9 @@ export default class MembersDrawerWrapper extends Component {
     constructor(props) {
         super();
         this.appNavigation = props.navigation;
+        this.appContext = props.appContext;
         this.topBar = React.createRef();
     }
-
-    logout = (sessionAutoExpired) => {
-        let clearSession = () => {
-            let session = Session.getInstance();
-            session.logout(() => {
-                this.appNavigation.replace('Login', {logout: true})
-            });
-        }
-
-
-        if(sessionAutoExpired === true){
-            clearSession();
-            Alert.alert("Oooof", "Sorry you were logged out, please login again!",
-                [{text: "Sure!",style: "cancel"}],
-                { cancelable: true }
-            );
-        }
-        else{
-            Alert.alert("Are you sure?", "Are you sure you want to logout?",
-                [
-                    {
-                        text: "Cancel",
-                        style: "cancel"
-                    },
-                    {
-                        text: "OK",
-                        onPress: () => {
-                            Helpers.logout(clearSession);
-                        }
-                    }
-                ],
-                { cancelable: true }
-            );
-        }
-    };
 
     CustomDrawerContent = (props, state, scrollable) => {
         let items = [];
@@ -82,7 +50,7 @@ export default class MembersDrawerWrapper extends Component {
         const TagName = (!scrollable ? View : DrawerContentScrollView);
 
         return (
-            <TagName {...props} style={{flex: 1, backgroundColor: '#222540',paddingTop:(Platform.OS === 'ios' ? 32 : 0)}}>
+            <TagName {...props} style={{flex: 1, backgroundColor: '#444442',paddingTop:(Platform.OS === 'ios' ? 32 : 0)}}>
                     { items }
                     <View style={{ flex: 1, justifyContent: 'flex-end', paddingBottom:(Platform.OS === 'ios' ? 24 : 0), alignItems:'center'}}>
                         { bottomItems }
@@ -139,10 +107,10 @@ export default class MembersDrawerWrapper extends Component {
         return (
             <DrawerNavigationContext.Provider value={{
                 appNavigation: this.appNavigation,
+                appContext: this.appContext,
                 addDrawerItem: this.addDrawerItem,
                 updateDrawerItem: this.updateDrawerItem,
                 removeDrawerItem: this.removeDrawerItem,
-                logout: this.logout,
             }}
             >
                 <NavigationContainer independent={true} >
@@ -153,7 +121,8 @@ export default class MembersDrawerWrapper extends Component {
             </DrawerNavigationContext.Provider>
         );
   }
-
-
-
 }
+
+const MembersArea = withAppContext(MembersDrawerWrapper);
+export default MembersArea;
+
