@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import BaseStyles from '../styles/base'
 import Styles from '../styles/onboarding'
 
-import {Text, View, Linking, TouchableHighlight, KeyboardAvoidingView} from 'react-native';
+import {Text, View, Linking, TouchableHighlight, KeyboardAvoidingView, Alert} from 'react-native';
 import Helpers from "../../sosa/Helpers";
 
 import {ActivityButton} from "../../components/ActivityButton";
@@ -27,6 +27,8 @@ class Login extends Component {
         socialMediaError: '',
         forLogin: true
     };
+
+    preauthId = null;
 
     constructor(props) {
         super();
@@ -52,13 +54,44 @@ class Login extends Component {
     componentDidMount() {
         this.addDeeplinkListener('login', 'preauth', (data) => {
             console.log('Data', data);
-            const {status, device_id} = data;
-            if(status === 'success'){
+            const {status, link_token, device_id, unregistered} = data;
+
+            const deviceLogin = (device_id) => {
                 Helpers.deviceLogin(device_id, () => {},
-                    (error, json) => {
-                        this.completeLogin(error, json, 'socialMediaError');
-                    }
+                      (error, json) => {
+                          this.completeLogin(error, json, 'socialMediaError');
+                      }
                 );
+            };
+
+            if(status === 'success'){
+                if(unregistered){
+                    Alert.alert(
+                          "You're not registered!",
+                          "Would you like us to create an account for you?",
+                          [{text: "No", style: "cancel"},
+                                {
+                                    text: "Sure! let's do it!",
+                                    onPress: () => {
+                                        Helpers.linkPreauth(
+                                              this.preauthId,
+                                              link_token,
+                                              (isLoading) => this.setState({loggingIn: isLoading}),
+                                              (error, json) => {
+                                                  if(error){
+									this.setState({loggingIn:false, socialMediaError: error.message});
+								  }else{
+									  this.completeLogin(error, json, 'socialMediaError');
+								  }
+                                                }
+                                        );
+                                    }
+                                }],
+                          { cancelable: true }
+                    );
+                }else{
+                    deviceLogin(device_id);
+                }
             }else{
                 this.setState({loggingIn:false, socialMediaError: data.error});
             }
@@ -142,6 +175,8 @@ class Login extends Component {
                 if(error){
                     state.socialMediaError = error.message;
                 }else{
+                    this.preauthId = json.response;
+
                     Linking.openURL(`${SoSaConfig.auth.server}/${network}/login?app=1&preauth=${json.response}`);
                     setTimeout(() => {
                         this.setState({loggingIn: false});

@@ -223,6 +223,37 @@ export default class Helpers {
 		}
 	};
 
+	static linkPreauth(preauthId, linkToken, loadingCallback, callback){
+		let deviceInstance = Device.getInstance();
+		loadingCallback(true);
+
+		try{
+			let namespace = 'login/link';
+			let errorResponse = null;
+			let jsonResponse = null;
+
+			jwt
+				.sign({link_token: linkToken}, deviceInstance.getSecret(), {alg: "HS256"})
+				.then((token) => {
+					Helpers.request(namespace, { preauth_id: preauthId, token: token })
+						.then((json) => {
+							if (json.error) errorResponse = new APIError(json.error.message);
+							jsonResponse = json;
+						})
+						.catch((e) => {
+							errorResponse = new APIError(e);
+						})
+						.finally(() => {
+							loadingCallback(false);
+							callback(errorResponse, jsonResponse);
+						});
+				});
+		}catch(e){
+			loadingCallback(false);
+			callback(e);
+		}
+	};
+
 	static handleAuthRequest(namespace, data, loadingCallback, callback){
 		let deviceInstance = Device.getInstance();
 		let sessionInstance = Session.getInstance();
@@ -234,9 +265,7 @@ export default class Helpers {
 			.then((json) => {
 				console.debug('Device login', json);
 
-				if(json.error){
-					errorResponse = new APIError(json.error.message);
-				}
+				if(json.error) errorResponse = new APIError(json.error.message);
 				else{
 					jsonResponse = json;
 
