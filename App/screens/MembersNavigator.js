@@ -17,6 +17,9 @@ import MeetupsScreen from "./Meetups";
 import MeetupScreen from "./Meetup";
 import {Preferences} from "../sosa/Preferences";
 
+import Device from "../sosa/Device";
+import Session from "../sosa/Session";
+
 
 const Stack = createStackNavigator();
 
@@ -26,6 +29,8 @@ class WrapperComponent extends Component {
     drawerNavigationContext = {};
     topBar = null;
     stackNavigation = null;
+    device = Device.getInstance();
+    apiClient = null;
 
     menuDefaults = {
         title: 'SoSa',
@@ -38,7 +43,8 @@ class WrapperComponent extends Component {
         headerIcons: [],
         preferences: {},
         showTopBar: true,
-        menu: this.menuDefaults
+        menu: this.menuDefaults,
+        loading: true
     };
 
     menuStack = [this.menuDefaults];
@@ -48,6 +54,9 @@ class WrapperComponent extends Component {
 
     constructor(props) {
         super();
+
+        this.session = Session.getInstance();
+
         this.drawerNavigation = props.navigation;
         this.drawerNavigationContext = props.navigationContext;
         this.appNavigation = this.drawerNavigationContext.appNavigation;
@@ -56,11 +65,42 @@ class WrapperComponent extends Component {
         this.topBar = React.createRef();
         this.stackNavigation = React.createRef();
 
+        this.apiClient = this.appContext.client;
+
+
         Preferences.getAll((preferences) => {
             this.setState({preferences});
             this.triggerListener('settings_update', preferences);
         });
+
+        this.connect();
     }
+
+    connect = () => {
+        const {apiClient} = this;
+        const {middleware} = apiClient;
+
+        middleware.clear();
+        middleware.add({
+            'receive_message': (message, client) => {
+                this.triggerListener('receive_message', message);
+                return message;
+            },
+            'authentication_successful': (authData, client) => {
+                this.setState({loading:false});
+                this.triggerListener('authentication_successful', authData);
+                return authData;
+            },
+            'disconnected': (message, client) => {
+                this.triggerListener('disconnected', message);
+                return message;
+            },
+            'rooms/join': (userData) => this.triggerListener('rooms/join', userData),
+            'rooms/left': (userData) => this.triggerListener('rooms/left', userData)
+        });
+
+        apiClient.connect();
+    };
 
     showSettings = () => {
         this.appNavigation.navigate('Settings');
@@ -166,16 +206,20 @@ class WrapperComponent extends Component {
     addHeaderIcon = (id, icon, onPress) => {this.topBar.current.addHeaderIcon(id, icon, onPress);};
 
     render() {
-        const {title, leftMode, showLeft, showRight} = this.state.menu;
-        return (
-            <MembersNavigationContext.Provider value={{
+        const {state: {menu: {title, leftMode, showLeft, showRight}}} = this;
+
+
+        if(this.state.loading) {
+            return <View><Text>Loading</Text></View>
+        }else{
+            return <MembersNavigationContext.Provider value={{
                 addHeaderIcon: this.addHeaderIcon,
                 drawerNavigation: this.drawerNavigation,
                 drawerNavigationContext: this.drawerNavigationContext,
                 navigate: this.navigate,
                 addListener: this.addListener,
                 preferences: this.state.preferences,
-                setMenuOptions: this.setMenuOptions
+                setMenuOptions: this.setMenuOptions,
             }}
             >
                 <View style={BaseStyles.container} >
@@ -189,7 +233,8 @@ class WrapperComponent extends Component {
                     </NavigationContainer>
                 </View>
             </MembersNavigationContext.Provider>
-        );
+        }
+
   }
 }
 

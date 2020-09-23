@@ -18,12 +18,40 @@ import Helpers from "./App/sosa/Helpers";
 import { AppContext } from "./App/screens/context/AppContext";
 import WelcomeScreen from "./App/screens/Welcome";
 import Session from "./App/sosa/Session";
+import {ChatClient} from "sosa-chat-client";
+import {SoSaConfig} from "./App/sosa/config";
+import io from "socket.io-client";
+import jwt from "react-native-pure-jwt";
+import Device from "./App/sosa/Device";
+
 
 const Stack = createStackNavigator();
 
 export default class SoSa extends Component {
 	coldBoot = true;
 	appNavigation = null;
+
+	session = Session.getInstance();
+	device = Device.getInstance();
+
+	client = new ChatClient(
+		{host: SoSaConfig.chat.server, api_key: SoSaConfig.chat.api_key},
+		io,
+		{
+			get: (callback) => {
+				let packet = {id: this.session.getId(), refresh_token: this.session.getRefreshToken()};
+				jwt.sign(packet, this.device.getSecret(), {alg: "HS256"}).then((token) => {
+					callback(token, this.device.getId(), false);
+				});
+			},
+			reauth: (callback) => {
+				Helpers.authCheck((device, session, error) => {
+					callback(error);
+				});
+			},
+			authFailed: () => {}/*this.logout(true)*/
+		}
+	);
 
 	state = {
 		initializing: false,
@@ -38,6 +66,10 @@ export default class SoSa extends Component {
 		Linking.getInitialURL().then((result) => {
 			this.handleDeepLink({url: result}, true);
 		});
+	}
+
+	componentWillUnmount(): void {
+		this.client.middleware.clear();
 	}
 
 	resetRoot = (name, params) => {
@@ -144,7 +176,7 @@ export default class SoSa extends Component {
 			this.deepLinkingListeners[namespace][method].push(callback);
 		}
 
-	}
+	};
 
 	removeDeeplinkListener = (namespace='', method='') => {
 		if(this.deepLinkingListeners[namespace] && this.deepLinkingListeners[namespace][method]){
@@ -170,7 +202,7 @@ export default class SoSa extends Component {
 			<View style={BaseStyles.container}>
 				<StatusBar barStyle="light-content" backgroundColor="#121211"/>
 				<View style={{flex:1}}>
-					<AppContext.Provider value={{addDeeplinkListener: this.addDeeplinkListener, removeDeeplinkListener: this.removeDeeplinkListener, logout: this.logout}}>
+					<AppContext.Provider value={{client: this.client, addDeeplinkListener: this.addDeeplinkListener, removeDeeplinkListener: this.removeDeeplinkListener, logout: this.logout}}>
 						<NavigationContainer ref={this.appNavigation}>
 							<Stack.Navigator initialRouteName={this.state.defaultScreen} screenOptions={{headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle, headerTintColor: 'white', headerTitleContainerStyle: { left: 10 }}} >
 								<Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }}/>

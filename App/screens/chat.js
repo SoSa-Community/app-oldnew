@@ -1,19 +1,14 @@
 import React, {Component} from 'react';
 import Styles from './styles/chat'
 import {FlatList, Text, View, TouchableHighlight, KeyboardAvoidingView, Platform, ScrollView, Keyboard} from 'react-native';
-import io from "socket.io-client";
-
-import { SoSaConfig } from "../sosa/config";
-import {ChatClient, Message} from 'sosa-chat-client';
+import {Message} from 'sosa-chat-client';
 
 import Session from "../sosa/Session";
-import Device from "../sosa/Device";
 
 import Helpers from '../sosa/Helpers';
 import {MessageInput} from "../components/MessageInput";
 import {UserList} from "../components/chat/UserList";
 
-import jwt from "react-native-pure-jwt";
 import {RoomItem} from "../components/chat/RoomItem";
 
 import withMembersNavigationContext from "./hoc/withMembersNavigationContext";
@@ -27,7 +22,7 @@ import ImagePicker from "react-native-image-picker";
 
 export class Chat extends Component {
 	drawerNavigationContext = {};
-	navigationContext = {};
+	membersNavigationContext = {};
 
 	navigation = {};
 	drawerNavigation = {};
@@ -46,7 +41,8 @@ export class Chat extends Component {
 
 	messageInput = ''; //We use this as well as state because setState doesn't update immediately and can create a race condition
 
-	client;
+	apiMiddleware;
+	apiClient;
 	session;
 
 	bufferRenderTimer = null;
@@ -80,51 +76,100 @@ export class Chat extends Component {
 	constructor(props) {
 		super();
 
+		const {navigation, navigationContext} = props;
+		const {drawerNavigation, drawerNavigationContext} = navigationContext;
+		const {appContext} = drawerNavigationContext;
+		const {addListener} = navigationContext;
+		const {client: apiClient} = appContext;
+		const {middleware: apiMiddleware} = apiClient;
+
 		this.session = Session.getInstance();
 
-		this.navigation = props.navigation;
-		this.navigationContext = props.navigationContext;
-		this.drawerNavigation = this.navigationContext.drawerNavigation;
-		this.drawerNavigationContext = props.navigationContext.drawerNavigationContext;
-		this.navigationContext.addListener('settings_update', (preferences) => this.preferencesChanged(preferences));
+		this.navigation = navigation;
+		this.drawerNavigation = drawerNavigation;
+
+		this.membersNavigationContext = navigationContext;
+		this.drawerNavigationContext = drawerNavigationContext;
+
+		this.appContext = appContext;
+		this.apiClient = apiClient;
+		this.apiMiddleware = apiMiddleware;
+
+		addListener('settings_update', (preferences) => this.preferencesChanged(preferences));
+		addListener('api_authenticated', (authData) => {
+			this.setupChat();
+		})
 	}
 
 	componentDidMount() {
 		this.componentMounted = true;
 		this.updateUserList();
-
-		let device = Device.getInstance();
-
-		this.client = new ChatClient(
-			{
-				host: SoSaConfig.chat.server,
-				api_key: SoSaConfig.chat.api_key
-			},
-			io,
-			{
-				get: (callback) => {
-					let packet = {id: this.session.getId(), refresh_token: this.session.getRefreshToken()};
-					jwt.sign(packet, device.getSecret(), {alg: "HS256"}).then((token) => {
-						callback(token, device.getId(), false);
-					});
-				},
-				reauth: (callback) => {
-					Helpers.authCheck((device, session, error) => {
-						callback(error);
-					});
-				},
-				authFailed: () => this.navigationContext.logout(true)
-			}
-		);
-		this.preferencesChanged(this.navigationContext.preferences);
-		this.connect();
-
+		this.preferencesChanged(this.membersNavigationContext.preferences);
+		this.setupChat();
 	}
 
 	componentWillUnmount(): void {
 		this.componentMounted = false;
-		this.disconnect();
-		this.client.middleware.clear();
+		//this.apiClient.middleware.clear();
+	}
+
+	addListeners = () => {
+		this.apiMiddleware.add({
+			'receive_message': (message, client) => {
+				this.addMessage(message);
+				return message;
+			},
+			'disconnected': (message, client) => {
+				clearTimeout(this.bufferRenderTimer);
+				this.addStatus('Disconnected from server');
+				return message;
+			},
+			'rooms/join': (userData) => {
+				if(this.state.currentRoom){
+
+					this.addStatus(`${userData.nickname} joined`);
+
+					let userList = this.state.userList;
+					let add = true;
+					userList.forEach((user, index) => {
+						if(user.nickname === userData.nickname) add = false;
+					});
+					if(add){
+						userList.push(userData);
+						this.sortUserList(userList);
+						this.setState({userList: userList});
+					}
+				}
+			},
+			'rooms/left': (userData) => {
+				if(this.state.currentRoom){
+					this.addStatus(`${userData.nickname} left`);
+					let userList = this.state.userList;
+
+					userList.forEach((user, index) => {
+						if(user.nickname === userData.nickname) delete userList[index];
+					});
+					this.sortUserList(userList);
+					this.setState({userList: userList});
+				}
+			}
+		});
+	}
+
+	setupChat() {
+		if(this.apiClient.connected && this.apiClient.authenticated){
+			this.addListeners();
+			this.addStatus(`Connected to server with nickname: ${this.session.nickname}`);
+
+			this.setupBufferRenderTimer();
+			this.updateRoomList();
+
+			if(this.state.currentRoom !== null){
+				this.joinRoom(this.state.currentRoom.community_id, this.state.currentRoom.name);
+			}else{
+				this.joinRoom('sosa', 'general');
+			}
+		}
 	}
 
 	preferencesChanged(preferences){
@@ -174,7 +219,7 @@ export class Chat extends Component {
 				},5000);
 				this.slowDownCounter++;
 
-				this.client.rooms().send((err, message) => {
+				this.apiClient.rooms().send((err, message) => {
 						if(!err) this.addMessage(message);
 					},
 					this.state.currentRoom.community_id,
@@ -212,7 +257,7 @@ export class Chat extends Component {
 			}
 			this.messageBuffer.push(item);
 
-			if(this.isScrolled()){
+			if(this.isScrolled() && !this.state.newMessagesNotificationVisible){
 				this.setState({newMessagesNotificationVisible: true});
 			}
 		}
@@ -249,7 +294,7 @@ export class Chat extends Component {
 
 	updateRoomList = () => {
 
-		this.client.rooms().list((err, data) => {
+		this.apiClient.rooms().list((err, data) => {
 			if(!err){
 				this.renderRoomList(data.rooms);
 				this.setState({rooms: data.rooms});
@@ -262,7 +307,7 @@ export class Chat extends Component {
 
 	joinRoom = (communityID, roomID, callback) => {
 
-		this.client.rooms().join((err, room, userList) => {
+		this.apiClient.rooms().join((err, room, userList) => {
 			this.sortUserList(userList);
 			this.setState({userList: userList});
 
@@ -275,7 +320,7 @@ export class Chat extends Component {
 				this.setState({currentRoom: room});
 				this.addStatus(`Joined room ${room.name}`);
 
-				this.navigationContext.addHeaderIcon('whos_online',['fal', 'users'], this.displayUserList);
+				this.membersNavigationContext.addHeaderIcon('whos_online',['fal', 'users'], this.displayUserList);
 				this.renderRoomList();
 			}
 
@@ -292,77 +337,11 @@ export class Chat extends Component {
 
 	};
 
-	connect = () => {
-		let client = this.client;
-		let middleware = this.client.middleware;
-		let chat = this;
-
-		middleware.clear();
-
-		middleware.add({
-			'receive_message': (message, client) => {
-				this.addMessage(message);
-				return message;
-			},
-			'authentication_successful': (authData, client) => {
-				this.nickname = chat.session.nickname;
-
-				this.addStatus(`Connected to server with nickname: ${chat.session.nickname}`);
-				this.setupBufferRenderTimer();
-
-				this.updateRoomList();
-
-				if(this.state.currentRoom !== null){
-					this.joinRoom(this.state.currentRoom.community_id, this.state.currentRoom.name);
-				}else{
-					this.joinRoom('sosa', 'general');
-				}
-				return authData;
-			},
-			'disconnected': (message, client) => {
-				this.addStatus('Disconnected from server');
-
-				return message;
-			},
-			'rooms/join': (userData) => {
-				if(this.state.currentRoom){
-
-					this.addStatus(`${userData.nickname} joined`);
-
-					let userList = this.state.userList;
-					let add = true;
-					userList.forEach((user, index) => {
-						if(user.nickname === userData.nickname) add = false;
-					});
-					if(add){
-						userList.push(userData);
-						this.sortUserList(userList);
-						this.setState({userList: userList});
-					}
-				}
-			},
-			'rooms/left': (userData) => {
-				if(this.state.currentRoom){
-					this.addStatus(`${userData.nickname} left`);
-					let userList = this.state.userList;
-
-					userList.forEach((user, index) => {
-						if(user.nickname === userData.nickname) delete userList[index];
-					});
-					this.sortUserList(userList);
-					this.setState({userList: userList});
-				}
-			}
-		});
-
-		client.connect();
-	};
-
 	sortUserList = (userList) => {
 		userList.sort((a,b) => a.nickname.localeCompare(b.nickname, [], {numeric: true, ignorePunctuation: true}));
-	}
+	};
 
-	disconnect = () => this.client.disconnect();
+	disconnect = () => this.apiClient.disconnect();
 
 	addTag = (username, usingTagList) => {
 		let text = this.state.messageInput;
@@ -450,7 +429,7 @@ export class Chat extends Component {
 	scrollToBottom = () => {
 		this.setState({newMessagesNotificationVisible: false});
 		this.scrollView.scrollToIndex({index:0, animated: true});
-	}
+	};
 
 	buildWrapper = (component) => {
 		if(Platform.OS === 'ios'){
@@ -510,7 +489,7 @@ export class Chat extends Component {
 		const doUpload = (file) => {
 			const formData = new FormData();
 
-			this.client.emit(
+			this.apiClient.emit(
 				'content/prepareUpload',
 				{community_id: 'sosa'},
 				(error, response) => {
@@ -589,6 +568,22 @@ export class Chat extends Component {
 		chooseImage();
 	};
 
+	renderItem = ({item}) => {
+		if(item instanceof Message){
+			return <MessageItem
+				message={item}
+				onFacePress={() => this.onFacePress(item)}
+				onLongFacePress={() => this.onLongFacePress(item)}
+				onUsernamePress={() => this.addTag(item.nickname)}
+				myNickname={this.nickname}
+				showSeparator={this.state.preferences.show_separators}
+				showSlim={this.state.preferences.show_slim}
+			/>
+		}else{
+			return <Text style={Styles.status}>{item.message}</Text>
+		}
+	}
+
 	render() {
 
 		return (
@@ -600,26 +595,13 @@ export class Chat extends Component {
 							onScroll={this.chatMessagesOnScroll}
 							keyboardShouldPersistTaps={'handled'}
 							inverted
+							initialNumToRender={50}
+							maxToRenderPerBatch={12}
+							windowSize={10}
 							data={this.state.messages}
 							extraData={this.state.messages}
 							keyExtractor={(item) => item.id.toString()}
-							renderItem={
-								({item}) => {
-									if(item instanceof Message){
-										return <MessageItem
-											message={item}
-											onFacePress={() => this.onFacePress(item)}
-											onLongFacePress={() => this.onLongFacePress(item)}
-											onUsernamePress={() => this.addTag(item.nickname)}
-											myNickname={this.nickname}
-											showSeparator={this.state.preferences.show_separators}
-											showSlim={this.state.preferences.show_slim}
-										/>
-									}else{
-										return <Text style={Styles.status}>{item.message}</Text>
-									}
-								}
-							}
+							renderItem={this.renderItem}
 							style={Styles.message_list}
 						/>
 
@@ -653,7 +635,7 @@ export class Chat extends Component {
 							uploadComplete={(error, locations, key, etag) => {
 								console.log(error, locations);
 								if(!error && Array.isArray(locations)){
-									this.client.rooms().send((err, message) => {
+									this.apiClient.rooms().send((err, message) => {
 											if(!err) this.addMessage(message);
 										},
 										this.state.currentRoom.community_id,
