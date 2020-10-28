@@ -34,6 +34,9 @@ class Welcome extends Component {
 		this.appContext = appContext;
 		this.navigation = navigation;
 		this.navigationContext = navigationContext;
+        
+        const {client: apiClient} = appContext;
+        this.apiClient = apiClient;
 
 		if(params){
 			const {user: {username, welcome: {haveEmail}}} = params;
@@ -44,7 +47,27 @@ class Welcome extends Component {
 	}
 
 	render() {
-		const {usernameInput, emailInput, fieldErrors} = this.state;
+		const {navigation, apiClient: { services: { auth: authService } }, state: { usernameInput, emailInput, fieldErrors } } = this;
+		
+		const confirmWelcome = () => {
+            this.setState({fieldErrors: {username: '', email: ''}});
+        
+            authService.confirmWelcome(usernameInput, emailInput)
+                .then(() => navigation.replace('MembersArea'))
+                .catch(errors => {
+                    let fieldErrors = Object.assign({}, this.state.fieldErrors);
+                    console.log(fieldErrors);
+                    if(Array.isArray(errors)){
+                        errors.forEach((error) => {
+                            const {message, field} = error;
+                            if(field) fieldErrors[field] = message;
+                        });
+                        this.setState({fieldErrors});
+                    }else {
+                        console.debug(errors);
+                    }
+                });
+        };
 
 		return (
 			<KeyboardAvoidingView
@@ -86,22 +109,7 @@ class Welcome extends Component {
 								</TouchableOpacity>
 							</View>
 							<View style={{flex: 2, paddingHorizontal: 4}} >
-								<ActivityButton showActivity={this.state.saving} onPress={() => {
-									this.setState({fieldErrors: {username: '', email: ''}});
-									Helpers.confirmWelcome((errors) => {
-										let fieldErrors = Object.assign({}, this.state.fieldErrors);
-										if(Array.isArray(errors)){
-											errors.forEach((error) => {
-												const {code, message, field} = error;
-												if(field) fieldErrors[field] = message;
-											});
-											console.log('Field Errors', fieldErrors);
-											this.setState({fieldErrors});
-										}else{
-											this.navigation.replace('MembersArea');
-										}
-									}, this.state.usernameInput, this.state.emailInput)
-								}} text="Confirm"/>
+								<ActivityButton showActivity={this.state.saving} onPress={confirmWelcome} text="Confirm"/>
 							</View>
 						</View>
 					</View>

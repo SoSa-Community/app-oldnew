@@ -18,12 +18,11 @@ import Helpers from "./App/sosa/Helpers";
 import { AppContext } from "./App/screens/context/AppContext";
 import WelcomeScreen from "./App/screens/Welcome";
 import Session from "./App/sosa/Session";
-import {ChatClient} from "sosa-chat-client";
+import { Client } from "sosa-chat-client";
 import {SoSaConfig} from "./App/sosa/config";
 import io from "socket.io-client";
 import jwt from "react-native-pure-jwt";
 import Device from "./App/sosa/Device";
-
 
 const Stack = createStackNavigator();
 
@@ -33,23 +32,33 @@ export default class SoSa extends Component {
 
 	session = Session.getInstance();
 	device = Device.getInstance();
-
-	client = new ChatClient(
-		{host: SoSaConfig.chat.server, api_key: SoSaConfig.chat.api_key},
+	
+	client = new Client(
+		{providers: SoSaConfig.providers},
 		io,
 		{
-			get: (callback) => {
-				let packet = {id: this.session.getId(), refresh_token: this.session.getRefreshToken()};
-				jwt.sign(packet, this.device.getSecret(), {alg: "HS256"}).then((token) => {
-					callback(token, this.device.getId(), false);
-				});
+			getDevice: () => this.device.init(),
+            updateDevice: (device) => new Promise((resolve, reject) => {
+                    console.info('App::updateDevice', this.device, device);
+                    
+                    this.device = device;
+                    device.save();
+                    resolve(device);
+            }),
+			getSession: () => new Promise((resolve => {
+                this.session.init().finally(() => resolve(this.session));
+            })),
+            updateSession: (session) => new Promise((resolve, reject) => {
+                this.session = session;
+                session.save();
+                resolve(session);
+            }),
+			generateJWT: (packet) => {
+			    if(!this.device.secret) throw new Error('Device not initialized');
+			    return jwt.sign(packet, this.device.secret, {alg: "HS256"});
 			},
-			reauth: (callback) => {
-				Helpers.authCheck((device, session, error) => {
-					callback(error);
-				});
-			},
-			authFailed: () => {}/*this.logout(true)*/
+			reauth: () => this.client.services.auth.validateSession(),
+			authFailed: () => {this.logout(true)}
 		}
 	);
 
@@ -73,13 +82,12 @@ export default class SoSa extends Component {
 	}
 
 	resetRoot = (name, params) => {
-		this.appNavigation?.current?.resetRoot({
-			index: 0,
-			routes: [{ name, params }],
-		});
+		this.appNavigation?.current?.resetRoot({ index: 0, routes: [{ name, params }] });
 	};
 
 	logout = (sessionAutoExpired) => {
+        const { client: { services: { auth: authService } } } = this;
+        
 		let clearSession = () => {
 			let session = Session.getInstance();
 			session.logout(() => {
@@ -97,16 +105,12 @@ export default class SoSa extends Component {
 		else{
 			Alert.alert("Are you sure?", "Are you sure you want to logout?",
 				[
-					{
-						text: "Cancel",
-						style: "cancel"
-					},
-					{
-						text: "OK",
-						onPress: () => {
-							Helpers.logout(clearSession);
-						}
-					}
+					{ text: "Cancel", style: "cancel" },
+					{ text: "OK", onPress: () => {
+					    authService.logout()
+                            .catch((error) => console.debug('App::logout', error))
+                            .finally(() => clearSession())
+                    } }
 				],
 				{ cancelable: true }
 			);
@@ -118,20 +122,19 @@ export default class SoSa extends Component {
 		AppState.addEventListener("change", this._handleAppStateChange);
 		Linking.addEventListener('url', this.handleDeepLink);
 
-		Helpers.authCheck((error, device, session, user) => {
-			if(error === null){
-				if(user.welcome){
-					this.resetRoot('Welcome', {user, welcome: user.welcome});
-				}else{
-					this.resetRoot('MembersArea', {device, session, user});
-				}
-			}else{
-				this.resetRoot('Login', {});
-			}
-		});
-
+		this.client.services.auth.validateSession()
+            .then((data) => {
+                const {user} = data;
+                if(user?.welcome){
+                    this.resetRoot('Welcome', {user, welcome: user.welcome});
+                }else{
+                    this.resetRoot('MembersArea', {user});
+                }
+            }).catch((error) => {
+                console.debug('error', error);
+                this.resetRoot('Login', {});
+            });
 		this.coldBoot = false;
-
 	}
 
 	componentWillUnmount(): void {
@@ -142,13 +145,20 @@ export default class SoSa extends Component {
 	handleDeepLink = ({url}, coldBoot = false) => {
 		if(url !== null){
 			url = url.replace('sosa://','').split('/');
-			console.log('Deep link', url, coldBoot);
+			
 
 			if(url.length > 0){
-				let namespace = url[0];
-				let method = url[1];
-				let data = JSON.parse(Helpers.base64Decode(url[2]));
-
+				const [namespace, method, encoded] = url;
+				const decoded = Helpers.base64Decode(encoded);
+				
+				let data = {status: 'failure', error:'system_error'};
+				try{
+				    data = JSON.parse(decoded);
+                }catch (e) {
+                    console.debug('App::handleDeepLink::invalid_payload', e);
+                } finally {
+                    console.info('App::handleDeepLink', coldBoot, namespace, method, encoded, decoded, data);
+                }
 				this.fireDeeplinkListener(namespace, method, data);
 			}
 		}
