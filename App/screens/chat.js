@@ -20,6 +20,7 @@ import {parseString as parseXMLString} from "react-native-xml2js";
 
 import ImagePicker from "react-native-image-picker";
 
+
 export class Chat extends Component {
 	drawerNavigationContext = {};
 	membersNavigationContext = {};
@@ -43,6 +44,7 @@ export class Chat extends Component {
 
 	apiMiddleware;
 	apiClient;
+	chatService;
 	session;
 
 	bufferRenderTimer = null;
@@ -81,7 +83,8 @@ export class Chat extends Component {
 		const {appContext} = drawerNavigationContext;
 		const {addListener} = navigationContext;
 		const {client: apiClient} = appContext;
-		const {middleware: apiMiddleware} = apiClient;
+		const {middleware: apiMiddleware, services: { chat: chatService } } = apiClient;
+		
 
 		this.session = Session.getInstance();
 
@@ -94,11 +97,9 @@ export class Chat extends Component {
 		this.appContext = appContext;
 		this.apiClient = apiClient;
 		this.apiMiddleware = apiMiddleware;
+		this.chatService = chatService;
 
 		addListener('settings_update', (preferences) => this.preferencesChanged(preferences));
-		addListener('api_authenticated', (authData) => {
-			this.setupChat();
-		})
 	}
 
 	componentDidMount() {
@@ -110,66 +111,81 @@ export class Chat extends Component {
 
 	componentWillUnmount(): void {
 		this.componentMounted = false;
-		//this.apiClient.middleware.clear();
+		this.apiClient.middleware.clear('app');
 	}
 
 	addListeners = () => {
-		this.apiMiddleware.add({
-			'receive_message': (message, client) => {
-				this.addMessage(message);
-				return message;
+	 
+		this.apiMiddleware.add('app', {
+			'event': ( packet ) => {
+                const { type, data } = packet;
+                return new Promise((resolve, reject) => {
+                    if(type === 'chat/message') {
+                        return this.addMessage(data);
+                    }
+                    else if (type === 'chat/rooms/join') {
+                        if (this.state.currentRoom) {
+                            this.addStatus(`${data.nickname} joined`).then(() => {
+                                let userList = this.state.userList;
+                                let add = true;
+                                userList.forEach((user, index) => {
+                                    if (user.nickname === data.nickname) add = false;
+                                });
+                                if (add) {
+                                    userList.push(data);
+                                    this.sortUserList(userList);
+                                    this.setState({userList: userList});
+                                }
+                            }).then(() => resolve());
+                        }else{
+                            resolve();
+                        }
+                    }
+                    else if (type === 'chat/rooms/leave') {
+                        if(this.state.currentRoom){
+                            this.addStatus(`${data.nickname} left`).then(() => {
+                                let userList = this.state.userList;
+    
+                                userList.forEach((user, index) => {
+                                    if(user.nickname === data.nickname) delete userList[index];
+                                });
+                                this.sortUserList(userList);
+                                this.setState({userList: userList});
+                                resolve();
+                            });
+                        }else{
+                            resolve();
+                        }
+                    }
+                }).finally(() => packet);
 			},
-			'disconnected': (message, client) => {
-				clearTimeout(this.bufferRenderTimer);
-				this.addStatus('Disconnected from server');
-				return message;
-			},
-			'rooms/join': (userData) => {
-				if(this.state.currentRoom){
-
-					this.addStatus(`${userData.nickname} joined`);
-
-					let userList = this.state.userList;
-					let add = true;
-					userList.forEach((user, index) => {
-						if(user.nickname === userData.nickname) add = false;
-					});
-					if(add){
-						userList.push(userData);
-						this.sortUserList(userList);
-						this.setState({userList: userList});
-					}
-				}
-			},
-			'rooms/left': (userData) => {
-				if(this.state.currentRoom){
-					this.addStatus(`${userData.nickname} left`);
-					let userList = this.state.userList;
-
-					userList.forEach((user, index) => {
-						if(user.nickname === userData.nickname) delete userList[index];
-					});
-					this.sortUserList(userList);
-					this.setState({userList: userList});
-				}
-			}
+			'disconnected': (reason, client) => {
+                return new Promise((resolve, reject) => {
+                    clearTimeout(this.bufferRenderTimer);
+                    this.addStatus('Disconnected from server');
+                    resolve(reason);
+                });
+            },
 		});
-	}
+	};
 
 	setupChat() {
-		if(this.apiClient.connected && this.apiClient.authenticated){
+	    //if(chatService.isConnected() && chatService.isAuthenticated()){
 			this.addListeners();
 			this.addStatus(`Connected to server with nickname: ${this.session.nickname}`);
 
 			this.setupBufferRenderTimer();
-			this.updateRoomList();
-
-			if(this.state.currentRoom !== null){
-				this.joinRoom(this.state.currentRoom.community_id, this.state.currentRoom.name);
-			}else{
-				this.joinRoom('sosa', 'general');
-			}
-		}
+			this.updateRoomList().then(() => {
+                if(this.state.rooms.length){
+                    if(this.state.currentRoom !== null){
+                        this.joinRoom(this.state.currentRoom.community_id, this.state.currentRoom.name);
+                    }else{
+                        const [room] = this.state.rooms;
+                        this.joinRoom(room.community_id, room.name);
+                    }
+                }
+            });
+		//}
 	}
 
 	preferencesChanged(preferences){
@@ -201,66 +217,70 @@ export class Chat extends Component {
 					}} />
 			</View>
 		), true);
-	}
+	};
 
 	sendMessage = () => {
-		if(!this.coolDown && this.slowDownCounter < 3){
-			let message = this.messageInput.trim();
+        console.log(this);
+	    let {coolDown, coolDownTimer, slowDownCounter, slowDownTimer, messageInput, state: { currentRoom: { community_id, name } } } = this;
+	    
+	    
+		if(!coolDown && slowDownCounter < 3){
+			let message = messageInput.trim();
 			if(message.length > 0){
 				this.coolDown = true;
+				
+				clearTimeout(coolDownTimer);
+				clearTimeout(slowDownTimer);
 
-				clearTimeout(this.coolDownTimer);
-				clearTimeout(this.slowDownTimer);
-
-				this.coolDownTimer = setTimeout(() => this.coolDown = false, this.slowDownCounter * 200);
+				this.coolDownTimer = setTimeout(() => this.coolDown = false, slowDownCounter * 200);
 				this.slowDownTimer = setTimeout(() => {
-					this.slowDownCounter = 0;
+                    this.slowDownCounter = 0;
 					this.setState({slowDownNotifierVisible: false, canSend: true, fuckWith: false});
 				},5000);
 				this.slowDownCounter++;
 
-				this.apiClient.rooms().send((err, message) => {
-						if(!err) this.addMessage(message);
-					},
-					this.state.currentRoom.community_id,
-					this.state.currentRoom.name,
-					message
-				);
+				this.chatService.rooms.send(community_id, name, message).then((message) => this.addMessage(message));
 				this.setMessageInput('');
 				this.scrollToBottom();
 			}
 		}else{
-			this.slowDownCounter++;
+            this.slowDownCounter++;
 
 			if(this.slowDownCounter > 3){
 				let data = {slowDownNotifierVisible: true, canSend: false};
 				if(this.slowDownCounter > 4) data.fuckWith = true;
-
 				this.setState(data);
 			}
 		}
 	};
 
 	addStatus = (message) => {
-		this.addMessage({id: Helpers.generateId(), message: message});
+	    return this.addMessage({id: Helpers.generateId(), message: message});
 	};
 
 	addMessage = (item) => {
-		if(this.componentMounted){
-			if(!item.id){
-				if(item.uuid){item.id = item.uuid;}
-				else if(item._id){
-					item.id = item._id;
-				}else{
-					item.id = Helpers.generateId();
-				}
-			}
-			this.messageBuffer.push(item);
-
-			if(this.isScrolled() && !this.state.newMessagesNotificationVisible){
-				this.setState({newMessagesNotificationVisible: true});
-			}
-		}
+	    console.debug('Message', item);
+	    return new Promise((resolve, reject) => {
+            if(this.componentMounted){
+                if(!item.id){
+                    if(item.uuid){item.id = item.uuid;}
+                    else if(item._id){
+                        item.id = item._id;
+                    }else{
+                        item.id = Helpers.generateId();
+                    }
+                }
+                this.messageBuffer.push(item);
+            
+                if(this.isScrolled() && !this.state.newMessagesNotificationVisible){
+                    this.setState({newMessagesNotificationVisible: true});
+                }
+                resolve(item);
+            }else{
+                reject();
+            }
+        });
+		
 	};
 
 	renderRoomList = (rooms) => {
@@ -293,38 +313,33 @@ export class Chat extends Component {
 	};
 
 	updateRoomList = () => {
-
-		this.apiClient.rooms().list((err, data) => {
-			if(!err){
-				this.renderRoomList(data.rooms);
-				this.setState({rooms: data.rooms});
-			}else{
-				Helpers.showAlert('Error getting room list', err.message);
-			}
-
-		}, 'sosa');
+        return this.chatService.rooms.list('sosa').then((rooms) => {
+            this.renderRoomList(rooms);
+            this.setState({rooms});
+		}).catch(error => {
+		    console.info('App::updateRoomList::error', error);
+            Helpers.showAlert('Error getting room list', error);
+            throw error;
+        });
 	};
 
-	joinRoom = (communityID, roomID, callback) => {
+	joinRoom = (communityID, roomID) => {
+        
+        this.chatService.rooms.join(communityID, roomID)
+            .then(({room, userList}) => {
+			    this.sortUserList(userList);
+			    this.setState({userList: userList});
 
-		this.apiClient.rooms().join((err, room, userList) => {
-			this.sortUserList(userList);
-			this.setState({userList: userList});
+			    this.updateUserList();
 
-			this.updateUserList();
-
-			if(err){
-				Helpers.showAlert('Can\'t Join Room', err.message);
-
-			}else{
 				this.setState({currentRoom: room});
 				this.addStatus(`Joined room ${room.name}`);
 
 				this.membersNavigationContext.addHeaderIcon('whos_online',['fal', 'users'], this.displayUserList);
 				this.renderRoomList();
-			}
-
-		}, communityID, roomID);
+		    }).catch(error => {
+                Helpers.showAlert('Can\'t Join Room', error);
+            });
 	};
 
 	displayUserList = () => {
@@ -633,15 +648,15 @@ export class Chat extends Component {
 							uploading={this.state.uploading}
 							uploadAction={this.uploadFile}
 							uploadComplete={(error, locations, key, etag) => {
-								console.log(error, locations);
+                                console.log(error, locations);
 								if(!error && Array.isArray(locations)){
-									this.apiClient.rooms().send((err, message) => {
-											if(!err) this.addMessage(message);
-										},
-										this.state.currentRoom.community_id,
-										this.state.currentRoom.name,
-										locations.join(" ")
-									);
+                                    this.chatService.rooms.send(this.state.currentRoom.community_id, this.state.currentRoom.name, locations.join(" "))
+                                        .then((message) => {
+											this.addMessage(message);
+										})
+                                        .catch(error => {
+                                            console.debug('send message', error);
+                                        });
 								}
 							}}
 						/>

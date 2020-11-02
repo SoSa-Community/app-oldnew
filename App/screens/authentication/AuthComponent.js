@@ -13,6 +13,7 @@ import {SoSaConfig} from "../../sosa/config";
 import {SocialButton} from "../../components/SocialButton";
 import Helpers from "../../sosa/Helpers";
 
+
 export default class AuthComponent extends Component {
     screenType = '';
     
@@ -102,6 +103,8 @@ export default class AuthComponent extends Component {
         let state = {processing: false};
         
         if(error){
+            if(Array.isArray(error)) error = error.pop();
+            
             state[errorField] = error.message || error.code;
             this.setState(state);
         }else{
@@ -137,6 +140,7 @@ export default class AuthComponent extends Component {
         const forLogin = screenType === 'login';
         
         const doTheThing = () => {
+            
             this.setState({processing: true});
             const complete = (error, response) => this.complete(error, response, 'error');
             

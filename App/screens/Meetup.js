@@ -211,7 +211,7 @@ export class Meetup extends Component {
                                     </View>
                                 }else{
                                     const comments = this.state.meetup.comments.map((item, index) => {
-                                        return <CommentItem comment={item} />
+                                        return <CommentItem comment={item} key={index}/>
                                     });
                                     return <View style={{flex:1}}>
                                         <Text style={{fontSize:18, color:'#fff', marginLeft:4, marginTop: 16, marginBottom:8}}>Comments</Text>
@@ -233,7 +233,7 @@ export class Meetup extends Component {
                         </View>}
                     </View>
                     <View style={{flex:1}}>
-                        <ActivityButton text={meetup.going ? 'Not Going' : (hasAttendees ? 'Going' : 'Be the first to go!')} style={{flex:1}} style={meetup.going ? {backgroundColor:'red'} : {}}/>
+                        <ActivityButton text={meetup.going ? 'Not Going' : (hasAttendees ? 'Going' : 'Be the first to go!')} style={meetup.going ? {backgroundColor:'red', flex:1} : {flex:1}}/>
                     </View>
                 </View>
             </View>

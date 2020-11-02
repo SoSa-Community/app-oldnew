@@ -12,14 +12,10 @@ export default class Helpers {
 	};
 
 	static showAlert = (title, message) => {
-		Alert.alert(
-			title,
-			message,
-			[
-				{text: 'OK', onPress: () => console.log('OK Pressed')},
-			],
-			{cancelable: true},
-		);
+	    if(typeof(message) !== 'string'){
+	        message = '';
+        }
+		Alert.alert(title, message,[{text: 'OK', onPress: () => console.log('OK Pressed')}],{cancelable: true});
 	}
 
 	static validatePassword(password){

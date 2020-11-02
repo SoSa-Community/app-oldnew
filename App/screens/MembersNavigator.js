@@ -44,7 +44,7 @@ class WrapperComponent extends Component {
         preferences: {},
         showTopBar: true,
         menu: this.menuDefaults,
-        loading: true
+        loading: false
     };
 
     menuStack = [this.menuDefaults];
@@ -80,26 +80,18 @@ class WrapperComponent extends Component {
         const {apiClient} = this;
         const {middleware} = apiClient;
 
-        middleware.clear();
-        middleware.add({
-            'receive_message': (message, client) => {
-                this.triggerListener('receive_message', message);
-                return message;
-            },
+        middleware.clear('app');
+        middleware.add('app', {
             'authentication_successful': (authData, client) => {
                 this.setState({loading:false});
-                this.triggerListener('authentication_successful', authData);
+                this.triggerListener('api_authenticated', authData);
                 return authData;
             },
             'disconnected': (message, client) => {
                 this.triggerListener('disconnected', message);
                 return message;
-            },
-            'rooms/join': (userData) => this.triggerListener('rooms/join', userData),
-            'rooms/left': (userData) => this.triggerListener('rooms/left', userData)
+            }
         });
-
-        apiClient.connect();
     };
 
     showSettings = () => {

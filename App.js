@@ -57,7 +57,7 @@ export default class SoSa extends Component {
 			    if(!this.device.secret) throw new Error('Device not initialized');
 			    return jwt.sign(packet, this.device.secret, {alg: "HS256"});
 			},
-			reauth: () => this.client.services.auth.validateSession(),
+			reauth: () => this.validateSession(),
 			authFailed: () => {this.logout(true)}
 		}
 	);
@@ -78,7 +78,7 @@ export default class SoSa extends Component {
 	}
 
 	componentWillUnmount(): void {
-		this.client.middleware.clear();
+		this.client.middleware.clear('app');
 	}
 
 	resetRoot = (name, params) => {
@@ -122,20 +122,36 @@ export default class SoSa extends Component {
 		AppState.addEventListener("change", this._handleAppStateChange);
 		Linking.addEventListener('url', this.handleDeepLink);
 
-		this.client.services.auth.validateSession()
-            .then((data) => {
-                const {user} = data;
+		
+		
+		const success = (data) => {
+        
+        };
+				
+		this.validateSession()
+            .then(({user}) => {
                 if(user?.welcome){
                     this.resetRoot('Welcome', {user, welcome: user.welcome});
                 }else{
                     this.resetRoot('MembersArea', {user});
                 }
-            }).catch((error) => {
-                console.debug('error', error);
-                this.resetRoot('Login', {});
-            });
+            })
+            .catch(() => this.resetRoot('Login', {}));
 		this.coldBoot = false;
 	}
+	
+	validateSession(){
+        const { client: { services: { auth } } } = this;
+        
+        return auth.validateSession().catch((error) => {
+                console.debug('error', error);
+                if(this.session.id.length > 0){
+                    return auth.deviceLogin(this.device.id);
+                }else{
+                    throw error;
+                }
+            });
+    }
 
 	componentWillUnmount(): void {
 		AppState.removeEventListener("change", this._handleAppStateChange);

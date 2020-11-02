@@ -26,7 +26,7 @@ export const RoomItem = ({room, roomActive, onPress}) =>{
         return  <TouchableHighlight onPress={onPress}>
             <View style={Styles.room}>
                 <Icon icon={['fal', 'campfire']} size={18} style={{marginRight:14, color}}/>
-                <Text style={{flex: 1, fontSize: 16, color}}>{room.title}</Text>
+                <Text style={{flex: 1, fontSize: 16, color}}>{room.title || room.name}</Text>
             </View>
         </TouchableHighlight>
 
