@@ -79,9 +79,9 @@ export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePr
     };
 
     const renderEmbeds = () => {
-        let embeds = message.embeds.map((embed) => {
+        let embeds = message.embeds.map((embed, index) => {
             if(embed.image && embed.image.length){
-                return <View style={{height:100, flexDirection: 'row', justifyContent:'flex-start'}}>
+                return <View style={{height:100, flexDirection: 'row', justifyContent:'flex-start'}} key={index}>
                             <TouchableOpacity onPress={() => Linking.openURL(embed.image)}>
                                 <Image source={{uri : embed.image}} style={{width:100, aspectRatio: 1/1}} resizeMethod="resize" resizeMode="stretch"/>
                             </TouchableOpacity>

@@ -32,6 +32,7 @@ export default class SoSa extends Component {
 
 	session = Session.getInstance();
 	device = Device.getInstance();
+    deepLinkingListeners = {};
 	
 	client = new Client(
 		{providers: SoSaConfig.providers},
@@ -72,14 +73,30 @@ export default class SoSa extends Component {
 		super();
 
 		this.appNavigation = React.createRef();
-		Linking.getInitialURL().then((result) => {
-			this.handleDeepLink({url: result}, true);
-		});
+		Linking.getInitialURL().then((result) => this.handleDeepLink({url: result}, true));
 	}
 
-	componentWillUnmount(): void {
+	componentWillUnmount(){
 		this.client.middleware.clear('app');
+        AppState.removeEventListener("change", this._handleAppStateChange);
+        Linking.removeEventListener('url', this.handleDeepLink);
 	}
+    
+    componentDidMount() {
+        AppState.addEventListener("change", this._handleAppStateChange);
+        Linking.addEventListener('url', this.handleDeepLink);
+        
+        this.validateSession()
+            .then(({user}) => {
+                if(user?.welcome){
+                    this.resetRoot('Welcome', {user, welcome: user.welcome});
+                }else{
+                    this.resetRoot('MembersArea', {user});
+                }
+            })
+            .catch(() => this.resetRoot('Login', {}));
+        this.coldBoot = false;
+    }
 
 	resetRoot = (name, params) => {
 		this.appNavigation?.current?.resetRoot({ index: 0, routes: [{ name, params }] });
@@ -90,9 +107,7 @@ export default class SoSa extends Component {
         
 		let clearSession = () => {
 			let session = Session.getInstance();
-			session.logout(() => {
-				this.resetRoot('Login', {logout: true})
-			});
+			session.logout(() => this.resetRoot('Login', {logout: true}));
 		};
 
 		if(sessionAutoExpired === true){
@@ -116,29 +131,6 @@ export default class SoSa extends Component {
 			);
 		}
 	};
-
-
-	componentDidMount(): void {
-		AppState.addEventListener("change", this._handleAppStateChange);
-		Linking.addEventListener('url', this.handleDeepLink);
-
-		
-		
-		const success = (data) => {
-        
-        };
-				
-		this.validateSession()
-            .then(({user}) => {
-                if(user?.welcome){
-                    this.resetRoot('Welcome', {user, welcome: user.welcome});
-                }else{
-                    this.resetRoot('MembersArea', {user});
-                }
-            })
-            .catch(() => this.resetRoot('Login', {}));
-		this.coldBoot = false;
-	}
 	
 	validateSession(){
         const { client: { services: { auth } } } = this;
@@ -152,11 +144,6 @@ export default class SoSa extends Component {
                 }
             });
     }
-
-	componentWillUnmount(): void {
-		AppState.removeEventListener("change", this._handleAppStateChange);
-		Linking.removeEventListener('url', this.handleDeepLink);
-	}
 
 	handleDeepLink = ({url}, coldBoot = false) => {
 		if(url !== null){
@@ -181,38 +168,36 @@ export default class SoSa extends Component {
 	};
 
 	_handleAppStateChange = nextAppState => {
-		if (
-			this.state.appState.match(/inactive|background/) &&
-			nextAppState === "active"
-		) {
-			console.log("App has come to the foreground!");
-		}
-		this.setState({ appState: nextAppState });
+	    this.setState({ appState: nextAppState });
 	};
 
-	deepLinkingListeners = {};
-
 	addDeeplinkListener = (namespace='', method='', callback, onlyOneAllowed=false) => {
-		if(!this.deepLinkingListeners[namespace]) this.deepLinkingListeners[namespace] = {};
-		if(!this.deepLinkingListeners[namespace][method]) this.deepLinkingListeners[namespace][method] = [];
+	    let { deepLinkingListeners } = this;
+		
+	    if(!deepLinkingListeners[namespace]) this.deepLinkingListeners[namespace] = {};
+		if(!deepLinkingListeners[namespace][method]) this.deepLinkingListeners[namespace][method] = [];
 
 		if(onlyOneAllowed){
-			this.deepLinkingListeners[namespace][method] = [callback];
+			deepLinkingListeners[namespace][method] = [callback];
 		}else{
-			this.deepLinkingListeners[namespace][method].push(callback);
+			deepLinkingListeners[namespace][method].push(callback);
 		}
-
 	};
 
 	removeDeeplinkListener = (namespace='', method='') => {
-		if(this.deepLinkingListeners[namespace] && this.deepLinkingListeners[namespace][method]){
-			delete this.deepLinkingListeners[namespace][method];
+        let { deepLinkingListeners } = this;
+        
+		if(deepLinkingListeners[namespace] && deepLinkingListeners[namespace][method]){
+			delete deepLinkingListeners[namespace][method];
 		}
 	};
 
 	fireDeeplinkListener = (namespace='', method='', data) => {
-		if(this.deepLinkingListeners[namespace] && this.deepLinkingListeners[namespace][method]){
-			this.deepLinkingListeners[namespace][method].forEach((listener) => {
+        let { deepLinkingListeners } = this;
+        
+		if(deepLinkingListeners[namespace] && deepLinkingListeners[namespace][method]){
+		    const triggers = deepLinkingListeners[namespace][method];
+			triggers.forEach((listener) => {
 				try{
 					listener(data);
 				}catch (e) {
@@ -222,33 +207,28 @@ export default class SoSa extends Component {
 		}
 	};
 
-	renderDisplay = (initializing) => {
-
-		return (
-			<View style={BaseStyles.container}>
-				<StatusBar barStyle="light-content" backgroundColor="#121211"/>
-				<View style={{flex:1}}>
-					<AppContext.Provider value={{client: this.client, addDeeplinkListener: this.addDeeplinkListener, removeDeeplinkListener: this.removeDeeplinkListener, logout: this.logout}}>
-						<NavigationContainer ref={this.appNavigation}>
-							<Stack.Navigator initialRouteName={this.state.defaultScreen} screenOptions={{headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle, headerTintColor: 'white', headerTitleContainerStyle: { left: 10 }}} >
-								<Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }}/>
-								<Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Login To SoSa' }}/>
-								<Stack.Screen name="Register" component={RegistrationScreen} options={{ title: 'Join SoSa' }} />
-								<Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ title: 'Forgotten Password' }} />
-								<Stack.Screen name="ForgotPasswordCode" component={ForgotPasswordCode} options={{title: 'Check your e-mail'}}/>
-								<Stack.Screen name="MembersArea" component={MembersArea} options={{title:'', headerShown:false}}/>
-								<Stack.Screen name="Settings" component={SettingsScreen} options={{title: 'Settings'}}/>
-								<Stack.Screen name="Welcome" component={WelcomeScreen} options={{title: 'Welcome To SoSa!'}}/>
-							</Stack.Navigator>
-						</NavigationContainer>
-					</AppContext.Provider>
-				</View>
-			</View>
-		);
-	};
-
 	render() {
-		return this.renderDisplay(this.state.initializing);
+        return (
+            <View style={BaseStyles.container}>
+                <StatusBar barStyle="light-content" backgroundColor="#121211"/>
+                <View style={{flex:1}}>
+                    <AppContext.Provider value={{client: this.client, addDeeplinkListener: this.addDeeplinkListener, removeDeeplinkListener: this.removeDeeplinkListener, logout: this.logout}}>
+                        <NavigationContainer ref={this.appNavigation}>
+                            <Stack.Navigator initialRouteName={this.state.defaultScreen} screenOptions={{headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle, headerTintColor: 'white', headerTitleContainerStyle: { left: 10 }}} >
+                                <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }}/>
+                                <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Login To SoSa' }}/>
+                                <Stack.Screen name="Register" component={RegistrationScreen} options={{ title: 'Join SoSa' }} />
+                                <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ title: 'Forgotten Password' }} />
+                                <Stack.Screen name="ForgotPasswordCode" component={ForgotPasswordCode} options={{title: 'Check your e-mail'}}/>
+                                <Stack.Screen name="MembersArea" component={MembersArea} options={{title:'', headerShown:false}}/>
+                                <Stack.Screen name="Settings" component={SettingsScreen} options={{title: 'Settings'}}/>
+                                <Stack.Screen name="Welcome" component={WelcomeScreen} options={{title: 'Welcome To SoSa!'}}/>
+                            </Stack.Navigator>
+                        </NavigationContainer>
+                    </AppContext.Provider>
+                </View>
+            </View>
+        );
 	}
 }
 

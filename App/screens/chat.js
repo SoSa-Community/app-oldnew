@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Styles from './styles/chat'
-import {FlatList, Text, View, TouchableHighlight, KeyboardAvoidingView, Platform, ScrollView, Keyboard} from 'react-native';
-import {Message} from 'sosa-chat-client';
+import {ActivityIndicator, FlatList, Text, View, TouchableHighlight, KeyboardAvoidingView, Platform, ScrollView, Keyboard} from 'react-native';
+import {Message, SoSaError} from 'sosa-chat-client';
 
 import Session from "../sosa/Session";
 
@@ -30,7 +30,7 @@ export class Chat extends Component {
 
 	scrollOffset = {y:0, x:0};
 	scrollView = null;
-	username = '';
+	
 	messageBuffer = [];
 	nickname = '';
 	coolDown = false;
@@ -52,7 +52,8 @@ export class Chat extends Component {
 
 	selectedProfile = null;
 	componentMounted = false;
-
+	
+	community = 'sosa';
 
 	state = {
 		userList: [],
@@ -120,12 +121,11 @@ export class Chat extends Component {
 			'event': ( packet ) => {
                 const { type, data } = packet;
                 return new Promise((resolve, reject) => {
-                    if(type === 'chat/message') {
-                        return this.addMessage(data);
-                    }
-                    else if (type === 'chat/rooms/join') {
+                    if(type === 'chat/message') return this.addMessage(data);
+                    
+                    if (type === 'chat/rooms/join') {
                         if (this.state.currentRoom) {
-                            this.addStatus(`${data.nickname} joined`).then(() => {
+                            return this.addStatus(`${data.nickname} joined`).then(() => {
                                 let userList = this.state.userList;
                                 let add = true;
                                 userList.forEach((user, index) => {
@@ -136,14 +136,14 @@ export class Chat extends Component {
                                     this.sortUserList(userList);
                                     this.setState({userList: userList});
                                 }
-                            }).then(() => resolve());
+                            });
                         }else{
                             resolve();
                         }
                     }
                     else if (type === 'chat/rooms/leave') {
                         if(this.state.currentRoom){
-                            this.addStatus(`${data.nickname} left`).then(() => {
+                            return this.addStatus(`${data.nickname} left`).then(() => {
                                 let userList = this.state.userList;
     
                                 userList.forEach((user, index) => {
@@ -159,7 +159,7 @@ export class Chat extends Component {
                     }
                 }).finally(() => packet);
 			},
-			'disconnected': (reason, client) => {
+			'disconnected': (reason) => {
                 return new Promise((resolve, reject) => {
                     clearTimeout(this.bufferRenderTimer);
                     this.addStatus('Disconnected from server');
@@ -170,22 +170,20 @@ export class Chat extends Component {
 	};
 
 	setupChat() {
-	    //if(chatService.isConnected() && chatService.isAuthenticated()){
-			this.addListeners();
-			this.addStatus(`Connected to server with nickname: ${this.session.nickname}`);
+        this.addListeners();
+        this.addStatus(`Connected to server with nickname: ${this.session.nickname}`);
 
-			this.setupBufferRenderTimer();
-			this.updateRoomList().then(() => {
-                if(this.state.rooms.length){
-                    if(this.state.currentRoom !== null){
-                        this.joinRoom(this.state.currentRoom.community_id, this.state.currentRoom.name);
-                    }else{
-                        const [room] = this.state.rooms;
-                        this.joinRoom(room.community_id, room.name);
-                    }
+        this.setupBufferRenderTimer();
+        this.updateRoomList().then(() => {
+            if(this.state.rooms.length){
+                if(this.state.currentRoom !== null){
+                    this.joinRoom(this.state.currentRoom.community_id, this.state.currentRoom.name);
+                }else{
+                    const [room] = this.state.rooms;
+                    this.joinRoom(room.community_id, room.name);
                 }
-            });
-		//}
+            }
+        });
 	}
 
 	preferencesChanged(preferences){
@@ -219,13 +217,12 @@ export class Chat extends Component {
 		), true);
 	};
 
-	sendMessage = () => {
-        console.log(this);
+	sendMessage = (setMessage) => {
 	    let {coolDown, coolDownTimer, slowDownCounter, slowDownTimer, messageInput, state: { currentRoom: { community_id, name } } } = this;
 	    
-	    
+	    console.debug('message', setMessage);
 		if(!coolDown && slowDownCounter < 3){
-			let message = messageInput.trim();
+			let message = (setMessage || messageInput).trim();
 			if(message.length > 0){
 				this.coolDown = true;
 				
@@ -290,7 +287,7 @@ export class Chat extends Component {
 			return <RoomItem key={room.id}
 					     onPress={() => {
 						     if(!this.state.currentRoom || this.state.currentRoom.name !== room.name) {
-							     this.joinRoom('sosa', room.name);
+							     this.joinRoom(this.community, room.name);
 						     }
 						     this.navigation.navigate('Chat');
 						     this.drawerNavigation.dangerouslyGetParent().closeDrawer();
@@ -313,7 +310,7 @@ export class Chat extends Component {
 	};
 
 	updateRoomList = () => {
-        return this.chatService.rooms.list('sosa').then((rooms) => {
+        return this.chatService.rooms.list(this.community).then((rooms) => {
             this.renderRoomList(rooms);
             this.setState({rooms});
 		}).catch(error => {
@@ -328,11 +325,9 @@ export class Chat extends Component {
         this.chatService.rooms.join(communityID, roomID)
             .then(({room, userList}) => {
 			    this.sortUserList(userList);
-			    this.setState({userList: userList});
-
+                this.setState({userList, currentRoom: room});
+                
 			    this.updateUserList();
-
-				this.setState({currentRoom: room});
 				this.addStatus(`Joined room ${room.name}`);
 
 				this.membersNavigationContext.addHeaderIcon('whos_online',['fal', 'users'], this.displayUserList);
@@ -499,54 +494,44 @@ export class Chat extends Component {
 		this.setState({profileModalVisible: true});
 	};
 
-	uploadFile = (callback) => {
-
+	uploadFile = () => {
+	    const instance = this;
+        const { chatService, state: { currentRoom }, apiClient: { services: { general } } } = instance;
+        
 		const doUpload = (file) => {
-			const formData = new FormData();
-
-			this.apiClient.emit(
-				'content/prepareUpload',
-				{community_id: 'sosa'},
-				(error, response) => {
-					if(error) {
-						callback(new APIError(error));
-					}else{
-						let data = response.post;
-
-						console.debug(data);
-						for(let key in data) formData.append(key, data[key]);
-
-						formData.append('file', file);
-
-						fetch('https://sosamedia.s3.amazonaws.com', {
-							method: 'POST',
-							body: formData,
-							headers: {"Content-Type": "multipart/form-data"}
-						})
-							.then((response) => response.text())
-							.then((response) => {
-								parseXMLString(response, function (err, result) {
-									const {Error: error} = result;
-									console.debug(result);
-
-									if(error){
-										callback(new APIError(error));
-									}else{
-										const {PostResponse: {ETag, Key, Location}} = result;
-										try{
-											callback(null, Location, Key, ETag);
-										}catch(e){
-											console.debug(e);
-										}
-									}
-								});
-							})
-							.catch((error) => {
-								console.error('Error:', error);
-							});
-					}
-				}
-			);
+		 
+			general.prepareUpload(this.community)
+                .then(({requestInfo, post}) => {
+                    let formData = new FormData();
+                    
+                    for(let key in post) formData.append(key, post[key]);
+                    formData.append('file', file);
+    
+                    let request = new Request(requestInfo.uploadURI, {
+                        method: "POST",
+                        body: formData,
+                        cache: "no-store",
+                        headers: {"Content-Type": "multipart/form-data"}
+                    });
+                
+                    return fetch(request)
+                    .then((response) => response.text())
+                    .then((response) => {
+                        parseXMLString(response, function (err, result) {
+                            console.debug(result);
+                            const {Error: error} = result;
+                            
+                            if(error) throw new SoSaError(null, error);
+                            const {PostResponse: {ETag, Key, Location}} = result;
+                            
+                            if(Array.isArray(Location)){
+                                return instance.sendMessage(Location.join(" "));
+                            }
+                        });
+                    })
+                }).catch((errors) => {
+                    console.debug('errors', errors);
+                });
 		};
 
 
@@ -647,18 +632,6 @@ export class Chat extends Component {
 							canSend={this.state.canSend}
 							uploading={this.state.uploading}
 							uploadAction={this.uploadFile}
-							uploadComplete={(error, locations, key, etag) => {
-                                console.log(error, locations);
-								if(!error && Array.isArray(locations)){
-                                    this.chatService.rooms.send(this.state.currentRoom.community_id, this.state.currentRoom.name, locations.join(" "))
-                                        .then((message) => {
-											this.addMessage(message);
-										})
-                                        .catch(error => {
-                                            console.debug('send message', error);
-                                        });
-								}
-							}}
 						/>
 					</View>
 					<ProfileModal visible={this.state.profileModalVisible} profile={this.selectedProfile} dismissTouch={() => this.setState({profileModalVisible: false})} />
