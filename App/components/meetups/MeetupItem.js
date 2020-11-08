@@ -162,7 +162,12 @@ export const MeetupItem = ({meetup, onChange, onTellMeMorePress}) =>{
                 </TouchableHighlight>
             </View>
             <View style={{flex:1}}>
-                <ActivityButton text={meetup.going ? 'Not Going' : (hasAttendees ? 'Going' : 'Be the first to go!')} style={{flex:1}} showActivity={getSaving} onPress={toggleGoing} style={meetup.going ? {backgroundColor:'red'} : {}}/>
+                <ActivityButton
+                    text={meetup.going ? 'Not Going' : (hasAttendees ? 'Going' : 'Be the first to go!')}
+                    style={{flex:1}}
+                    showActivity={getSaving}
+                    onPress={toggleGoing}
+                    style={{backgroundColor: meetup.going? '#dc3545':'#28a745'}}/>
             </View>
         </View>
     </View>
