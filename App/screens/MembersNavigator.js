@@ -166,6 +166,7 @@ class WrapperComponent extends Component {
     }
 
     setMenuOptions = (options, resetOnBack) => {
+        const { drawerNavigationContext } = this;
         let currentState = Object.assign({}, this.state.menu);
         let updateState = false;
         for(let key in options){
@@ -176,6 +177,10 @@ class WrapperComponent extends Component {
             }
         }
         if(updateState) this.setState({menu: currentState});
+        
+        if(currentState.leftMode === 'back') drawerNavigationContext.allowLeftSwipe(false);
+        else drawerNavigationContext.allowLeftSwipe(true);
+        
         this.menuStack.push(currentState);
     };
 

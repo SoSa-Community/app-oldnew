@@ -129,8 +129,8 @@ export const MeetupItem = ({meetup, onChange, onTellMeMorePress}) =>{
     const mo = new Intl.DateTimeFormat('en', { month: 'long' }).format(dateTime);
     const da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(dateTime);
 
-    const attendees = meetup.attendees.map((attendee) => {
-        return <View style={Styles.attendeeImageContainer}><Image source={{uri : attendee.picture}} style={Styles.attendeeImage}  /></View>
+    const attendees = meetup.attendees.map((attendee, index) => {
+        return <View style={Styles.attendeeImageContainer} key={index}><Image source={{uri : attendee.picture}} style={Styles.attendeeImage}  /></View>
     });
 
     return  <View style={Styles.container}>
