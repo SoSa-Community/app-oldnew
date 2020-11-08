@@ -11,7 +11,7 @@ export const CommentItem = ({comment, depth}) =>{
     const {id, nickname, picture, content, children} = comment;
     const [getSaving, setSaving] = useState(false);
     const [getShowingFull, setShowingFull] = useState(false);
-    const [getShowingChildren, setShowingChildren] = useState(false);
+    const [getShowingChildren, setShowingChildren] = useState(true);
     const [getHideProfilePicture, setHideProfilePicture] = useState(false);
     const colors = ['#c0392B','#2ECC71','#3498DB','#9B59B6','#D35400','#1ABC9C','#34495E','#8E44AD','#F1C40F','#ECF0F1','#2C3E50','#2980B9','#E74C3C','#C0392B','#2ECC71','#3498DB','#9B59B6','#D35400','#1ABC9C','#34495E'];
 
@@ -32,8 +32,8 @@ export const CommentItem = ({comment, depth}) =>{
 
     let childrenViews = null;
     if(children){
-        childrenViews = children.map((comment) => {
-            return <CommentItem comment={comment} depth={depth + 1} />;
+        childrenViews = children.map((comment, index) => {
+            return <CommentItem comment={comment} depth={depth + 1} key={index + id} />;
         });
     }
 
