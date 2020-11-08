@@ -105,6 +105,7 @@ export class Meetup extends Component {
     drawerNavigation = {};
 
     state = {
+        saving: false,
         items: [
             {type:'description'},
             {type:'comments'}
@@ -201,6 +202,23 @@ export class Meetup extends Component {
         const attendees = meetup.attendees.map((attendee) => {
             return <View style={Styles.attendeeImageContainer} key={attendee.id}><Image source={{uri : attendee.picture}} style={Styles.attendeeImage}  /></View>
         });
+        
+        const buttonText = meetup.going ? 'Not Going' : (hasAttendees ? 'Going' : 'Be the first to go!');
+    
+        const toggleGoing = () => {
+            this.setState({saving: true});
+            setTimeout(() => {
+                let currentMeetup = Object.assign({}, meetup);
+    
+                currentMeetup.going = !currentMeetup.going;
+            
+                if(currentMeetup.going && !hasAttendees) currentMeetup.attendees = [ {picture: `https://picsum.photos/300/300?seed=${Math.random()}`} ];
+                if(currentMeetup.going && hasAttendees) currentMeetup.attendees.push({picture: `https://picsum.photos/300/300?seed=${Math.random()}`});
+                if(!currentMeetup.going) meetup.attendees.pop();
+    
+                this.setState({saving: false, meetup:currentMeetup});
+            }, 100);
+        };
 
         return (
             <View style={{flex:1, backgroundColor: '#121111'}}>
@@ -260,7 +278,7 @@ export class Meetup extends Component {
                         </View>}
                     </View>
                     <View style={{flex:1}}>
-                        <ActivityButton text={meetup.going ? 'Not Going' : (hasAttendees ? 'Going' : 'Be the first to go!')} style={meetup.going ? {backgroundColor:'red', flex:1} : {flex:1}}/>
+                        <ActivityButton text={buttonText} style={{backgroundColor: meetup.going ? '#dc3545' : '#28a745'}} onPress={toggleGoing} showActivity={this.state.saving} />
                     </View>
                 </View>
             </View>
