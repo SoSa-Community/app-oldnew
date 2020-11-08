@@ -23,6 +23,7 @@ import {SoSaConfig} from "./App/sosa/config";
 import io from "socket.io-client";
 import jwt from "react-native-pure-jwt";
 import Device from "./App/sosa/Device";
+import {parseString as parseXMLString} from "react-native-xml2js";
 
 const Stack = createStackNavigator();
 
@@ -37,6 +38,13 @@ export default class SoSa extends Component {
 	client = new Client(
 		{providers: SoSaConfig.providers},
 		io,
+        (response) => new Promise((resolve, reject) => {
+                parseXMLString(response, function (err, result) {
+                    if(err) reject(err);
+                    else{ resolve(result); }
+                });
+            }
+        ),
 		{
 			getDevice: () => this.device.init(),
             updateDevice: (device) => new Promise((resolve, reject) => {

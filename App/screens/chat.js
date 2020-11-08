@@ -16,8 +16,6 @@ import withMembersNavigationContext from "./hoc/withMembersNavigationContext";
 import {ProfileModal} from "../components/ProfileModal";
 import {MessageItem} from "../components/chat/MessageItem";
 
-import {parseString as parseXMLString} from "react-native-xml2js";
-
 import ImagePicker from "react-native-image-picker";
 
 
@@ -496,44 +494,21 @@ export class Chat extends Component {
 
 	uploadFile = () => {
 	    const instance = this;
-        const { chatService, state: { currentRoom }, apiClient: { services: { general } } } = instance;
+        const { apiClient: { services: { general } } } = instance;
         
 		const doUpload = (file) => {
-		 
-			general.prepareUpload(this.community)
-                .then(({requestInfo, post}) => {
-                    let formData = new FormData();
-                    
-                    for(let key in post) formData.append(key, post[key]);
-                    formData.append('file', file);
-    
-                    let request = new Request(requestInfo.uploadURI, {
-                        method: "POST",
-                        body: formData,
-                        cache: "no-store",
-                        headers: {"Content-Type": "multipart/form-data"}
-                    });
-                
-                    return fetch(request)
-                    .then((response) => response.text())
-                    .then((response) => {
-                        parseXMLString(response, function (err, result) {
-                            console.debug(result);
-                            const {Error: error} = result;
-                            
-                            if(error) throw new SoSaError(null, error);
-                            const {PostResponse: {ETag, Key, Location}} = result;
-                            
-                            if(Array.isArray(Location)){
-                                return instance.sendMessage(Location.join(" "));
-                            }
-                        });
-                    })
-                }).catch((errors) => {
-                    console.debug('errors', errors);
-                });
+		    this.setState({uploading: true});
+			general.handleUpload(this.community, file).then(({uris, tag, uuid}) => {
+			    if(Array.isArray(uris)){
+                    return instance.sendMessage(uris.join(" "));
+                }
+            }).catch((errors) => {
+                console.info('App::UploadFile::error', errors);
+                Helpers.showAlert('Error uploading file', errors);
+            }).finally(() => {
+                this.setState({uploading: false});
+            });
 		};
-
 
 		const chooseImage = async () => {
 
