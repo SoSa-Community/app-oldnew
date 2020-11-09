@@ -26,7 +26,9 @@ const Styles = StyleSheet.create({
     },
 
     footer: {
-        flexDirection: 'row'
+        flexDirection: 'row',
+        paddingBottom: Platform.OS === 'ios' ? 24 : 4,
+        backgroundColor: '#121211'
     },
 
     newMessageScrollNotifier: {
@@ -59,7 +61,7 @@ const Styles = StyleSheet.create({
 
     white: {color: '#ffffff'},
     black: {color: '#000'},
-    container: {flex: 1, marginBottom: Platform.OS === 'ios' ? 24 : 0},
+    container: {flex: 1, marginBottom: Platform.OS === 'ios' ? 0 : 0},
     messageListContainer: {flex: 1, backgroundColor: '#2b2b2b', zIndex:1000}
 });
 

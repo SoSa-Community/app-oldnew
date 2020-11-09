@@ -441,7 +441,7 @@ export class Chat extends Component {
 
 	buildWrapper = (component) => {
 		if(Platform.OS === 'ios'){
-			return  (<KeyboardAvoidingView style={{flex: 1, backgroundColor: '#121111'}} behavior="padding">{component}</KeyboardAvoidingView>);
+			return  (<KeyboardAvoidingView style={{flex: 1, backgroundColor: '#121111'}} behavior="padding" keyboardVerticalOffset="62">{component}</KeyboardAvoidingView>);
 		}else {
 			return (<View style={{flex: 1}} behavior="padding">{component}</View>);
 		}
@@ -537,13 +537,7 @@ export class Chat extends Component {
 						fileName = uriSplit[uriSplit.length - 1];
 					}
 
-					console.debug('honhonhonhon', response);
-					const file = {
-						//uri: Platform.OS=='ios' ? response.uri.replace('file://','/private') : response.uri,
-						uri,
-						type,
-						name: fileName,
-					};
+					const file = {uri, type, name: fileName};
 					doUpload(file);
 				}
 			});
