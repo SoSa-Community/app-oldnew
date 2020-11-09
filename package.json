@@ -20,6 +20,7 @@
     "@react-native-community/datetimepicker": "^3.0.2",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-native-community/picker": "^1.7.1",
+    "@react-native-community/progress-bar-android": "^1.0.4",
     "@react-navigation/drawer": "^5.8.1",
     "@react-navigation/native": "^5.5.0",
     "@react-navigation/stack": "^5.4.1",
@@ -42,7 +43,7 @@
     "react-native-xml2js": "^1.0.3",
     "react-navigation": "^4.3.9",
     "socket.io-client": "^2.3.0",
-    "sosa-chat-client": "https://github.com/SoSa-Community/chat-client.git#0.0.9"
+    "sosa-chat-client": "git+https://github.com/SoSa-Community/chat-client.git#feature-0.0.10"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",
