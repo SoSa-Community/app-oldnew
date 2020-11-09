@@ -530,10 +530,19 @@ export class Chat extends Component {
 					console.log('User tapped custom button: ', response.customButton);
 					alert(response.customButton);
 				} else {
+					let {uri, fileName, type} = response;
+
+					if(!fileName){
+						const uriSplit = uri.split('/');
+						fileName = uriSplit[uriSplit.length - 1];
+					}
+
+					console.debug('honhonhonhon', response);
 					const file = {
-						uri: response.uri,
-						name: response.fileName,
-						type: response.type
+						//uri: Platform.OS=='ios' ? response.uri.replace('file://','/private') : response.uri,
+						uri,
+						type,
+						name: fileName,
 					};
 					doUpload(file);
 				}
