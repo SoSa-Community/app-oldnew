@@ -130,9 +130,8 @@ export default class SoSa extends Component {
 				[
 					{ text: "Cancel", style: "cancel" },
 					{ text: "OK", onPress: () => {
-					    authService.logout()
-                            .catch((error) => console.debug('App::logout', error))
-                            .finally(() => clearSession())
+						clearSession();
+					    authService.logout().catch((error) => console.debug('App::logout', error))
                     } }
 				],
 				{ cancelable: true }
