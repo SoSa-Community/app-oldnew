@@ -7,31 +7,36 @@ import { DrawerNavigationContext } from './context/DrawerNavigationContext';
 import MembersNavigator from './MembersNavigator';
 
 import {createDrawerNavigator, DrawerContentScrollView} from '@react-navigation/drawer';
-import Session from "../sosa/Session";
-import Helpers from "../sosa/Helpers";
-import {Icon} from "../components/Icon";
 import withAppContext from "./hoc/withAppContext";
 
 const DrawerL = createDrawerNavigator();
 const DrawerR = createDrawerNavigator();
 
 class MembersDrawerWrapper extends Component {
-    topBar = null;
     appNavigation = null;
     appContext = null;
-
+    
     state = {
         leftDrawerItems:[],
         rightDrawerItems:[],
         headerIcons: [],
+        allowLeftSwipe: true,
+        allowRightSwipe: true,
     };
 
     constructor(props) {
         super();
         this.appNavigation = props.navigation;
         this.appContext = props.appContext;
-        this.topBar = React.createRef();
     }
+    
+    allowLeftSwipe = (allowLeftSwipe) => {
+        this.setState({allowLeftSwipe});
+    };
+    
+    allowRightSwipe = (allowRightSwipe) => {
+        this.setState({allowRightSwipe});
+    };
 
     CustomDrawerContent = (props, state, scrollable) => {
         let items = [];
@@ -95,7 +100,7 @@ class MembersDrawerWrapper extends Component {
     RightDrawer = () => {
         return (
             <View style={{flex:1}}>
-                <DrawerR.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.rightDrawerItems, true)} drawerPosition="right" drawerType="slide" edgeWidth={38} ref={this.rightDrawer}>
+                <DrawerR.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.rightDrawerItems, true)} drawerPosition="right" drawerType="slide" edgeWidth={38} screenOptions={{gestureEnabled: this.state.allowRightSwipe}}>
                     <DrawerR.Screen name="LoggedInNavigationWrapper" component={MembersNavigator}/>
                 </DrawerR.Navigator>
             </View>
@@ -108,13 +113,15 @@ class MembersDrawerWrapper extends Component {
             <DrawerNavigationContext.Provider value={{
                 appNavigation: this.appNavigation,
                 appContext: this.appContext,
+                allowLeftSwipe: this.allowLeftSwipe,
+                allowRightSwipe: this.allowRightSwipe,
                 addDrawerItem: this.addDrawerItem,
                 updateDrawerItem: this.updateDrawerItem,
                 removeDrawerItem: this.removeDrawerItem,
             }}
             >
                 <NavigationContainer independent={true} >
-                    <DrawerL.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.leftDrawerItems, false)} drawerPosition="left" drawerType="slide" edgeWidth={38} ref={this.leftDrawer} >
+                    <DrawerL.Navigator drawerContent={props => this.CustomDrawerContent(props, this.state.leftDrawerItems, false)} drawerPosition="left" drawerType="slide" edgeWidth={38} screenOptions={{gestureEnabled: this.state.allowLeftSwipe}} >
                         <DrawerL.Screen name="RightDrawer" component={this.RightDrawer} />
                     </DrawerL.Navigator>
                 </NavigationContainer>

@@ -105,6 +105,7 @@ export class Meetup extends Component {
     drawerNavigation = {};
 
     state = {
+        saving: false,
         items: [
             {type:'description'},
             {type:'comments'}
@@ -129,8 +130,35 @@ export class Meetup extends Component {
                     children:[{entity:2, context:'meetup', id: 2, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.'}]},
                     {entity:2, context:'meetup', id: 3, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.',
                         children: [
-                            {entity:2, context:'meetup', id: 4, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.',
-                            children:[{entity:2, context:'meetup', id: 5, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.'}]},
+                            {
+                                entity:2, context:'meetup', id: 4, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.',
+                                children:[
+                                    {entity:2, context:'meetup', id: 5, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.'},
+                                    {
+                                        entity:2, context:'meetup', id: 8, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.',
+                                        children:[
+                                            {
+                                                entity:2, context:'meetup', id: 9, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.',
+                                                children:[
+                                                    {
+                                                        entity:2, context:'meetup', id: 10, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.',
+                                                        children:[
+                                                            {
+                                                                entity:2, context:'meetup', id: 11, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.',
+                                                                children:[
+                                                                    {
+                                                                        entity:2, context:'meetup', id: 12, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.'
+                                                                    },
+                                                                ]
+                                                            },
+                                                        ]
+                                                    },
+                                                ]
+                                            },
+                                        ]
+                                    }
+                                ]
+                            },
 
                         ]
                     },
@@ -174,6 +202,23 @@ export class Meetup extends Component {
         const attendees = meetup.attendees.map((attendee) => {
             return <View style={Styles.attendeeImageContainer} key={attendee.id}><Image source={{uri : attendee.picture}} style={Styles.attendeeImage}  /></View>
         });
+        
+        const buttonText = meetup.going ? 'Not Going' : (hasAttendees ? 'Going' : 'Be the first to go!');
+    
+        const toggleGoing = () => {
+            this.setState({saving: true});
+            setTimeout(() => {
+                let currentMeetup = Object.assign({}, meetup);
+    
+                currentMeetup.going = !currentMeetup.going;
+            
+                if(currentMeetup.going && !hasAttendees) currentMeetup.attendees = [ {picture: `https://picsum.photos/300/300?seed=${Math.random()}`} ];
+                if(currentMeetup.going && hasAttendees) currentMeetup.attendees.push({picture: `https://picsum.photos/300/300?seed=${Math.random()}`});
+                if(!currentMeetup.going) meetup.attendees.pop();
+    
+                this.setState({saving: false, meetup:currentMeetup});
+            }, 100);
+        };
 
         return (
             <View style={{flex:1, backgroundColor: '#121111'}}>
@@ -211,7 +256,7 @@ export class Meetup extends Component {
                                     </View>
                                 }else{
                                     const comments = this.state.meetup.comments.map((item, index) => {
-                                        return <CommentItem comment={item} />
+                                        return <CommentItem comment={item} key={index}/>
                                     });
                                     return <View style={{flex:1}}>
                                         <Text style={{fontSize:18, color:'#fff', marginLeft:4, marginTop: 16, marginBottom:8}}>Comments</Text>
@@ -233,7 +278,7 @@ export class Meetup extends Component {
                         </View>}
                     </View>
                     <View style={{flex:1}}>
-                        <ActivityButton text={meetup.going ? 'Not Going' : (hasAttendees ? 'Going' : 'Be the first to go!')} style={{flex:1}} style={meetup.going ? {backgroundColor:'red'} : {}}/>
+                        <ActivityButton text={buttonText} style={{backgroundColor: meetup.going ? '#dc3545' : '#28a745'}} onPress={toggleGoing} showActivity={this.state.saving} />
                     </View>
                 </View>
             </View>

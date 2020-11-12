@@ -17,6 +17,9 @@ import MeetupsScreen from "./Meetups";
 import MeetupScreen from "./Meetup";
 import {Preferences} from "../sosa/Preferences";
 
+import Device from "../sosa/Device";
+import Session from "../sosa/Session";
+
 
 const Stack = createStackNavigator();
 
@@ -26,6 +29,8 @@ class WrapperComponent extends Component {
     drawerNavigationContext = {};
     topBar = null;
     stackNavigation = null;
+    device = Device.getInstance();
+    apiClient = null;
 
     menuDefaults = {
         title: 'SoSa',
@@ -38,7 +43,8 @@ class WrapperComponent extends Component {
         headerIcons: [],
         preferences: {},
         showTopBar: true,
-        menu: this.menuDefaults
+        menu: this.menuDefaults,
+        loading: false
     };
 
     menuStack = [this.menuDefaults];
@@ -48,6 +54,9 @@ class WrapperComponent extends Component {
 
     constructor(props) {
         super();
+
+        this.session = Session.getInstance();
+
         this.drawerNavigation = props.navigation;
         this.drawerNavigationContext = props.navigationContext;
         this.appNavigation = this.drawerNavigationContext.appNavigation;
@@ -56,11 +65,34 @@ class WrapperComponent extends Component {
         this.topBar = React.createRef();
         this.stackNavigation = React.createRef();
 
+        this.apiClient = this.appContext.client;
+
+
         Preferences.getAll((preferences) => {
             this.setState({preferences});
             this.triggerListener('settings_update', preferences);
         });
+
+        this.connect();
     }
+
+    connect = () => {
+        const {apiClient} = this;
+        const {middleware} = apiClient;
+
+        middleware.clear('app');
+        middleware.add('app', {
+            'authentication_successful': (authData, client) => {
+                this.setState({loading:false});
+                this.triggerListener('api_authenticated', authData);
+                return authData;
+            },
+            'disconnected': (message, client) => {
+                this.triggerListener('disconnected', message);
+                return message;
+            }
+        });
+    };
 
     showSettings = () => {
         this.appNavigation.navigate('Settings');
@@ -134,6 +166,7 @@ class WrapperComponent extends Component {
     }
 
     setMenuOptions = (options, resetOnBack) => {
+        const { drawerNavigationContext } = this;
         let currentState = Object.assign({}, this.state.menu);
         let updateState = false;
         for(let key in options){
@@ -144,6 +177,10 @@ class WrapperComponent extends Component {
             }
         }
         if(updateState) this.setState({menu: currentState});
+        
+        if(currentState.leftMode === 'back') drawerNavigationContext.allowLeftSwipe(false);
+        else drawerNavigationContext.allowLeftSwipe(true);
+        
         this.menuStack.push(currentState);
     };
 
@@ -166,16 +203,20 @@ class WrapperComponent extends Component {
     addHeaderIcon = (id, icon, onPress) => {this.topBar.current.addHeaderIcon(id, icon, onPress);};
 
     render() {
-        const {title, leftMode, showLeft, showRight} = this.state.menu;
-        return (
-            <MembersNavigationContext.Provider value={{
+        const {state: {menu: {title, leftMode, showLeft, showRight}}} = this;
+
+
+        if(this.state.loading) {
+            return <View><Text>Loading</Text></View>
+        }else{
+            return <MembersNavigationContext.Provider value={{
                 addHeaderIcon: this.addHeaderIcon,
                 drawerNavigation: this.drawerNavigation,
                 drawerNavigationContext: this.drawerNavigationContext,
                 navigate: this.navigate,
                 addListener: this.addListener,
                 preferences: this.state.preferences,
-                setMenuOptions: this.setMenuOptions
+                setMenuOptions: this.setMenuOptions,
             }}
             >
                 <View style={BaseStyles.container} >
@@ -189,7 +230,8 @@ class WrapperComponent extends Component {
                     </NavigationContainer>
                 </View>
             </MembersNavigationContext.Provider>
-        );
+        }
+
   }
 }
 

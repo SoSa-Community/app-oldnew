@@ -3,9 +3,11 @@ import AsyncStorage from "@react-native-community/async-storage";
 export default class Session {
 
     static instance = null;
+    
+    initialized = false;
     id = '';
     expiry = '';
-    refreshToken = '';
+    refresh_token = '';
     username = '';
     nickname = '';
 
@@ -17,24 +19,22 @@ export default class Session {
         return this.instance;
     }
 
-    init(callback){
-        let session = this;
-
-        Session.retrieve((obj) => {
-            if(obj !== null){
-                console.log('retrieved');
-                obj.forEach((value, key) => session[key] = value);
+    init(){
+        return new Promise((resolve, reject) => {
+            let session = this;
+            if(this.initialized) {
+                resolve(session);
+            }else{
+                Session.retrieve((obj) => {
+                    console.info('App::Session::init', obj);
+                    
+                    if(obj !== null){
+                        obj.forEach((value, key) => session[key] = value);
+                    }
+                    resolve(session);
+                });
             }
-            callback(session);
         });
-    }
-
-    getId = () => {
-        return this.id;
-    }
-
-    setId = (id) => {
-        this.id = id;
     }
 
     getExpiry(){
@@ -45,17 +45,9 @@ export default class Session {
         this.expiry = expiry;
     }
 
-    getRefreshToken(){
-        return this.refreshToken;
-    }
-
-    setRefreshToken = (refreshToken) => {
-        this.refreshToken = refreshToken;
-    }
-
     getParsedExpiry(){
         let date = new Date(Date.parse(this.getExpiry().replace(/-/g, '/')));
-        if(date === NaN){date = null;}
+        if(isNaN(date)){date = null;}
 
         return date;
     }
@@ -69,9 +61,9 @@ export default class Session {
     }
 
     logout(callback){
-        this.setExpiry(null);
-        this.setId(null);
-        this.setRefreshToken(null);
+        this.expiry = null;
+        this.id = null;
+        this.refresh_token = null;
         this.save(callback);
     }
 
@@ -80,31 +72,29 @@ export default class Session {
             AsyncStorage.getItem('current_session').then(value => {
                 let obj = null;
                 if(typeof(value) === "string")  obj = JSON.parse(value);
-
                 callback(obj);
+    
+                console.info('App::Session::retrieve', obj);
             });
         } catch(e) {
-            console.log('Error Retrieving Session', e);
+            console.error('App::Session::retrieve', e);
         }
     }
 
     save(callback){
-        console.log(this);
         try {
+            console.info('App::Session::save', this);
             AsyncStorage.setItem('current_session', JSON.stringify(this), callback);
         } catch (e) {
-            console.log('Error Saving Session', e);
+            console.error('App::Session::retrieve', e);
         }
     }
-
-    fromJSON(jsonObject={}){
-
-        if(jsonObject.id)   this.setId(jsonObject.id);
-        if(jsonObject.expiry) this.setExpiry(jsonObject.expiry);
-        if(jsonObject.refresh_token) this.setRefreshToken(jsonObject.refresh_token);
-
+    
+    parseJSON(jsonData){
+        jsonData.forEach((value, key) => {
+            if(this.hasOwnProperty(key)) this[key] = value;
+        });
         this.save();
     }
-
 
 }

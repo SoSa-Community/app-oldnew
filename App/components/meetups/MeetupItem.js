@@ -129,8 +129,8 @@ export const MeetupItem = ({meetup, onChange, onTellMeMorePress}) =>{
     const mo = new Intl.DateTimeFormat('en', { month: 'long' }).format(dateTime);
     const da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(dateTime);
 
-    const attendees = meetup.attendees.map((attendee) => {
-        return <View style={Styles.attendeeImageContainer}><Image source={{uri : attendee.picture}} style={Styles.attendeeImage}  /></View>
+    const attendees = meetup.attendees.map((attendee, index) => {
+        return <View style={Styles.attendeeImageContainer} key={index}><Image source={{uri : attendee.picture}} style={Styles.attendeeImage}  /></View>
     });
 
     return  <View style={Styles.container}>
@@ -162,7 +162,12 @@ export const MeetupItem = ({meetup, onChange, onTellMeMorePress}) =>{
                 </TouchableHighlight>
             </View>
             <View style={{flex:1}}>
-                <ActivityButton text={meetup.going ? 'Not Going' : (hasAttendees ? 'Going' : 'Be the first to go!')} style={{flex:1}} showActivity={getSaving} onPress={toggleGoing} style={meetup.going ? {backgroundColor:'red'} : {}}/>
+                <ActivityButton
+                    text={meetup.going ? 'Not Going' : (hasAttendees ? 'Going' : 'Be the first to go!')}
+                    style={{flex:1}}
+                    showActivity={getSaving}
+                    onPress={toggleGoing}
+                    style={{backgroundColor: meetup.going? '#dc3545':'#28a745'}}/>
             </View>
         </View>
     </View>

@@ -8,7 +8,7 @@ export const ActivityButton = ({showActivity, validateInput, onPress, text, styl
         return  <TouchableWithoutFeedback>
             <View style={[Styles.letMeIn_button, Styles.letMeIn_button_pressed, style]}>
                 <Text style={Styles.letMeIn_text}>{text}</Text>
-                <ActivityIndicator size="small" style={Styles.letMeIn_activity}/>
+                <ActivityIndicator size="small" style={Styles.letMeIn_activity} color="#fff"/>
             </View>
         </TouchableWithoutFeedback>;
 

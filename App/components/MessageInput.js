@@ -1,10 +1,9 @@
 import React from 'react';
 
-import {TextInput, View, TouchableOpacity, Dimensions, Text, StyleSheet} from "react-native";
+import {ActivityIndicator, TextInput, View, TouchableOpacity, Dimensions, Text, StyleSheet} from "react-native";
 import {Icon} from './Icon';
-import {parseString as parseXMLString} from "react-native-xml2js";
-import ImagePicker from "react-native-image-picker";
 import {SoSaConfig} from "../sosa/config";
+
 
 const Styles = StyleSheet.create({
     container: {
@@ -93,16 +92,20 @@ export const MessageInput = ({canSend, sendAction, maxLength, lengthIndicatorSho
         lengthIndicatorStyles.push(Styles.lengthIndicatorWarning);
     }
 
-
-
     return (
         <View style={Styles.container}>
             {
-                SoSaConfig.features.general.canUpload && <TouchableOpacity onPress={() => uploadAction(uploadComplete)} style={{alignSelf:'center', backgroundColor: '#444442', height:48, width:42, borderRadius:16, alignItems: 'center', justifyContent: 'center', marginRight: 8}}>
+                SoSaConfig.features.general.canUpload &&
+                <TouchableOpacity onPress={() => uploadAction(uploadComplete)} style={{alignSelf:'center', backgroundColor: '#444442', height:38, width:38, borderRadius:24, alignItems: 'center', justifyContent: 'center', marginRight: 8}}>
                     <Icon icon={['fal','image']}  style={Styles.icon} size={24}  />
                 </TouchableOpacity>
             }
             <View style={Styles.innerContainer}>
+                {uploading && <>
+                    <ActivityIndicator color="#121211" size="large" style={{marginLeft: 10}}/>
+                    <Text style={Styles.textInput}>Uploading...</Text>
+                </>}
+                {!uploading &&
                 <TextInput
                     selection={selection}
                     style={Styles.textInput}
@@ -119,7 +122,7 @@ export const MessageInput = ({canSend, sendAction, maxLength, lengthIndicatorSho
                     onKeyPress={onKeyPress}
                     autoCorrect={autoCorrect}
                     maxLength={maxLength}
-                />
+                />}
                 { (lengthPercentage >= lengthIndicatorShowPercentage ? <Text style={[lengthIndicatorStyles]}>{`${text.length}/${maxLength}`}</Text> : null) }
             </View>
             <TouchableOpacity onPress={onPress} style={buttonStyles}>

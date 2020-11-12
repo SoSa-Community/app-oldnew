@@ -18,10 +18,6 @@ import {
 import { SoSaConfig } from "../sosa/config";
 
 import withMembersNavigationContext from "./hoc/withMembersNavigationContext";
-import {Message} from "sosa-chat-client";
-import {MessageItem} from "../components/chat/MessageItem";
-import Styles from "./styles/chat";
-import {ActivityButton} from "../components/ActivityButton";
 import {MeetupItem} from "../components/meetups/MeetupItem";
 
 export class Meetups extends Component {
@@ -96,7 +92,7 @@ export class Meetups extends Component {
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={
                         ({item, index}) => {
-                            return <MeetupItem meetup={item} onChange={(meetup) => {
+                            return <MeetupItem key={item.id} meetup={item} onChange={(meetup) => {
                                 let meetups = this.state.meetups;
                                 meetups[index] = meetup;
                                 this.setState({meetups: meetups});
