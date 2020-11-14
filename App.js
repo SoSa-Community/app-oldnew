@@ -33,9 +33,9 @@ export default class SoSa extends Component {
 
 	session = Session.getInstance();
 	device = Device.getInstance();
-    deepLinkingListeners = {};
+    middleware = {};
 	
-	client = new Client(
+	apiClient = new Client(
 		{providers: SoSaConfig.providers},
 		io,
         (response) => new Promise((resolve, reject) => {
@@ -85,7 +85,7 @@ export default class SoSa extends Component {
 	}
 
 	componentWillUnmount(){
-		this.client.middleware.clear('app');
+		this.apiClient.middleware.clear('app');
         AppState.removeEventListener("change", this._handleAppStateChange);
         Linking.removeEventListener('url', this.handleDeepLink);
 	}
@@ -93,6 +93,32 @@ export default class SoSa extends Component {
     componentDidMount() {
         AppState.addEventListener("change", this._handleAppStateChange);
         Linking.addEventListener('url', this.handleDeepLink);
+    
+        const {apiClient} = this;
+        const {middleware} = apiClient;
+    
+        middleware.clear('app');
+        middleware.add('app', {
+            'event': (packet) => {
+                return new Promise((resolve) => {
+                    this.triggerMiddleware('api_event', packet);
+                    resolve(packet);
+                });
+            },
+            'authentication_successful': (authData) => {
+                return new Promise((resolve) => {
+                    this.setState({loading:false});
+                    this.triggerMiddleware('api_authenticated', authData);
+                    resolve(authData);
+                });
+            },
+            'disconnected': (message) => {
+                return new Promise((resolve) => {
+                    this.triggerMiddleware('api_disconnected', message);
+                    resolve(message);
+                });
+            }
+        });
         
         this.validateSession()
             .then(({user}) => {
@@ -111,11 +137,11 @@ export default class SoSa extends Component {
 	};
 
 	logout = (sessionAutoExpired) => {
-        const { client: { services: { auth: authService } } } = this;
+        const { apiClient: { services: { auth: authService } } } = this;
         
 		let clearSession = () => {
 			let session = Session.getInstance();
-			session.logout(() => this.resetRoot('Login', {logout: true}));
+			session.logout().then(() => this.resetRoot('Login', {logout: true}));
 		};
 
 		if(sessionAutoExpired === true){
@@ -140,7 +166,7 @@ export default class SoSa extends Component {
 	};
 	
 	validateSession(){
-        const { client: { services: { auth } } } = this;
+        const { apiClient: { services: { auth } } } = this;
         
         return auth.validateSession().catch((error) => {
                 console.debug('error', error);
@@ -156,7 +182,6 @@ export default class SoSa extends Component {
 		if(url !== null){
 			url = url.replace('sosa://','').split('/');
 			
-
 			if(url.length > 0){
 				const [namespace, method, encoded] = url;
 				const decoded = Helpers.base64Decode(encoded);
@@ -169,7 +194,7 @@ export default class SoSa extends Component {
                 } finally {
                     console.info('App::handleDeepLink', coldBoot, namespace, method, encoded, decoded, data);
                 }
-				this.fireDeeplinkListener(namespace, method, data);
+                this.triggerMiddleware(`${namespace}/${method}`, data);
 			}
 		}
 	};
@@ -177,49 +202,60 @@ export default class SoSa extends Component {
 	_handleAppStateChange = nextAppState => {
 	    this.setState({ appState: nextAppState });
 	};
-
-	addDeeplinkListener = (namespace='', method='', callback, onlyOneAllowed=false) => {
-	    let { deepLinkingListeners } = this;
-		
-	    if(!deepLinkingListeners[namespace]) this.deepLinkingListeners[namespace] = {};
-		if(!deepLinkingListeners[namespace][method]) this.deepLinkingListeners[namespace][method] = [];
-
-		if(onlyOneAllowed){
-			deepLinkingListeners[namespace][method] = [callback];
-		}else{
-			deepLinkingListeners[namespace][method].push(callback);
-		}
-	};
-
-	removeDeeplinkListener = (namespace='', method='') => {
-        let { deepLinkingListeners } = this;
+	   
+    addMiddleware = (namespace, event, middleware, onlyOneAllowed=false) => {
+        if(!namespace.length) namespace = 'global';
         
-		if(deepLinkingListeners[namespace] && deepLinkingListeners[namespace][method]){
-			delete deepLinkingListeners[namespace][method];
-		}
-	};
-
-	fireDeeplinkListener = (namespace='', method='', data) => {
-        let { deepLinkingListeners } = this;
+        let add = (event, middleware) => {
+            if(!this.middleware[event] || onlyOneAllowed) this.middleware[event] = [];
+            
+            if(!this.middleware[namespace]) this.middleware[namespace] = {};
+            if(!this.middleware[namespace][event]) this.middleware[namespace][event] = [];
+            this.middleware[namespace][event].push(middleware);
+        };
         
-		if(deepLinkingListeners[namespace] && deepLinkingListeners[namespace][method]){
-		    const triggers = deepLinkingListeners[namespace][method];
-			triggers.forEach((listener) => {
-				try{
-					listener(data);
-				}catch (e) {
-					console.log(e);
-				}
-			})
-		}
-	};
+        if(typeof(event) === 'string'){
+            add(event, middleware);
+        }else{
+            event.forEach((middleware, event) => add(event, middleware));
+        }
+    };
+    
+    clearMiddlewareNamespace = (namespace) => {
+        this.middleware[namespace] = {};
+    };
+    
+    triggerMiddleware = (event, data) => {
+        return new Promise((resolve, reject) => {
+            if(event){
+                let callbacks = [];
+                console.debug('App::Middleware::trigger::namespace', event, this.middleware);
+                
+                for(const namespace in this.middleware){
+                    if(this.middleware[namespace].hasOwnProperty(event)){
+                        callbacks = [...callbacks, ...Object.values(this.middleware[namespace][event]).map((middleware) =>
+                            new Promise((resolve1, reject1) => {
+                                middleware(data, this.client, event);
+                                resolve1();
+                            }).catch((error) => {
+                                console.debug('App::Middleware::trigger::error', event, error);
+                            })
+                        )];
+                    }
+                }
+                Promise.all(callbacks).then(() => resolve(data));
+            }else{
+                resolve(data);
+            }
+        });
+    };
 
 	render() {
         return (
             <View style={BaseStyles.container}>
                 <StatusBar barStyle="light-content" backgroundColor="#121211"/>
                 <View style={{flex:1}}>
-                    <AppContext.Provider value={{client: this.client, addDeeplinkListener: this.addDeeplinkListener, removeDeeplinkListener: this.removeDeeplinkListener, logout: this.logout}}>
+                    <AppContext.Provider value={{apiClient: this.apiClient, clearMiddlewareNamespace: this.clearMiddlewareNamespace, addMiddleware: this.addMiddleware, triggerMiddleware: this.triggerMiddleware, logout: this.logout}}>
                         <NavigationContainer ref={this.appNavigation}>
                             <Stack.Navigator initialRouteName={this.state.defaultScreen} screenOptions={{headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle, headerTintColor: 'white', headerTitleContainerStyle: { left: 10 }}} >
                                 <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }}/>

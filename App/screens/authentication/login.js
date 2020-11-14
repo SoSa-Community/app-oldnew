@@ -4,7 +4,7 @@ import AuthComponent from './AuthComponent';
 import BaseStyles from '../styles/base'
 import Styles from '../styles/onboarding'
 
-import {Text, View, Linking, TouchableHighlight, KeyboardAvoidingView, Alert} from 'react-native';
+import {Text, View, TouchableHighlight, KeyboardAvoidingView} from 'react-native';
 
 import withAppContext from '../hoc/withAppContext';
 import {SoSaConfig} from "../../sosa/config";

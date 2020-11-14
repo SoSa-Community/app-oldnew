@@ -48,8 +48,6 @@ class WrapperComponent extends Component {
     };
 
     menuStack = [this.menuDefaults];
-
-    eventListeners = {};
     navigationStateChangeListener = null;
 
     constructor(props) {
@@ -70,56 +68,21 @@ class WrapperComponent extends Component {
 
         Preferences.getAll((preferences) => {
             this.setState({preferences});
-            this.triggerListener('settings_update', preferences);
+            this.appContext.triggerMiddleware('settings_update', preferences);
         });
-
-        this.connect();
     }
 
-    connect = () => {
-        const {apiClient} = this;
-        const {middleware} = apiClient;
-
-        middleware.clear('app');
-        middleware.add('app', {
-            'authentication_successful': (authData, client) => {
-                this.setState({loading:false});
-                this.triggerListener('api_authenticated', authData);
-                return authData;
-            },
-            'disconnected': (message, client) => {
-                this.triggerListener('disconnected', message);
-                return message;
-            }
-        });
-    };
+    connect = () => {};
 
     showSettings = () => {
         this.appNavigation.navigate('Settings');
 
         const unsubscribe = this.appNavigation.addListener('focus', () => {
             Preferences.getAll((preferences) => {
-                this.triggerListener('settings_update', preferences);
+                this.appContext.triggerMiddleware('settings_update', preferences);
             });
             unsubscribe();
         });
-    };
-
-    addListener = (event, callback) => {
-        if(!this.eventListeners[event]) this.eventListeners[event] = [];
-        this.eventListeners[event].push(callback);
-    };
-
-    triggerListener = (event, data) => {
-        if(this.eventListeners[event]){
-            this.eventListeners[event].forEach((callback) => {
-                try{
-                    callback(data);
-                }catch (e) {
-                    console.debug('Callback error', e);
-                }
-            })
-        }
     };
 
     showMeetups = () => {
@@ -128,7 +91,8 @@ class WrapperComponent extends Component {
     };
 
     componentDidMount() {
-
+        this.connect();
+        
         this.drawerNavigationContext.addDrawerItem('community', (
             <View style={{marginBottom: 16}} key={'community'}>
                 <TouchableHighlight style={{}} onPress={this.showMeetups}>

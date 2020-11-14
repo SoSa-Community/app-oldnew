@@ -39,26 +39,21 @@ export default class AuthComponent extends Component {
         const {appContext, navigation, route: {params}} = props;
         this.navigation = navigation;
         
-        const {client: apiClient} = appContext;
-        const {middleware: apiMiddleware} = apiClient;
-    
+        this.appContext = appContext;
+        
+        const { apiClient } = appContext;
         this.apiClient = apiClient;
-        this.apiMiddleware = apiMiddleware;
         
         if(params){
             const {email, password} = params;
             if(email) this.state.usernameInput = email;
             if(password) this.state.passwordInput = password;
         }
-        
-        const {addDeeplinkListener, removeDeeplinkListener} = appContext;
-
-        this.addDeeplinkListener = addDeeplinkListener;
-        this.removeDeeplinkListener = removeDeeplinkListener;
     }
 
     componentDidMount() {
-        this.addDeeplinkListener(this.screenType, 'preauth', (data) => {
+        this.appContext.clearMiddlewareNamespace('login');
+        this.appContext.addMiddleware('login', `${this.screenType}/preauth`, (data) => {
             const { apiClient: { services: { auth: authService } } } = this;
             const {status, link_token, device_id, unregistered} = data;
             
@@ -147,7 +142,7 @@ export default class AuthComponent extends Component {
             if(!forLogin && (!usernameInput.length || !passwordInput.length || !emailInput.length)) {
                 complete(new Error('Please provide a username, e-mail address and password'));
             }else {
-                const {apiClient: {services: {auth: authService}}} = this;
+                const { apiClient: { services: { auth: authService } } } = this;
                 const promise = (forLogin ? authService.login(usernameInput, passwordInput) : authService.register(usernameInput, passwordInput, emailInput));
     
                 promise.then((response) => {
