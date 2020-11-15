@@ -13,8 +13,8 @@ import ChatScreen from "./chat";
 import { NavigationContainer } from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {Icon} from "../components/Icon";
-import MeetupsScreen from "./Meetups";
-import MeetupScreen from "./Meetup";
+import MeetupsScreen from "./meetups/Meetups";
+import MeetupScreen from "./meetups/Meetup";
 import {Preferences} from "../sosa/Preferences";
 
 import Device from "../sosa/Device";

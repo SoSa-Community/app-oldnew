@@ -15,10 +15,10 @@ import {
     Modal,
     ImageBackground
 } from 'react-native';
-import { SoSaConfig } from "../sosa/config";
+import { SoSaConfig } from "../../sosa/config";
 
-import withMembersNavigationContext from "./hoc/withMembersNavigationContext";
-import {MeetupItem} from "../components/meetups/MeetupItem";
+import withMembersNavigationContext from "../hoc/withMembersNavigationContext";
+import {MeetupItem} from "../../components/meetups/MeetupItem";
 
 export class Meetups extends Component {
     drawerNavigationContext = {};

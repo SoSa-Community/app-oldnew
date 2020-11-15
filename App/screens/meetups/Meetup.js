@@ -5,10 +5,10 @@ import {
     ImageBackground, StyleSheet, Image, FlatList, Platform
 } from 'react-native';
 
-import withMembersNavigationContext from "./hoc/withMembersNavigationContext";
-import {ActivityButton} from "../components/ActivityButton";
-import {Icon} from "../components/Icon";
-import {CommentItem} from "../components/comments/CommentItem";
+import withMembersNavigationContext from "../hoc/withMembersNavigationContext";
+import {ActivityButton} from "../../components/ActivityButton";
+import {Icon} from "../../components/Icon";
+import {CommentItem} from "../../components/comments/CommentItem";
 
 const Styles = StyleSheet.create({
     container: {flex:1, margin:16},

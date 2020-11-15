@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Styles from './styles/chat'
-import {ActivityIndicator, FlatList, Text, View, TouchableHighlight, KeyboardAvoidingView, Platform, ScrollView, Keyboard} from 'react-native';
-import {Message, SoSaError} from 'sosa-chat-client';
+import {FlatList, Text, View, TouchableHighlight, KeyboardAvoidingView, Platform, ScrollView, Keyboard} from 'react-native';
+import {Message} from 'sosa-chat-client';
 
 import Session from "../sosa/Session";
 
@@ -15,8 +15,6 @@ import withMembersNavigationContext from "./hoc/withMembersNavigationContext";
 
 import {ProfileModal} from "../components/ProfileModal";
 import {MessageItem} from "../components/chat/MessageItem";
-
-import ImagePicker from "react-native-image-picker";
 
 
 export class Chat extends Component {
