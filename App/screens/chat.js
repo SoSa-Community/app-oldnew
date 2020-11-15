@@ -330,12 +330,14 @@ export class Chat extends Component {
 	joinRoom = (communityID, roomID) => {
         
         this.chatService.rooms.join(communityID, roomID)
-            .then(({room, userList}) => {
+            .then(({room, userList, history}) => {
 			    this.sortUserList(userList);
-                this.setState({userList, currentRoom: room});
-                
-			    this.updateUserList();
-				this.addStatus(`Joined room ${room.name}`);
+			    console.debug('history 2', history);
+                this.setState({userList, currentRoom: room, messages: Object.assign([], history)});
+                this.messageBuffer = [];
+			    
+                this.updateUserList();
+			    this.addStatus(`Joined room ${room.name}`);
 
 				this.membersNavigationContext.addHeaderIcon('whos_online',['fal', 'users'], this.displayUserList);
 				this.renderRoomList();
@@ -491,7 +493,6 @@ export class Chat extends Component {
 		if(Platform.OS === 'ios') this.checkForTags();
 	}
 
-
 	onFacePress = (message) => {
 		!this.state.preferences.touch_face_for_profile ? this.addTag(message.nickname) : this.onLongFacePress(message);
 	};
@@ -499,60 +500,6 @@ export class Chat extends Component {
 	onLongFacePress = (message) => {
 		this.selectedProfile = message;
 		this.setState({profileModalVisible: true});
-	};
-
-	uploadFile = () => {
-	    const instance = this;
-        const { apiClient: { services: { general } } } = instance;
-        
-		const doUpload = (file) => {
-		    this.setState({uploading: true});
-			general.handleUpload(this.community, file).then(({uris, tag, uuid}) => {
-			    if(Array.isArray(uris)){
-                    return instance.sendMessage(uris.join(" "));
-                }
-            }).catch((errors) => {
-                console.info('App::UploadFile::error', errors);
-                Helpers.showAlert('Error uploading file', errors);
-            }).finally(() => {
-                this.setState({uploading: false});
-            });
-		};
-
-		const chooseImage = async () => {
-
-			let options = {
-				title: 'Upload Prescription',
-				takePhotoButtonTitle: 'Take a Photo',
-				chooseFromLibraryButtonTitle: 'Select From Gallery',
-				storageOptions: {
-					skipBackup: true
-				},
-			};
-
-			ImagePicker.showImagePicker(options, async (response) => {
-				if (response.didCancel) {
-					console.log('User cancelled image picker');
-				} else if (response.error) {
-					console.log('ImagePicker Error: ', response.error);
-				} else if (response.customButton) {
-					console.log('User tapped custom button: ', response.customButton);
-					alert(response.customButton);
-				} else {
-					let {uri, fileName, type} = response;
-
-					if(!fileName){
-						const uriSplit = uri.split('/');
-						fileName = uriSplit[uriSplit.length - 1];
-					}
-
-					const file = {uri, type, name: fileName};
-					doUpload(file);
-				}
-			});
-		};
-
-		chooseImage();
 	};
 
 	renderItem = ({item}) => {
@@ -618,7 +565,14 @@ export class Chat extends Component {
 							fuckWith={this.state.fuckWith}
 							canSend={this.state.canSend}
 							uploading={this.state.uploading}
-							uploadAction={this.uploadFile}
+							uploadAction={() => {
+							    Helpers.uploadFile(this.apiClient, this.community, (uploading) => {this.setState({uploading});})
+                                    .then(({uris, tag, uuid}) => {
+                                        if(Array.isArray(uris)){
+                                            return this.sendMessage(uris.join(" "));
+                                        }
+                                    });
+                                }}
 						/>
 					</View>
 					<ProfileModal visible={this.state.profileModalVisible} profile={this.selectedProfile} dismissTouch={() => this.setState({profileModalVisible: false})} />
