@@ -4,6 +4,7 @@ import {Image, ImageBackground, Text, View, TouchableHighlight} from "react-nati
 import {StyleSheet} from 'react-native';
 import {ActivityButton} from "../ActivityButton";
 import {Icon} from "../Icon";
+import Helpers from "../../sosa/Helpers";
 
 const Styles = StyleSheet.create({
     container: {flex:1, margin:16},
@@ -113,33 +114,21 @@ export const MeetupItem = ({meetup, onChange, onTellMeMorePress}) =>{
         }, 100);
     };
 
-    const nth = function(d) {
-        if (d > 3 && d < 21) return 'th';
-        switch (d % 10) {
-            case 1:  return "st";
-            case 2:  return "nd";
-            case 3:  return "rd";
-            default: return "th";
-        }
-    }
-
-    const dateTime = new Date(meetup.start_timestamp * 1000);
-    const wd = new Intl.DateTimeFormat('en', { weekday: 'long' }).format(dateTime);
-    const ye = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(dateTime);
-    const mo = new Intl.DateTimeFormat('en', { month: 'long' }).format(dateTime);
-    const da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(dateTime);
-
     const attendees = meetup.attendees.map((attendee, index) => {
         return <View style={Styles.attendeeImageContainer} key={index}><Image source={{uri : attendee.picture}} style={Styles.attendeeImage}  /></View>
     });
-
+    
+    let imageSource = {};
+    if(meetup.image) imageSource = {uri : meetup.image};
+    else imageSource = require('../../assets/choose_meetup_image_v2.jpg');
+    
     return  <View style={Styles.container}>
-        <ImageBackground source={{uri : meetup.picture}} style={Styles.image} imageStyle={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }}>
+        <ImageBackground source={imageSource} style={Styles.image} imageStyle={{ borderTopLeftRadius: 8, borderTopRightRadius: 8 }}>
             <View style={Styles.imageOverlay} />
             <View style={Styles.imageTitleContainer}>
                 <View style={Styles.imageTitleInnerContainer}>
                     <Text style={Styles.title}>{meetup.title}</Text>
-                    <Text style={Styles.meetupDate}>{`${wd}, ${da}${nth(da)} ${mo} ${ye}` }</Text>
+                    <Text style={Styles.meetupDate}>{ Helpers.dateToLongForm(meetup.start_timestamp) }</Text>
                 </View>
             </View>
             <View style={Styles.imageBottomContainer}>
@@ -149,7 +138,7 @@ export const MeetupItem = ({meetup, onChange, onTellMeMorePress}) =>{
                         { attendees }
                     </View>}
                     <View style={Styles.infoIconContainer}>
-                        <Icon icon={meetup.virtual ? ['fas', 'trees'] : ['far', 'wifi']} style={{opacity: 0.95}} size={28} color='#cccccc' />
+                        <Icon icon={meetup.type === 'virtual' ? ['fas', 'trees'] : ['far', 'wifi']} style={{opacity: 0.95}} size={28} color='#cccccc' />
                     </View>
                 </View>
             </View>

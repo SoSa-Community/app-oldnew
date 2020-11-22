@@ -9,6 +9,7 @@ import withMembersNavigationContext from "../hoc/withMembersNavigationContext";
 import {ActivityButton} from "../../components/ActivityButton";
 import {Icon} from "../../components/Icon";
 import {CommentItem} from "../../components/comments/CommentItem";
+import Helpers from "../../sosa/Helpers";
 
 const Styles = StyleSheet.create({
     container: {flex:1, margin:16},
@@ -98,6 +99,8 @@ const Styles = StyleSheet.create({
 });
 
 export class Meetup extends Component {
+    id = null;
+    
     drawerNavigationContext = {};
     navigationContext = {};
 
@@ -110,7 +113,8 @@ export class Meetup extends Component {
             {type:'description'},
             {type:'comments'}
         ],
-        meetup: {
+        meetup: {},
+        meetup2: {
                 id: 2,
                 picture: 'https://i.ytimg.com/vi/N7ZafWA2jd8/maxresdefault.jpg',
                 title: 'Team Fortress 2',
@@ -167,43 +171,60 @@ export class Meetup extends Component {
         }
     };
 
-    constructor(props) {
+    constructor({navigation, navigationContext, route: { params }}) {
         super();
 
-        this.navigation = props.navigation;
-        this.navigationContext = props.navigationContext;
+        const { id } = params;
+        this.id = id;
+        
+        this.navigation = navigation;
+        this.navigationContext = navigationContext;
         this.drawerNavigation = this.navigationContext.drawerNavigation;
-        this.drawerNavigationContext = props.navigationContext.drawerNavigationContext;
-
-        this.navigationContext.setMenuOptions({showLeft:true, showRight: false, leftMode: 'back', title: this.state.meetup.title});
+        this.drawerNavigationContext = this.navigationContext.drawerNavigationContext;
+        
+        const {appContext} = this.drawerNavigationContext;
+        const {apiClient} = appContext;
+        this.apiClient = apiClient;
+    
+        this.navigationContext.setMenuOptions({showLeft:true, showRight: false, leftMode: 'back', title: ''});
     }
+    
+    componentDidMount(){
+        const { apiClient: { services: { meetups } } } = this;
+        
+        meetups.get(this.id).then((meetup) => {
+            this.setState({meetup});
+            this.navigationContext.setMenuOptions({title: meetup.title}, true);
+        }).catch((errors) => {
+            console.debug(errors);
+        })
+    }
+    
 
     render() {
         let {meetup} = this.state;
         let hasAttendees = false;
-        if(meetup.attendees && meetup.attendees.length) hasAttendees = true;
-
-        const nth = function(d) {
-            if (d > 3 && d < 21) return 'th';
-            switch (d % 10) {
-                case 1:  return "st";
-                case 2:  return "nd";
-                case 3:  return "rd";
-                default: return "th";
-            }
-        };
-
-        const dateTime = new Date(meetup.start_timestamp * 1000);
-        const wd = new Intl.DateTimeFormat('en', { weekday: 'long' }).format(dateTime);
-        const ye = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(dateTime);
-        const mo = new Intl.DateTimeFormat('en', { month: 'long' }).format(dateTime);
-        const da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(dateTime);
-
-        const attendees = meetup.attendees.map((attendee) => {
-            return <View style={Styles.attendeeImageContainer} key={attendee.id}><Image source={{uri : attendee.picture}} style={Styles.attendeeImage}  /></View>
-        });
+        let attendees = null;
+        let comments = null;
+        
+        if(Array.isArray(meetup.attendees)){
+            if(meetup.attendees.length) hasAttendees = true;
+            attendees = meetup.attendees.map((attendee) => {
+                return <View style={Styles.attendeeImageContainer} key={attendee.id}><Image source={{uri : attendee.picture}} style={Styles.attendeeImage}  /></View>
+            });
+        }
+        
+        if(Array.isArray(meetup.comments)){
+            comments = meetup.comments.map((item, index) => {
+                return <CommentItem comment={item} key={index}/>
+            });
+        }
         
         const buttonText = meetup.going ? 'Not Going' : (hasAttendees ? 'Going' : 'Be the first to go!');
+    
+        let imageSource = {};
+        if(meetup.image) imageSource = {uri : meetup.image};
+        else imageSource = require('../../assets/choose_meetup_image_v2.jpg');
     
         const toggleGoing = () => {
             this.setState({saving: true});
@@ -224,18 +245,18 @@ export class Meetup extends Component {
             <View style={{flex:1, backgroundColor: '#121111'}}>
                 <View style={{flex:0}}>
                     <View style={{height:175}}>
-                        <ImageBackground source={{uri : meetup.picture}} style={Styles.image}>
+                        <ImageBackground source={imageSource} style={Styles.image}>
                             <View style={Styles.imageOverlay} />
                             <View style={Styles.imageTitleContainer}>
                                 <View style={Styles.imageTitleInnerContainer}>
                                     <Text style={Styles.title}>{meetup.title}</Text>
-                                    <Text style={Styles.meetupDate}>{`${wd}, ${da}${nth(da)} ${mo} ${ye}` }</Text>
+                                    <Text style={Styles.meetupDate}>{ Helpers.dateToLongForm(meetup.start_datetime) }</Text>
                                 </View>
                             </View>
                             <View style={Styles.imageBottomContainer}>
                                 <View style={Styles.imageBottomInnerContainer}>
                                     <View style={Styles.infoIconContainer}>
-                                        <Icon icon={meetup.virtual ? ['fas', 'trees'] : ['far', 'wifi']} style={{opacity: 0.95}} size={28} color='#cccccc' />
+                                        <Icon icon={meetup.type === 'virtual' ? ['fas', 'trees'] : ['far', 'wifi']} style={{opacity: 0.95}} size={28} color='#cccccc' />
                                     </View>
                                 </View>
                             </View>
@@ -255,14 +276,12 @@ export class Meetup extends Component {
                                         <Text style={{color:'#fff'}}>{this.state.meetup.description}</Text>
                                     </View>
                                 }else{
-                                    const comments = this.state.meetup.comments.map((item, index) => {
-                                        return <CommentItem comment={item} key={index}/>
-                                    });
-                                    return <View style={{flex:1}}>
-                                        <Text style={{fontSize:18, color:'#fff', marginLeft:4, marginTop: 16, marginBottom:8}}>Comments</Text>
-                                        {comments}
-                                    </View>
-
+                                    if(comments){
+                                        return <View style={{flex:1}}>
+                                            <Text style={{fontSize:18, color:'#fff', marginLeft:4, marginTop: 16, marginBottom:8}}>Comments</Text>
+                                            {comments}
+                                        </View>
+                                    }
                                 }
 
                             }

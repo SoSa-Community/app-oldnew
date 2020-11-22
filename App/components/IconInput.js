@@ -4,39 +4,36 @@ import {TextInput, View, TouchableOpacity, Text, Keyboard} from "react-native";
 import {Icon} from './Icon';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {Picker} from '@react-native-community/picker';
+import Helpers from "../sosa/Helpers";
 
-export const IconInput = ({icon, placeholder, value, onChangeText, validateInput, enabled, allowClear, alwaysShowClear, type}) => {
+export const IconInput = ({icon, placeholder, value, onChangeText, validateInput, enabled, allowClear, alwaysShowClear, type, pickerOptions=[]}) => {
 	if(typeof(value) !== 'string') value = '';
-	if(!['text','date', 'picker'].includes(type)) type = 'text';
+	if(!['text','date', 'time', 'picker'].includes(type)) type = 'text';
 
 	const [inputValue, setInputValue] = useState('');
 	const [dateInputValue, setDateInputValue] = useState(new Date());
 	const [showDate, setShowDate] = useState(false);
 
-	const dateToString = (date) => {
-		let month = date.getMonth() + 1;
-		let day = date.getDate();
-
-		if(month < 10) month = `0${month}`;
-		if(day < 10) day = `0${day}`;
-
-		return `${date.getFullYear()}-${month}-${day}`
-	};
 
 	useEffect(() => {
 		let dateValue = value;
 
-		if(type === 'date'){
+		if(type === 'date' || type === 'time'){
 			let date = (new Date(dateValue));
-			if(Object.prototype.toString.call(date) !== '[object Date]' || isNaN(date.getTime())){
-				date = new Date();
-				date.setFullYear(date.getFullYear() - 16);
-			}else{
-				value = dateToString(date);
-			}
+			if(Object.prototype.toString.call(date) !== '[object Date]' || isNaN(date.getTime())) {
+                date = new Date();
+            }
+            if(type === 'time'){
+                const [hour, minutes] = dateValue.split(':');
+                
+                date.setHours(hour);
+                date.setMinutes(minutes);
+            }
+			
+            value = Helpers.dateToString(date, type);
+			
 			dateValue = date;
 		}
-
 		setInputValue(value);
 		setDateInputValue(dateValue);
 	}, [value]);
@@ -62,13 +59,17 @@ export const IconInput = ({icon, placeholder, value, onChangeText, validateInput
 	const clearInput = () => {setInputValue('');};
 
 	const handleChange = (data) => {
-		if(data !== undefined){
-			if(type === 'date'){
+		let otherData = null;
+		
+	    if(data !== undefined){
+			if(type === 'date' || type === 'time'){
 				setDateInputValue(data);
-				data = dateToString(data);
+				otherData = new Date(data.getTime());
+				data = Helpers.dateToString(data, type);
 			}
+
 			setInputValue(data);
-			if(typeof(onChangeText) === 'function') onChangeText(data);
+			if(typeof(onChangeText) === 'function') onChangeText(data, otherData);
 		}
 	};
 
@@ -79,7 +80,7 @@ export const IconInput = ({icon, placeholder, value, onChangeText, validateInput
 				<Icon icon={icon}  style={Styles.inputIcon} size={18}/>
 
 				{type === 'text' && <TextInput placeholder={placeholder} placeholderTextColor="#ccc" value={inputValue} style={Styles.input} onChangeText={handleChange} editable={enabled}/>}
-				{type === 'date' &&
+				{(type === 'date' || type === 'time') &&
 					<TouchableOpacity onPress={() => {Keyboard.dismiss(); setShowDate(true)}} style={{marginHorizontal: 4, flex: 1, height: '100%', justifyContent:'center'}}>
 						{ inputValue.length > 0 && <Text style={{color: '#121111'}}>{inputValue}</Text>}
 						{ inputValue.length === 0 && <Text style={{color: '#ccc'}}>{placeholder}</Text>}
@@ -87,15 +88,14 @@ export const IconInput = ({icon, placeholder, value, onChangeText, validateInput
 				}
 				{type === 'picker' && <Picker
 					selectedValue={inputValue}
-					placeholder={placeholder}
+                    placeholder={placeholder}
+					prompt={placeholder}
 					style={{flex: 1, color: '#121111'}}
 					textStyle={{fontSize: 12, color: '#121111'}}
 					size={12}
 					onValueChange={(itemValue, itemIndex) => handleChange(itemValue)}
 				>
-					<Picker.Item label="Not Applicable" value="na"/>
-					<Picker.Item label="Female" value="female"/>
-					<Picker.Item label="Male" value="male" />
+                    { pickerOptions.map(({label, value}) => <Picker.Item label={label} value={value} key={value}/>) }
 				</Picker> }
 
 
@@ -104,11 +104,11 @@ export const IconInput = ({icon, placeholder, value, onChangeText, validateInput
 				<TouchableOpacity onPress={clearInput}>
 					<Icon icon={['fas', 'times-circle']}  style={Styles.inputIcon} size={16} color='#bababa' />
 				</TouchableOpacity> }
-				{type === 'date' && showDate && (
+				{(type === 'date' || type === 'time') && showDate && (
 					<DateTimePicker
 						testID="dateTimePicker"
 						value={dateInputValue}
-						mode={'date'}
+						mode={type}
 						display="default"
 						onChange={(event, selectedDate) => {
 							setShowDate(false);

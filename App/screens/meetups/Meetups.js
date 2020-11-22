@@ -1,24 +1,25 @@
 import React, {Component} from 'react';
 import {
-    Image,
     FlatList,
-    Text,
     View,
     Button,
-    TouchableHighlight,
-    TouchableOpacity,
-    Linking,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    Keyboard,
-    Modal,
-    ImageBackground
 } from 'react-native';
-import { SoSaConfig } from "../../sosa/config";
 
 import withMembersNavigationContext from "../hoc/withMembersNavigationContext";
 import {MeetupItem} from "../../components/meetups/MeetupItem";
+import { useFocusEffect } from '@react-navigation/native';
+
+
+function FocusComponent({addHeaderIcon, removeHeaderIcon}) {
+    useFocusEffect(
+        React.useCallback(() => {
+            addHeaderIcon('create_meetup', ['fal', 'plus'], () => this.navigation.navigate('CreateMeetup'));
+            
+            return () => removeHeaderIcon('create_meetup');
+        }, [])
+    );
+    return null;
+}
 
 export class Meetups extends Component {
     drawerNavigationContext = {};
@@ -26,51 +27,11 @@ export class Meetups extends Component {
 
     navigation = {};
     drawerNavigation = {};
+    
+    apiClient = null;
 
     state = {
-        meetups: [
-            {
-                id: 1,
-                picture: 'https://secure.meetupstatic.com/photos/event/5/a/e/e/600_490223278.jpeg',
-                title: 'Terraria',
-                start_timestamp: 1595863949,
-                going: false,
-                virtual: false,
-                attendees: [
-                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                ]
-            },
-            {
-                id: 2,
-                picture: 'https://i.ytimg.com/vi/N7ZafWA2jd8/maxresdefault.jpg',
-                title: 'Team Fortress 2',
-                virtual: true,
-                start_timestamp: 1595863949,
-                going: false,
-                attendees: [
-
-                ]
-            },
-            {
-                id: 3,
-                picture: 'https://steamcdn-a.akamaihd.net/steam/apps/434170/capsule_616x353.jpg?t=1581354185',
-                title: 'Jackbox Party',
-                virtual: false,
-                start_timestamp: 1595863949,
-                going: false,
-                attendees: [
-                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                    {picture: `https://picsum.photos/300/300?seed=${Math.random()}`}
-                ]
-            },
-        ]
+        meetups: []
     };
 
     constructor(props) {
@@ -80,12 +41,26 @@ export class Meetups extends Component {
         this.navigationContext = props.navigationContext;
         this.drawerNavigation = this.navigationContext.drawerNavigation;
         this.drawerNavigationContext = props.navigationContext.drawerNavigationContext;
+    
+        const {appContext} = this.drawerNavigationContext;
+        const {apiClient} = appContext;
+        this.apiClient = apiClient;
     }
-
+    
+    componentDidMount(){
+        const { apiClient: { services: { meetups } } } = this;
+        meetups.search('sosa').then((meetups) => {
+            this.setState({meetups});
+        }).catch((errors) => {
+            console.debug(errors);
+        })
+    }
+    
     render() {
 
         return (
             <View style={{flex:1}}>
+                <FocusComponent addHeaderIcon={this.navigationContext.addHeaderIcon} removeHeaderIcon={this.navigationContext.removeHeaderIcon} />
                 <FlatList
                     data={this.state.meetups}
                     extraData={this.state.meetups}
@@ -96,7 +71,7 @@ export class Meetups extends Component {
                                 let meetups = this.state.meetups;
                                 meetups[index] = meetup;
                                 this.setState({meetups: meetups});
-                            }} onTellMeMorePress={() => this.navigation.navigate('Meetup')}/>;
+                            }} onTellMeMorePress={() => this.navigation.navigate('Meetup', {id: item.id})} />;
                         }
                     }
                     style={{flex: 1, backgroundColor: '#121111'}}

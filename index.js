@@ -25,14 +25,15 @@ import {
 	faImage as falImage,
 	faChevronLeft as falChevonLeft,
 	faMapMarkerSmile as falMapMarkerSmile,
-	faGenderless as falGenderless
+	faGenderless as falGenderless,
+    faPlus as falPlus
 } from '@fortawesome/pro-light-svg-icons'
 
 import {faWifi as farWifi} from '@fortawesome/pro-regular-svg-icons';
 
 library.add(fasUsers, falUsers, falBars, fasCampfire, falCampfire, falArrowAltLeft, falUser, falKey, fasInfoCircle,
 	fasCheck, falEye, falEyeSlash, falEnvelope, falPaperPlane, fasTrees, farWifi, falCalendarStar,
-	falCogs, falSignOutAlt, falImage, falChevonLeft, falMapMarkerSmile, falGenderless, fasTimesCircle);
+	falCogs, falSignOutAlt, falImage, falChevonLeft, falMapMarkerSmile, falGenderless, fasTimesCircle, falPlus);
 
 /**
  * Object.prototype.forEach() polyfill
