@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import {Keyboard, Text, View} from "react-native";
+import {Keyboard, Text, View, StyleSheet, BackHandler} from "react-native";
 
-import {StyleSheet} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+
 import {IconButton} from "./IconButton";
 import BaseStyles from "../screens/styles/base";
 
@@ -14,8 +15,18 @@ const Styles = StyleSheet.create({
         paddingTop: Platform.OS === 'ios' ? 32 : 0
     },
     menuTopLeft: {paddingLeft: 7, paddingRight: 5},
-    menuTopRight: {paddingRight: 10}
+    menuTopRight: {paddingRight: 10, flex:1, flexDirection: 'row', alignItems: 'center', justifyContent:'flex-end'}
 });
+
+function HandleBackButton({ onBack }) {
+    useFocusEffect(
+        React.useCallback(() => {
+            BackHandler.addEventListener('hardwareBackPress', onBack);
+            return () => BackHandler.removeEventListener('hardwareBackPress', onBack);
+        }, [])
+    );
+    return null;
+}
 
 export default class MembersAreaNavigationHeader extends Component {
     state = {
@@ -40,7 +51,7 @@ export default class MembersAreaNavigationHeader extends Component {
         });
 
         if(!found){
-            icons.push({
+            icons.unshift({
                 id: id,
                 icon: icon,
                 onPress: onPress
@@ -49,6 +60,17 @@ export default class MembersAreaNavigationHeader extends Component {
 
         this.setState({headerIcons: icons});
     };
+    
+    removeHeaderIcon = (id) => {
+        let icons = this.state.headerIcons;
+        let found = false;
+    
+        icons.forEach((item, index) => {
+            if(item.id === id) delete icons[index];
+        });
+    
+        this.setState({headerIcons: icons});
+    }
 
     render() {
 
@@ -79,7 +101,7 @@ export default class MembersAreaNavigationHeader extends Component {
 
         if(this.props.showRightMenu) {
             let icons = this.state.headerIcons.map((item, i) => {
-                return (<View style={{verticalAlign:'center'}} key={item.id}>
+                return (<View style={{verticalAlign:'center', marginLeft: 10}} key={item.id}>
                     <IconButton icon={item.icon} style={{color: '#CCC'}} activeStyle={{color: '#444442'}} size={30} onPress={item.onPress}/>
                 </View>);
             });
@@ -88,6 +110,7 @@ export default class MembersAreaNavigationHeader extends Component {
 
 
         return  <View style={Styles.menuTop}>
+                    { this.props.leftMenuMode === 'back' && <HandleBackButton onBack={this.props.onBack} /> }
                     {leftMenu}
                     <Text style={BaseStyles.headerTitle}>{this.props.title}</Text>
                     {rightMenu}
