@@ -114,6 +114,7 @@ export class CreateMeetup extends Component {
             new Date(`${date} ${end}`),
             { image: this.imageURI }
         ).then((meetup) => {
+            this.navigationContext.popMenuStack();
             this.navigation.replace('Meetup', {id: meetup.id});
         }).catch((errors) => {
             console.debug('errors', errors);

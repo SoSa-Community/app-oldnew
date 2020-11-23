@@ -191,6 +191,7 @@ class WrapperComponent extends Component {
                 addListener: this.addListener,
                 preferences: this.state.preferences,
                 setMenuOptions: this.setMenuOptions,
+                popMenuStack: this.popMenuStack
             }}
             >
                 <View style={BaseStyles.container} >
