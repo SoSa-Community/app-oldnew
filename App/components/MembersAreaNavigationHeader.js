@@ -15,7 +15,7 @@ const Styles = StyleSheet.create({
         paddingTop: Platform.OS === 'ios' ? 32 : 0
     },
     menuTopLeft: {paddingLeft: 7, paddingRight: 5},
-    menuTopRight: {paddingRight: 10, flex:1, flexDirection: 'row', alignItems: 'center', justifyContent:'flex-end'}
+    menuTopRight: {paddingRight: 10, flex:0, flexDirection: 'row', alignItems: 'center', justifyContent:'flex-end'}
 });
 
 function HandleBackButton({ onBack }) {

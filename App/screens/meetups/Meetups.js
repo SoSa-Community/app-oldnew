@@ -10,10 +10,10 @@ import {MeetupItem} from "../../components/meetups/MeetupItem";
 import { useFocusEffect } from '@react-navigation/native';
 
 
-function FocusComponent({addHeaderIcon, removeHeaderIcon}) {
+function FocusComponent({addHeaderIcon, removeHeaderIcon, navigate}) {
     useFocusEffect(
         React.useCallback(() => {
-            addHeaderIcon('create_meetup', ['fal', 'plus'], () => this.navigation.navigate('CreateMeetup'));
+            addHeaderIcon('create_meetup', ['fal', 'plus'], () => navigate('CreateMeetup'));
             
             return () => removeHeaderIcon('create_meetup');
         }, [])
@@ -60,7 +60,7 @@ export class Meetups extends Component {
 
         return (
             <View style={{flex:1}}>
-                <FocusComponent addHeaderIcon={this.navigationContext.addHeaderIcon} removeHeaderIcon={this.navigationContext.removeHeaderIcon} />
+                <FocusComponent addHeaderIcon={this.navigationContext.addHeaderIcon} removeHeaderIcon={this.navigationContext.removeHeaderIcon} navigate={this.navigation.navigate} />
                 <FlatList
                     data={this.state.meetups}
                     extraData={this.state.meetups}
