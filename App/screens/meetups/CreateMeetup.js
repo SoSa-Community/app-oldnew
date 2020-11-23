@@ -106,12 +106,13 @@ export class CreateMeetup extends Component {
         const { nameInput: name, descriptionInput: description, dateInput: date, startInput: start, endInput: end, typeInput: type} = this.state;
         
         this.setState({saving: true});
+
         meetups.create('sosa',
             name,
             description,
             type,
-            new Date(`${date} ${start}`),
-            new Date(`${date} ${end}`),
+            new Date(`${date}T${start}`),
+            new Date(`${date}T${end}`),
             { image: this.imageURI }
         ).then((meetup) => {
             this.navigationContext.popMenuStack();

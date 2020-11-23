@@ -20,8 +20,10 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-	<key>CFBundleURLTypes</key>
-	<array>
+	<key>UIUserInterfaceStyle</key>
+  <string>Light</string>
+  <key>CFBundleURLTypes</key>
+  <array>
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
