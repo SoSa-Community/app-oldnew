@@ -13,12 +13,13 @@ import ChatScreen from "./chat";
 import { NavigationContainer } from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {Icon} from "../components/Icon";
-import MeetupsScreen from "./Meetups";
-import MeetupScreen from "./Meetup";
+import MeetupsScreen from "./meetups/Meetups";
+import MeetupScreen from "./meetups/Meetup";
 import {Preferences} from "../sosa/Preferences";
 
 import Device from "../sosa/Device";
 import Session from "../sosa/Session";
+import CreateMeetupScreen from "./meetups/CreateMeetup";
 
 
 const Stack = createStackNavigator();
@@ -48,8 +49,6 @@ class WrapperComponent extends Component {
     };
 
     menuStack = [this.menuDefaults];
-
-    eventListeners = {};
     navigationStateChangeListener = null;
 
     constructor(props) {
@@ -70,56 +69,21 @@ class WrapperComponent extends Component {
 
         Preferences.getAll((preferences) => {
             this.setState({preferences});
-            this.triggerListener('settings_update', preferences);
+            this.appContext.triggerMiddleware('settings_update', preferences);
         });
-
-        this.connect();
     }
 
-    connect = () => {
-        const {apiClient} = this;
-        const {middleware} = apiClient;
-
-        middleware.clear('app');
-        middleware.add('app', {
-            'authentication_successful': (authData, client) => {
-                this.setState({loading:false});
-                this.triggerListener('api_authenticated', authData);
-                return authData;
-            },
-            'disconnected': (message, client) => {
-                this.triggerListener('disconnected', message);
-                return message;
-            }
-        });
-    };
+    connect = () => {};
 
     showSettings = () => {
         this.appNavigation.navigate('Settings');
 
         const unsubscribe = this.appNavigation.addListener('focus', () => {
             Preferences.getAll((preferences) => {
-                this.triggerListener('settings_update', preferences);
+                this.appContext.triggerMiddleware('settings_update', preferences);
             });
             unsubscribe();
         });
-    };
-
-    addListener = (event, callback) => {
-        if(!this.eventListeners[event]) this.eventListeners[event] = [];
-        this.eventListeners[event].push(callback);
-    };
-
-    triggerListener = (event, data) => {
-        if(this.eventListeners[event]){
-            this.eventListeners[event].forEach((callback) => {
-                try{
-                    callback(data);
-                }catch (e) {
-                    console.debug('Callback error', e);
-                }
-            })
-        }
     };
 
     showMeetups = () => {
@@ -128,7 +92,8 @@ class WrapperComponent extends Component {
     };
 
     componentDidMount() {
-
+        this.connect();
+        
         this.drawerNavigationContext.addDrawerItem('community', (
             <View style={{marginBottom: 16}} key={'community'}>
                 <TouchableHighlight style={{}} onPress={this.showMeetups}>
@@ -165,7 +130,7 @@ class WrapperComponent extends Component {
         });
     }
 
-    setMenuOptions = (options, resetOnBack) => {
+    setMenuOptions = (options, justUpdate, resetOnBack) => {
         const { drawerNavigationContext } = this;
         let currentState = Object.assign({}, this.state.menu);
         let updateState = false;
@@ -181,16 +146,23 @@ class WrapperComponent extends Component {
         if(currentState.leftMode === 'back') drawerNavigationContext.allowLeftSwipe(false);
         else drawerNavigationContext.allowLeftSwipe(true);
         
-        this.menuStack.push(currentState);
+        if(!justUpdate){
+            this.menuStack.push(currentState);
+        }
     };
 
     popMenuStack = () => {
-        if(this.menuStack.length > 1){
-            this.menuStack.pop();
-            this.setState({menu: this.menuStack[this.menuStack.length - 1]});
-        }else{
-            this.setState({menu: this.menuDefaults});
+        const { drawerNavigationContext, menuDefaults, menuStack } = this;
+        
+        let newState = menuDefaults;
+        if(menuStack.length > 1){
+            menuStack.pop();
+            newState = menuStack[menuStack.length - 1];
         }
+        if(newState.leftMode === 'back') drawerNavigationContext.allowLeftSwipe(false);
+        else drawerNavigationContext.allowLeftSwipe(true);
+        
+        this.setState({menu: newState});
     };
 
     componentWillUnmount(){
@@ -201,6 +173,7 @@ class WrapperComponent extends Component {
     }
 
     addHeaderIcon = (id, icon, onPress) => {this.topBar.current.addHeaderIcon(id, icon, onPress);};
+    removeHeaderIcon = (id) => {this.topBar.current.removeHeaderIcon(id);}
 
     render() {
         const {state: {menu: {title, leftMode, showLeft, showRight}}} = this;
@@ -211,21 +184,24 @@ class WrapperComponent extends Component {
         }else{
             return <MembersNavigationContext.Provider value={{
                 addHeaderIcon: this.addHeaderIcon,
+                removeHeaderIcon: this.removeHeaderIcon,
                 drawerNavigation: this.drawerNavigation,
                 drawerNavigationContext: this.drawerNavigationContext,
                 navigate: this.navigate,
                 addListener: this.addListener,
                 preferences: this.state.preferences,
                 setMenuOptions: this.setMenuOptions,
+                popMenuStack: this.popMenuStack
             }}
             >
                 <View style={BaseStyles.container} >
-                    <MembersAreaNavigationHeader title={title} leftMenuMode={leftMode} showLeftMenu={showLeft} showRightMenu={showRight} drawerNavigation={this.drawerNavigation} membersNavigation={this.stackNavigation} icons={this.state.headerIcons} ref={this.topBar} onBack={this.popMenuStack}/>
+                    <MembersAreaNavigationHeader title={title} leftMenuMode={leftMode} showLeftMenu={showLeft} showRightMenu={showRight} drawerNavigation={this.drawerNavigation} membersNavigation={this.stackNavigation} icons={this.state.headerIcons} ref={this.topBar} onBack={this.popMenuStack} />
                     <NavigationContainer independent={true} ref={this.stackNavigation} onStateChange={(state) => {if (!state) return; console.log("hello2");}}>
-                        <Stack.Navigator>
+                        <Stack.Navigator initialRouteName="Chat">
                             <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: false }}/>
                             <Stack.Screen name="Meetups" component={MeetupsScreen} options={{ headerShown: false}}/>
                             <Stack.Screen name="Meetup" component={MeetupScreen} options={{ headerShown: false}} />
+                            <Stack.Screen name="CreateMeetup" component={CreateMeetupScreen} options={{ headerShown: false}} />
                         </Stack.Navigator>
                     </NavigationContainer>
                 </View>

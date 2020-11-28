@@ -3,7 +3,7 @@ index 3571647..de8ff9a 100644
 --- a/node_modules/react-native/Libraries/Image/RCTImageLoader.mm
 +++ b/node_modules/react-native/Libraries/Image/RCTImageLoader.mm
 @@ -1040,12 +1040,12 @@ - (BOOL)canHandleRequest:(NSURLRequest *)request
- 
+
  - (id)sendRequest:(NSURLRequest *)request withDelegate:(id<RCTURLRequestDelegate>)delegate
  {
 -  __block RCTImageLoaderCancellationBlock requestToken;
@@ -13,8 +13,8 @@ index 3571647..de8ff9a 100644
        [delegate URLRequest:requestToken didCompleteWithError:error];
        return;
 -    }
-+    }jhkh
- 
++    }
+
      NSString *mimeType = nil;
      NSData *imageData = nil;
 diff --git a/node_modules/react-native/scripts/.packager.env b/node_modules/react-native/scripts/.packager.env

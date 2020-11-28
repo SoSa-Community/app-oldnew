@@ -35,7 +35,7 @@ class Welcome extends Component {
 		this.navigation = navigation;
 		this.navigationContext = navigationContext;
         
-        const {client: apiClient} = appContext;
+        const { apiClient } = appContext;
         this.apiClient = apiClient;
 
 		if(params){

@@ -60,11 +60,15 @@ export default class Session {
         return true;
     }
 
-    logout(callback){
-        this.expiry = null;
-        this.id = null;
-        this.refresh_token = null;
-        this.save(callback);
+    logout(){
+        return new Promise(resolve => {
+            this.expiry = null;
+            this.id = null;
+            this.refresh_token = null;
+            this.username = null;
+            this.nickname = null;
+            this.save(() => {resolve();});
+        });
     }
 
     static retrieve(callback){
