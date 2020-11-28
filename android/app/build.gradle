@@ -131,8 +131,8 @@ android {
         applicationId "com.socialsavanna"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 42
-        versionName "1.0.9"
+        versionCode 43
+        versionName "1.1.0"
         multiDexEnabled true
     }
     splits {
