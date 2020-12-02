@@ -1,6 +1,16 @@
 import React, {Component} from 'react';
 import Styles from './styles/chat'
-import {FlatList, Text, View, TouchableHighlight, KeyboardAvoidingView, Platform, ScrollView, Keyboard} from 'react-native';
+import {
+    FlatList,
+    Text,
+    View,
+    TouchableHighlight,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    Keyboard,
+    Button, Modal, Image, ImageBackground, ActivityIndicator, TouchableOpacity, Linking
+} from 'react-native';
 import {Message} from 'sosa-chat-client';
 
 import Session from "../sosa/Session";
@@ -56,6 +66,12 @@ export class Chat extends Component {
 		messages: [],
 		tagSearchData: [],
 		messageInput: '',
+        previewEmbed: null,
+        imageInput: [
+            {id: Helpers.generateId(), uri:'https://i.imgur.com/qGCPtBf.jpg', image: 'https://i.imgur.com/qGCPtBf.jpg', percentage: 100},
+            {id: Helpers.generateId(), uri:'https://i.imgur.com/KI5NCXC.jpeg', image: 'https://i.imgur.com/KI5NCXC.jpeg', percentage: 100},
+            {id: Helpers.generateId(), uri:'https://i.imgur.com/8JzjIPz.jpeg', image: 'https://i.imgur.com/8JzjIPz.jpeg', percentage: 100}
+        ],
 		rooms: [],
 		scrolling: true,
 		newMessagesNotificationVisible: false,
@@ -69,7 +85,7 @@ export class Chat extends Component {
 			touch_face_for_profile: false,
 			show_separators: false,
 			show_slim: false
-		}
+		},
 	};
 	
 	settingUp = false;
@@ -189,7 +205,7 @@ export class Chat extends Component {
         
 	}
 
-	preferencesChanged(preferences){
+	preferencesChanged = (preferences) => {
 		let stateChanges = this.state.preferences;
 		let updateState = false;
 
@@ -221,10 +237,18 @@ export class Chat extends Component {
 	};
 
 	sendMessage = (setMessage) => {
-	    let {coolDown, coolDownTimer, slowDownCounter, slowDownTimer, messageInput, state: { currentRoom: { community_id, name } } } = this;
+	    let {coolDown, coolDownTimer, slowDownCounter, slowDownTimer, messageInput, state: { imageInput, currentRoom: { community_id, name } } } = this;
 	
 		if(!coolDown && slowDownCounter < 3){
 			let message = (setMessage || messageInput).trim();
+			
+			if(imageInput.length) {
+			    let images = [];
+			    images = imageInput.map(({uri}) => uri);
+			    
+			    if(images.length) message = `${message} ${images.join(' ')}`;
+            }
+			
 			if(message.length > 0){
 				this.coolDown = true;
 				
@@ -241,6 +265,7 @@ export class Chat extends Component {
 				this.chatService.rooms.send(community_id, name, message).then((message) => this.addMessage(message)).catch((error) => {
 				    console.debug(error);
                 });
+				this.setState({imageInput: []});
 				this.setMessageInput('');
 				this.scrollToBottom();
 			}
@@ -330,7 +355,7 @@ export class Chat extends Component {
         this.chatService.rooms.join(communityID, roomID)
             .then(({room, userList, history}) => {
 			    this.sortUserList(userList);
-			    console.debug('history 2', history);
+			    
                 this.setState({userList, currentRoom: room, messages: Object.assign([], history)});
                 this.messageBuffer = [];
 			    
@@ -514,29 +539,109 @@ export class Chat extends Component {
 		}else{
 			return <Text style={Styles.status}>{item.message}</Text>
 		}
-	}
+	};
+	
+	renderImageList = () => {
+	    const images = this.state.imageInput.map((imageData, index) => {
+	        if(imageData){
+                const {image, uri, percentage} = imageData;
+                if(!image) return;
+        
+                const deleteImage = () => {
+                    let images = [...this.state.imageInput];
+                    images.splice(index, 1);
+                    this.setState({imageInput: images});
+                };
+        
+                const defaultSize = 64;
+        
+                let width = defaultSize;
+                if(percentage < 100) {
+                    width = Math.floor((percentage / 100) * width - defaultSize) * -1;
+                }
+        
+                return (<TouchableOpacity key={index} style={{margin:2, borderRadius: defaultSize / 2, overflow:'hidden'}} onPress={() => {uri && this.setState({previewEmbed: imageData})}} onLongPress={() => {uri && deleteImage(index)}} >
+                    <ImageBackground source={{uri : image}} style={{height:defaultSize, width:defaultSize, resizeMode:'contain'}} imageStyle={{ borderRadius: defaultSize / 2 }}>
+                        <View style={[{
+                            backgroundColor: 'rgba(0, 0, 0, 0.30)',
+                            position:'absolute',
+                            top:0,
+                            right: 0,
+                        }, {height: defaultSize, width}]} />
+                        { percentage < 100 && <ActivityIndicator color="#fff" size="large" style={{alignSelf:'center', flex:1, position:'absolute', top:0, left: 0, height:'100%', width:'100%'}}/> }
+                    </ImageBackground>
+                </TouchableOpacity>);
+            }
+        });
+	    return <View style={{flexDirection: 'row', paddingBottom: 2}}>{images}</View>;
+    }
 
 	render() {
 
 		return (
 			this.buildWrapper(
 				<View style={Styles.container}>
+                    <Modal visible={(!!this.state.previewEmbed)} transparent={true} onRequestClose={() => this.setState({previewEmbed: null})}>
+                        <View style={{backgroundColor:'rgba(0,0,0,0.75)', paddingTop: '15%', paddingBottom:'35%'}}>
+                            <View style={{backgroundColor:'#fff', height:'100%', borderRadius:12, alignItems:'center', overflow:'hidden', paddingHorizontal:'2%'}}>
+                                <TouchableHighlight onPress={() => Linking.openURL(this?.state?.previewEmbed?.uri)}>
+                                    <Image source={{uri: this?.state?.previewEmbed?.image}} style={{width:'100%', marginTop:'2%', aspectRatio: 1/1, borderRadius: 12}}/>
+                                </TouchableHighlight>
+                                <View style={{flex:1, width:'100%', flexDirection: 'row', justifyContent:'flex-end', alignItems:'flex-end', marginBottom: 16}}>
+                                        <TouchableHighlight onPress={() => {
+                                            const index = this.state.imageInput.indexOf(this.state.previewEmbed);
+                                            let newState = {previewEmbed: null};
+                                            
+                                            if(index !== -1) {
+                                                const images = [...this.state.imageInput];
+                                                images.splice(index, 1);
+                                                newState.imageInput = images;
+                                            }
+                                            this.setState(newState);
+                                            
+                                        }} style={{alignItems:'center',
+                                            borderRadius: 8,
+                                            borderColor: '#dc3545',
+                                            borderWidth: 1,
+                                            backgroundColor: '#dc3545',
+                                            paddingVertical: 10,
+                                            paddingHorizontal: 12,
+                                            marginRight: 12
+                                        }}>
+                                            <Text style={{color:'#fff'}}>Remove</Text>
+                                        </TouchableHighlight>
+                                    
+                                        <TouchableHighlight onPress={() => this.setState({previewEmbed: null})} style={{alignItems:'center',
+                                            borderRadius: 8,
+                                            borderColor: '#f0ad4e',
+                                            borderWidth: 1,
+                                            paddingVertical: 10,
+                                            paddingHorizontal: 24}}>
+                                            <Text>Close</Text>
+                                        </TouchableHighlight>
+                                    
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
 					<View style={Styles.messageListContainer}>
 						<FlatList
 							ref={(ref) => {this.scrollView = ref;}}
 							onScroll={this.chatMessagesOnScroll}
 							keyboardShouldPersistTaps={'handled'}
 							inverted
-							initialNumToRender={50}
+							initialNumToRender={10}
 							maxToRenderPerBatch={12}
-							windowSize={10}
+                            updateCellsBatchingPeriod={25}
+							windowSize={21}
+                            removeClippedSubviews={true}
 							data={this.state.messages}
 							extraData={this.state.messages}
-							keyExtractor={(item) => item.id.toString()}
+							keyExtractor={(item) => item.id}
 							renderItem={this.renderItem}
 							style={Styles.message_list}
 						/>
-
+                        { this.state.imageInput.length ? this.renderImageList() : null }
 						{
 							this.state.newMessagesNotificationVisible &&
 							<TouchableHighlight onPress={this.scrollToBottom} style={Styles.newMessageScrollNotifier}>
@@ -564,13 +669,39 @@ export class Chat extends Component {
 							canSend={this.state.canSend}
 							uploading={this.state.uploading}
 							uploadAction={() => {
-							    Helpers.uploadFile(this.apiClient, this.community, (uploading) => {this.setState({uploading});})
-                                    .then(({uris, tag, uuid}) => {
-                                        if(Array.isArray(uris)){
-                                            return this.sendMessage(uris.join(" "));
-                                        }
+                                let image = {id: Helpers.generateId(), uri:'', image: '', percentage: 0};
+                                
+                                const updateState = () => {
+                                    let images = this.state.imageInput;
+                                    let indx = images.length;
+                                    
+                                    images.forEach((item, index) => {
+                                        if(item.id === image.id) indx = index;
                                     });
-                                }}
+                                    
+                                    images[indx] = image;
+                                    this.setState({imageInput: images});
+                                };
+                                
+							    Helpers.uploadFile(
+							        this.apiClient,
+                                    this.community,
+                                    (uploading) => {
+							            this.setState({uploading});
+							         },
+                                     ({uri, fileName, type, data}) => {
+							             image.image = `data:${type};base64,${data}`;
+                                         updateState();
+                                     }
+                                )
+                                .then(({uris, tag, uuid}) => {
+                                    image.uri = uris[0];
+                                    image.percentage = 100;
+                                    updateState();
+                                }).catch(() => {
+                                    console.debug('cancelled upload');
+                                });
+                            }}
 						/>
 					</View>
 					<ProfileModal visible={this.state.profileModalVisible} profile={this.selectedProfile} dismissTouch={() => this.setState({profileModalVisible: false})} />
