@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import Styles from './styles/chat'
 import {
     FlatList,
     Text,
@@ -9,8 +8,10 @@ import {
     Platform,
     ScrollView,
     Keyboard,
-    Button, Modal, Image, ImageBackground, ActivityIndicator, TouchableOpacity, Linking
+    Modal, ImageBackground, ActivityIndicator, TouchableOpacity, Linking
 } from 'react-native';
+
+import FastImage from "react-native-fast-image";
 import {Message} from 'sosa-chat-client';
 
 import Session from "../sosa/Session";
@@ -25,6 +26,7 @@ import withMembersNavigationContext from "./hoc/withMembersNavigationContext";
 
 import {ProfileModal} from "../components/ProfileModal";
 import {MessageItem} from "../components/chat/MessageItem";
+import Styles from './styles/chat'
 
 
 export class Chat extends Component {
@@ -67,11 +69,7 @@ export class Chat extends Component {
 		tagSearchData: [],
 		messageInput: '',
         previewEmbed: null,
-        imageInput: [
-            {id: Helpers.generateId(), uri:'https://i.imgur.com/qGCPtBf.jpg', image: 'https://i.imgur.com/qGCPtBf.jpg', percentage: 100},
-            {id: Helpers.generateId(), uri:'https://i.imgur.com/KI5NCXC.jpeg', image: 'https://i.imgur.com/KI5NCXC.jpeg', percentage: 100},
-            {id: Helpers.generateId(), uri:'https://i.imgur.com/8JzjIPz.jpeg', image: 'https://i.imgur.com/8JzjIPz.jpeg', percentage: 100}
-        ],
+        imageInput: [],
 		rooms: [],
 		scrolling: true,
 		newMessagesNotificationVisible: false,
@@ -129,7 +127,7 @@ export class Chat extends Component {
             'settings_update': this.preferencesChanged,
             'api_event': ( packet ) => {
                 const { type, data } = packet;
-                console.debug(packet);
+                
                 return new Promise((resolve, reject) => {
                     if(type === 'chat/message') return this.addMessage(data);
                 
@@ -345,7 +343,7 @@ export class Chat extends Component {
             this.setState({rooms});
 		}).catch(error => {
 		    console.info('App::updateRoomList::error', error);
-            Helpers.showAlert('Error getting room list', error);
+            this.appContext.createModal('Error getting room list', error);
             throw error;
         });
 	};
@@ -365,7 +363,7 @@ export class Chat extends Component {
 				this.membersNavigationContext.addHeaderIcon('whos_online',['fal', 'users'], this.displayUserList);
 				this.renderRoomList();
 		    }).catch(error => {
-                Helpers.showAlert('Can\'t Join Room', error);
+                this.appContext.createModal('Can\'t Join Room', error);
             });
 	};
 
@@ -374,7 +372,7 @@ export class Chat extends Component {
 			Keyboard.dismiss();
 			this.navigation.openDrawer();
 		}else{
-			Helpers.showAlert('You\'re not in a room','Please join a room first!');
+            this.appContext.createModal('You\'re not in a room','Please join a room first!');
 		}
 
 	};
@@ -585,7 +583,7 @@ export class Chat extends Component {
                         <View style={{backgroundColor:'rgba(0,0,0,0.75)', paddingTop: '15%', paddingBottom:'35%'}}>
                             <View style={{backgroundColor:'#fff', height:'100%', borderRadius:12, alignItems:'center', overflow:'hidden', paddingHorizontal:'2%'}}>
                                 <TouchableHighlight onPress={() => Linking.openURL(this?.state?.previewEmbed?.uri)}>
-                                    <Image source={{uri: this?.state?.previewEmbed?.image}} style={{width:'100%', marginTop:'2%', aspectRatio: 1/1, borderRadius: 12}}/>
+                                    <FastImage source={{uri: this?.state?.previewEmbed?.image}} style={{width:'100%', marginTop:'2%', aspectRatio: 1/1, borderRadius: 12}}/>
                                 </TouchableHighlight>
                                 <View style={{flex:1, width:'100%', flexDirection: 'row', justifyContent:'flex-end', alignItems:'flex-end', marginBottom: 16}}>
                                         <TouchableHighlight onPress={() => {
@@ -698,8 +696,36 @@ export class Chat extends Component {
                                     image.uri = uris[0];
                                     image.percentage = 100;
                                     updateState();
-                                }).catch(() => {
-                                    console.debug('cancelled upload');
+                                })
+                                .catch((error) => {
+                                    const index = this.state.imageInput.indexOf(image);
+                                    if(index !== -1) {
+                                        const images = [...this.state.imageInput];
+                                        images.splice(index, 1);
+                                        this.setState({imageInput: images});
+                                    }
+                                    
+                                    const code = error?.message?.Code;
+                                    let title = 'Error uploading image';
+                                    let message = '';
+                                    
+                                    if(Array.isArray(code)){
+                                        if(code[0] === 'EntityTooLarge'){
+                                            title = 'Ooops! that\'s a bit too big!';
+                                            message = 'The max image size is 10mb';
+                                        }else{
+                                            message = 'Invalid image';
+                                        }
+                                    }else{
+                                        message = error?.message;
+                                    }
+                                    
+                                    if(message.length && message !== 'user_cancelled'){
+                                        this.appContext.createModal(title, message);
+                                    }
+                                    
+                                }).finally(() => {
+                                    this.setState({uploading: false});
                                 });
                             }}
 						/>
