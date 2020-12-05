@@ -73,7 +73,7 @@ export default class Helpers {
         return atob(input.replace(/[^A-Za-z0-9\+\/\=]/g, ""));
 	}
     
-    static uploadFile = (apiClient, communityId, isUploading, beforeUpload) => {
+    static uploadFile = (appContext, apiClient, communityId, isUploading, beforeUpload) => {
 	    return new Promise((resolve, reject) => {
             const { services: { general } } = apiClient;
         
@@ -85,6 +85,29 @@ export default class Helpers {
                 isUploading(true);
                 general.handleUpload(communityId, file).then(resolve).catch((errors) => {
                     console.info('App::UploadFile::error', errors);
+                    
+                    if(appContext){
+                        const code = errors?.message?.Code;
+                        let title = 'Error uploading image';
+                        let message = '';
+    
+                        if(Array.isArray(code)){
+                            if(code[0] === 'EntityTooLarge'){
+                                title = 'Ooops! that\'s a bit too big!';
+                                message = 'The max image size is 10mb';
+                            }else{
+                                message = 'Invalid image';
+                            }
+                        }else{
+                            message = error?.message;
+                        }
+    
+                        if(message.length && message !== 'user_cancelled'){
+                            appContext.createModal(title, message);
+                        }
+                    }
+                    
+                    
                     reject(errors);
                 }).finally(() => {
                     isUploading(false);
