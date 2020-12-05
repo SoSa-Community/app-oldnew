@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Text, View, TouchableOpacity, Switch, KeyboardAvoidingView} from 'react-native';
 
-import {IconInput} from "../components/IconInput";
+import {Input} from "../components/Input";
 import {ActivityButton} from "../components/ActivityButton";
 import withAppContext from "./hoc/withAppContext";
 import {InfoBox} from "../components/InfoBox";
@@ -83,13 +83,13 @@ class Welcome extends Component {
 						<View style={{marginTop:32}}>
 							<View>
 								<Text style={{marginBottom: 8}}>Your username</Text>
-								<IconInput icon={['fal', 'user']} placeholder="Username" value={usernameInput} onChangeText={data => this.setState({ usernameInput: data})} enabled={!this.state.saving}/>
+								<Input icon={['fal', 'user']} placeholder="Username" value={usernameInput} onChangeText={data => this.setState({ usernameInput: data})} enabled={!this.state.saving}/>
 								<FormError errorState={fieldErrors.username} />
 							</View>
 							{ !this.haveEmail &&
 							<View style={{marginTop: 12}}>
 								<Text style={{marginBottom: 8}}>Your e-mail</Text>
-								<IconInput icon={['fal', 'envelope']} placeholder="E-mail" value={emailInput} onChangeText={data => this.setState({ emailInput: data})} enabled={!this.state.saving}/>
+								<Input icon={['fal', 'envelope']} placeholder="E-mail" value={emailInput} onChangeText={data => this.setState({ emailInput: data})} enabled={!this.state.saving}/>
 								<FormError errorState={fieldErrors.email} />
 								<InfoBox
 									title="Why do you need my e-mail address?"

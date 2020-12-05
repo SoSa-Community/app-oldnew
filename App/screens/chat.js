@@ -682,6 +682,7 @@ export class Chat extends Component {
                                 };
                                 
 							    Helpers.uploadFile(
+							        this.appContext,
 							        this.apiClient,
                                     this.community,
                                     (uploading) => {
@@ -704,26 +705,6 @@ export class Chat extends Component {
                                         images.splice(index, 1);
                                         this.setState({imageInput: images});
                                     }
-                                    
-                                    const code = error?.message?.Code;
-                                    let title = 'Error uploading image';
-                                    let message = '';
-                                    
-                                    if(Array.isArray(code)){
-                                        if(code[0] === 'EntityTooLarge'){
-                                            title = 'Ooops! that\'s a bit too big!';
-                                            message = 'The max image size is 10mb';
-                                        }else{
-                                            message = 'Invalid image';
-                                        }
-                                    }else{
-                                        message = error?.message;
-                                    }
-                                    
-                                    if(message.length && message !== 'user_cancelled'){
-                                        this.appContext.createModal(title, message);
-                                    }
-                                    
                                 }).finally(() => {
                                     this.setState({uploading: false});
                                 });
