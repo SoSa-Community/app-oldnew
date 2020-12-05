@@ -658,6 +658,7 @@ export class Chat extends Component {
 						<MessageInput
 							onChangeText={data => this.setMessageInput(data)}
 							sendAction={this.sendMessage}
+                            placeholder="Enter your message"
 							value={this.state.messageInput}
 							onSelectionChange={(event) => {
 								this.messageInputSelectionChange(event);

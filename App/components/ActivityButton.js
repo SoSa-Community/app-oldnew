@@ -2,9 +2,9 @@ import React from 'react';
 import Styles from "../screens/styles/onboarding";
 import {ActivityIndicator, Text, TouchableWithoutFeedback, View} from "react-native";
 
-export const ActivityButton = ({showActivity, validateInput, onPress, text, style}) => {
+export const ActivityButton = ({showActivity, validateInput, onPress, text, style, disabled}) => {
 
-    if(showActivity){
+    if(showActivity && !disabled){
         return  <TouchableWithoutFeedback>
             <View style={[Styles.letMeIn_button, Styles.letMeIn_button_pressed, style]}>
                 <Text style={Styles.letMeIn_text}>{text}</Text>
@@ -13,7 +13,7 @@ export const ActivityButton = ({showActivity, validateInput, onPress, text, styl
         </TouchableWithoutFeedback>;
 
     }else{
-        if(!validateInput || validateInput()) {
+        if((!validateInput || validateInput()) && !disabled) {
 
             return <TouchableWithoutFeedback onPress={onPress}>
                 <View style={[Styles.letMeIn_button, style]}>

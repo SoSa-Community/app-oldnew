@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
-import {Image, Text, View, TouchableHighlight} from "react-native";
+import {Text, View, TouchableHighlight} from "react-native";
+import FastImage from "react-native-fast-image";
 
 import {StyleSheet} from 'react-native';
 import {Preferences} from "../../sosa/Preferences";
@@ -8,7 +9,12 @@ const Styles = StyleSheet.create({
 });
 
 export const CommentItem = ({comment, depth}) =>{
-    const {id, nickname, picture, content, children} = comment;
+    const {id, content, children} = comment;
+    let { picture, nickname } = comment;
+    
+    if(!picture) picture = `https://picsum.photos/300/300?seed=${Math.random()}`;
+    if(!nickname) nickname = 'anonymous';
+    
     const [getSaving, setSaving] = useState(false);
     const [getShowingFull, setShowingFull] = useState(false);
     const [getShowingChildren, setShowingChildren] = useState(true);
@@ -21,6 +27,7 @@ export const CommentItem = ({comment, depth}) =>{
 
     const contentSplit = content.split(' ');
     const excerpt = contentSplit.slice(0,30).join(' ');
+    const moreContent = excerpt !== content;
 
     const [getContent, setContent] = useState(excerpt);
 
@@ -42,16 +49,17 @@ export const CommentItem = ({comment, depth}) =>{
                     <View style={{flexDirection:'row', flexWrap:'wrap'}}>
                         {!getHideProfilePicture &&
                         <View style={{flex: 0}}>
-                            <Image source={{uri: picture}} style={{width: 36, height: 36, borderRadius: 36/2, borderWidth: 0.25, borderColor:'#121111', marginRight: 8}}/>
+                            <FastImage source={{uri: picture}} style={{width: 36, height: 36, borderRadius: 36/2, borderWidth: 0.25, borderColor:'#121111', marginRight: 8}}/>
                         </View> }
                         <View style={{flex:1}}>
-                            <Text style={[{color:'#fff', paddingRight:6},heightStyles]}>
+                            <Text style={[{color:'#fff', paddingRight:6, lineHeight: 22}, heightStyles]}>
                                 <Text style={{color:'#5cb85c'}}>{nickname} </Text>
                                 {getContent}
+                                { moreContent &&
                                 <Text onPress={() => {
                                     setContent((getShowingFull ? excerpt : content));
                                     setShowingFull(!getShowingFull);
-                                }} style={{color: '#5cb85c'}}> {getShowingFull ? 'show less' : 'show more'}</Text>
+                                }} style={{color: '#5cb85c'}}> {getShowingFull ? 'show less' : 'show more'}</Text> }
                             </Text>
                         </View>
                     </View>

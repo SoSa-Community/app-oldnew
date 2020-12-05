@@ -59,6 +59,7 @@ export const Input = (
 	    lengthPercentage = Math.floor((inputValue.length / maxLength) * 100);
 	    if(typeof(setIsValid) === 'function'){
             if(inputValue.length <= maxLength && inputValue.length >= minLength) setIsValid(true);
+            else  setIsValid(false);
         }
     }, [inputValue] )
 
@@ -221,22 +222,22 @@ export const Input = (
         styles.push(inputStyle);
     
         const renderLengthWarning = () => {
-            if(inputValue.length){
-                let lengthIndicatorStyles = [Styles.lengthIndicator];
-                
-                if(inputValue.length >= minLength){
-                    if(lengthPercentage >= lengthDangerPercentage){
-                        lengthIndicatorStyles.push(Styles.lengthIndicatorDanger);
-                    }
-                    else if(lengthPercentage >= lengthWarningPercentage){
-                        lengthIndicatorStyles.push(Styles.lengthIndicatorWarning);
-                    }
-                    if(lengthPercentage >= lengthIndicatorShowPercentage) return (<Text style={[lengthIndicatorStyles]}>{`${inputValue.length}/${maxLength}`}</Text>);
-                }else{
-                    lengthIndicatorStyles.push(Styles.lengthIndicatorNeutral);
-                    return (<Text style={[lengthIndicatorStyles]}>{`${minLength - inputValue.length}`}</Text>);
+            
+            let lengthIndicatorStyles = [Styles.lengthIndicator];
+            
+            if(inputValue.length >= minLength){
+                if(lengthPercentage >= lengthDangerPercentage){
+                    lengthIndicatorStyles.push(Styles.lengthIndicatorDanger);
                 }
+                else if(lengthPercentage >= lengthWarningPercentage){
+                    lengthIndicatorStyles.push(Styles.lengthIndicatorWarning);
+                }
+                if(lengthPercentage >= lengthIndicatorShowPercentage) return (<Text style={[lengthIndicatorStyles]}>{`${inputValue.length}/${maxLength}`}</Text>);
+            }else{
+                lengthIndicatorStyles.push(Styles.lengthIndicatorNeutral);
+                return (<Text style={[lengthIndicatorStyles]}>{!inputValue.length ? 'at-least ' : ''}{`${minLength - inputValue.length}`}{!inputValue.length ? ' thingies ' : ''}</Text>);
             }
+            
         };
         
         return (
@@ -270,7 +271,7 @@ export const Input = (
     };
     
 	return (
-        <View style={[{flex:1}, containerStyle]}>
+        <View style={[containerStyle]}>
             { label && <Text style={[{color: '#fff', marginTop: 8, marginBottom: 4, fontSize:16}, labelStyle]}>{label}</Text> }
             <View style={[outerContainerStyles, outerContainerStyle]}>
                 <View style={[innerContainerStyles, innerContainerStyle]}>

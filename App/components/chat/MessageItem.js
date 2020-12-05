@@ -80,7 +80,7 @@ export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePr
     };
 
     const renderEmbeds = () => {
-        let e = [...message.embeds, ...message.embeds];
+        let e = [...message.embeds];
         let embeds = e.map((embed, index) => {
             if(embed.image && embed.image.length){
                 return <View style={{flex:1, justifyContent:'flex-start', flexWrap: 'wrap', marginBottom: 10}} key={index}>

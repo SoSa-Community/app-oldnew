@@ -54,7 +54,7 @@ let buttonLeft = 0;
 let text = '';
 
 export const MessageInput = ({canSend, sendAction, maxLength, lengthIndicatorShowPercentage, lengthWarningPercentage,
-    lengthDangerPercentage, onChangeText, selection, value, onSelectionChange, onBlur, onKeyPress, autoCorrect, fuckWith, uploadComplete, uploadAction, uploading}) => {
+    lengthDangerPercentage, onChangeText, selection, value, onSelectionChange, onBlur, onKeyPress, autoCorrect, fuckWith, uploadComplete, uploadAction, uploading, placeholder}) => {
 
     if(!maxLength) maxLength = 1000;
 
@@ -95,7 +95,7 @@ export const MessageInput = ({canSend, sendAction, maxLength, lengthIndicatorSho
     return (
         <View style={Styles.container}>
             {
-                SoSaConfig.features.general.canUpload &&
+                SoSaConfig.features.general.canUpload && uploadAction &&
                 <TouchableOpacity onPress={() => uploadAction(uploadComplete)} style={{alignSelf:'center', backgroundColor: '#444442', height:38, width:38, borderRadius:24, alignItems: 'center', justifyContent: 'center', marginRight: 8}}>
                     <Icon icon={['fal','image']}  style={Styles.icon} size={24}  />
                 </TouchableOpacity>
@@ -110,7 +110,7 @@ export const MessageInput = ({canSend, sendAction, maxLength, lengthIndicatorSho
                     selection={selection}
                     style={Styles.textInput}
                     placeholderTextColor = "#ccc"
-                    placeholder="Enter your message"
+                    placeholder={placeholder}
                     onChangeText={(data) => {
                         text = data;
                         if(onChangeText) onChangeText(data);

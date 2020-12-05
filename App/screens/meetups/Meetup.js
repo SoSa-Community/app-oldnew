@@ -1,5 +1,6 @@
-import React, {Component} from 'react';
+import React, {Component, createRef} from 'react';
 import {
+    Keyboard,
     Text,
     View,
     ImageBackground, StyleSheet, Image, FlatList, Platform
@@ -10,6 +11,7 @@ import {ActivityButton} from "../../components/ActivityButton";
 import {Icon} from "../../components/Icon";
 import {CommentItem} from "../../components/comments/CommentItem";
 import Helpers from "../../sosa/Helpers";
+import {MessageInput} from "../../components/MessageInput";
 
 const Styles = StyleSheet.create({
     container: {flex:1, margin:16},
@@ -86,8 +88,8 @@ const Styles = StyleSheet.create({
     buttonContainer: {
         flexDirection:'row',
         alignItems:'center',
-        paddingBottom: Platform.OS === 'ios' ? 32 : 8,
-        paddingRight: 14
+        paddingVertical: 4,
+        backgroundColor: '#444442'
     },
 
     viewButtonContainer: {
@@ -95,11 +97,18 @@ const Styles = StyleSheet.create({
         justifyContent:'flex-start',
     },
 
-    viewButtonText: {textAlign:'center', color:'#fff'}
+    viewButtonText: {textAlign:'center', color:'#fff'},
+    
+    footer: {
+        flexDirection: 'row',
+        paddingBottom: Platform.OS === 'ios' ? 24 : 4,
+    },
 });
 
 export class Meetup extends Component {
     id = null;
+    
+    flatListRef = createRef();
     
     drawerNavigationContext = {};
     navigationContext = {};
@@ -109,27 +118,14 @@ export class Meetup extends Component {
 
     state = {
         saving: false,
+        sending: false,
         items: [
             {type:'description'},
             {type:'comments'}
         ],
         meetup: {},
-        meetup2: {
-                id: 2,
-                picture: 'https://i.ytimg.com/vi/N7ZafWA2jd8/maxresdefault.jpg',
-                title: 'Team Fortress 2',
-                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ultricies mollis quam, quis sagittis sapien tempus egestas. Mauris rutrum et justo vitae volutpat. Maecenas ut augue eu lorem varius accumsan sit amet non erat. Ut placerat ipsum quis dolor iaculis efficitur. Nunc ut urna imperdiet, pretium elit id, congue libero. Integer nec varius nisl. Ut suscipit quam leo, nec suscipit massa iaculis ut. Mauris a libero turpis.',
-                virtual: true,
-                start_timestamp: 1595863949,
-                going: false,
-                attendees: [
-                    {id:1, picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                    {id:2, picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                    {id:3, picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                    {id:4, picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                    {id:5, picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                ],
-        }
+        comments: [],
+        commentInput: ''
     };
 
     constructor({navigation, navigationContext, route: { params }}) {
@@ -155,65 +151,50 @@ export class Meetup extends Component {
         
         meetups.get(this.id).then((meetup) => {
             meetup.attendees = [
-                {id:1, picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                {id:2, picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                {id:3, picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                {id:4, picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
-                {id:5, picture: `https://picsum.photos/300/300?seed=${Math.random()}`},
+                {id:1, picture: `https://botface.io/generate?seed=${Math.random()}`},
+                {id:2, picture: `https://botface.io/generate?seed=${Math.random()}`},
+                {id:3, picture: `https://botface.io/generate?seed=${Math.random()}`},
+                {id:4, picture: `https://botface.io/generate?seed=${Math.random()}`},
+                {id:5, picture: `https://botface.io/generate?seed=${Math.random()}`},
             ];
             meetup.going = false;
-            meetup.comments = [
-                {entity:2, context:'meetup', id: 1, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.',
-                    children:[{entity:2, context:'meetup', id: 2, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.'}]},
-                {entity:2, context:'meetup', id: 3, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.',
-                    children: [
-                        {
-                            entity:2, context:'meetup', id: 4, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.',
-                            children:[
-                                {entity:2, context:'meetup', id: 5, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.'},
-                                {
-                                    entity:2, context:'meetup', id: 8, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.',
-                                    children:[
-                                        {
-                                            entity:2, context:'meetup', id: 9, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.',
-                                            children:[
-                                                {
-                                                    entity:2, context:'meetup', id: 10, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.',
-                                                    children:[
-                                                        {
-                                                            entity:2, context:'meetup', id: 11, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.',
-                                                            children:[
-                                                                {
-                                                                    entity:2, context:'meetup', id: 12, picture: `https://picsum.photos/300/300?seed=${Math.random()}`, nickname: 'Bot1', content:'Bacon ipsum dolor amet chicken alcatra salami drumstick, meatloaf beef ribeye picanha jerky tongue cow pig. Shankle shank frankfurter ham pork belly, cupim beef turducken swine bresaola leberkas pancetta beef ribs filet mignon brisket. Meatloaf boudin ham pastrami tenderloin cupim tongue short ribs short loin chislic bacon strip steak kevin. Ham capicola corned beef leberkas chislic. Frankfurter tri-tip beef ribs pork belly venison fatback. Tenderloin pastrami prosciutto, swine drumstick cupim chuck ham hock corned beef kevin buffalo venison sausage. Rump kevin frankfurter ham. Pork loin kielbasa pork bacon, meatloaf ham salami beef ribeye tongue bresaola. Pork picanha rump, tongue ball tip tenderloin short ribs pig andouille ham kevin. Porchetta pastrami meatball pork chop, brisket ground round turducken rump prosciutto hamburger strip steak beef andouille pork loin. Chislic chicken t-bone tenderloin.'
-                                                                },
-                                                            ]
-                                                        },
-                                                    ]
-                                                },
-                                            ]
-                                        },
-                                    ]
-                                }
-                            ]
-                        },
             
-                    ]
-                },
-    
-            ]
-            this.setState({meetup});
+            this.setState({meetup, comments: meetup.comments});
             this.navigationContext.setMenuOptions({title: meetup.title}, true);
         }).catch((errors) => {
             console.debug(errors);
         })
     }
     
+    sendComment = () => {
+        this.setState({sending: true});
+        
+        Keyboard.dismiss();
+        this.apiClient.services.comments.create('sosa', this.state.commentInput,'meetup', this.id)
+            .then(comment => {
+                let comments = [...this.state.comments];
+                comments.unshift(comment);
+                this.setState({comments});
+                this.flatListRef.scrollToIndex({animated: true, index: 1});
+                
+                
+            }).finally(() => {
+                this.setState({sending: false});
+            });
+    }
+    
 
     render() {
-        let {meetup} = this.state;
+        let {meetup, comments} = this.state;
         let hasAttendees = false;
         let attendees = null;
-        let comments = null;
+        
+        const renderComments = () => {
+            if(Array.isArray(comments) && comments.length){
+                return comments.map((item, index) => (<CommentItem comment={item} key={item.id} />));
+            }
+        }
+        
         
         if(Array.isArray(meetup.attendees)){
             if(meetup.attendees.length) hasAttendees = true;
@@ -222,11 +203,7 @@ export class Meetup extends Component {
             });
         }
         
-        if(Array.isArray(meetup.comments)){
-            comments = meetup.comments.map((item, index) => {
-                return <CommentItem comment={item} key={index}/>
-            });
-        }
+        
         
         const buttonText = meetup.going ? 'Not Going' : (hasAttendees ? 'Going' : 'Be the first to go!');
     
@@ -241,8 +218,8 @@ export class Meetup extends Component {
     
                 currentMeetup.going = !currentMeetup.going;
             
-                if(currentMeetup.going && !hasAttendees) currentMeetup.attendees = [ {picture: `https://picsum.photos/300/300?seed=${Math.random()}`} ];
-                if(currentMeetup.going && hasAttendees) currentMeetup.attendees.push({picture: `https://picsum.photos/300/300?seed=${Math.random()}`});
+                if(currentMeetup.going && !hasAttendees) currentMeetup.attendees = [ {picture: `https://botface.io/generate?seed=${Math.random()}`} ];
+                if(currentMeetup.going && hasAttendees) currentMeetup.attendees.push({picture: `https://botface.io/generate?seed=${Math.random()}`});
                 if(!currentMeetup.going) meetup.attendees.pop();
     
                 this.setState({saving: false, meetup:currentMeetup});
@@ -271,32 +248,6 @@ export class Meetup extends Component {
                         </ImageBackground>
                     </View>
                 </View>
-                <View style={{flex:1, paddingBottom: 8, alignItems:'flex-start'}}>
-                    <FlatList
-                        data={this.state.items}
-                        extraData={this.state.items}
-                        keyExtractor={(item) => item.type}
-                        renderItem={
-                            ({item, index}) => {
-                                const {type} = item;
-                                if(type === 'description'){
-                                    return <View style={{flex:1, marginTop: 16}}>
-                                        <Text style={{color:'#fff'}}>{this.state.meetup.description}</Text>
-                                    </View>
-                                }else{
-                                    if(comments){
-                                        return <View style={{flex:1}}>
-                                            <Text style={{fontSize:18, color:'#fff', marginLeft:4, marginTop: 16, marginBottom:8}}>Comments</Text>
-                                            {comments}
-                                        </View>
-                                    }
-                                }
-
-                            }
-                        }
-                        style={{flex: 1, backgroundColor: '#121111', paddingHorizontal:8}}
-                    />
-                </View>
                 <View style={Styles.buttonContainer}>
                     <View style={Styles.viewButtonContainer}>
                         { hasAttendees &&
@@ -308,6 +259,44 @@ export class Meetup extends Component {
                         <ActivityButton text={buttonText} style={{backgroundColor: meetup.going ? '#dc3545' : '#28a745'}} onPress={toggleGoing} showActivity={this.state.saving} />
                     </View>
                 </View>
+                <View style={{flex:1, alignItems:'flex-start'}}>
+                    <FlatList
+                        ref={(ref) => { this.flatListRef = ref; }}
+                        data={this.state.items}
+                        extraData={this.state.items}
+                        keyExtractor={(item) => item.type}
+                        renderItem={
+                            ({item, index}) => {
+                                const {type} = item;
+                                if(type === 'description'){
+                                    return <View style={{flex:1, marginTop: 16}}>
+                                        <Text style={{color:'#fff'}}>{this.state.meetup.description}</Text>
+                                    </View>
+                                }else{
+                                    if(comments.length){
+                                        return <View style={{flex:1}}>
+                                            <Text style={{fontSize:18, color:'#fff', marginLeft:4, marginTop: 16, marginBottom:8}}>Comments</Text>
+                                            {renderComments()}
+                                        </View>
+                                    }
+                                }
+
+                            }
+                        }
+                        style={{paddingHorizontal:8, width:'100%'}}
+                        contentContainerStyle={{paddingBottom:8}}
+                    />
+                </View>
+                <View style={Styles.footer}>
+                    <MessageInput
+                        onChangeText={data => this.setState({commentInput: data})}
+                        sendAction={this.sendComment}
+                        value={this.state.commentInput}
+                        placeholder="Leave a comment"
+                        canSend={!this.state.sending}
+                    />
+                </View>
+                
             </View>
         );
     }

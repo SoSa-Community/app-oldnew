@@ -79,7 +79,7 @@ export class CreateMeetup extends Component {
     state = {
         saving: false,
         image: '',
-        titleInput: 'testy test test test',
+        titleInput: '',
         dateInput: Helpers.dateToString(new Date(), 'date'),
         startInput: '19:00',
         endInput: '21:00',
@@ -89,6 +89,7 @@ export class CreateMeetup extends Component {
         isValid: {title: false, date:true, description: false, type: true},
         errors: {}
     };
+    
 
     constructor(props) {
         super();
@@ -104,6 +105,7 @@ export class CreateMeetup extends Component {
         this.appContext = appContext;
         this.apiClient = apiClient;
         this.navigationContext.setMenuOptions({showLeft:true, showRight: false, leftMode: 'back', title: 'Create Meetup'});
+    
     }
     
     setIsValid = (field, valid) => {
@@ -219,7 +221,6 @@ export class CreateMeetup extends Component {
                         </View>
                         <View style={{flex:1, paddingHorizontal:4, marginTop: 8}}>
                             <Input
-                                icon={['fal', 'user']}
                                 error={errors['title']}
                                 placeholder="What's it called?"
                                 value={titleInput}
@@ -230,18 +231,30 @@ export class CreateMeetup extends Component {
                                 setIsValid={(isValid) => this.setIsValid('title', isValid)}
                             />
                             
-                            <Input label="When is it?" icon={['fal', 'user']} error={errors['date']} placeholder="Date" type="date" value={dateInput} onChangeText={(data, date) => this.setState({ dateInput: data})} />
+                            <Input label="When is it?" icon={['fal', 'calendar-week']} error={errors['date']} placeholder="Date" type="date" value={dateInput} onChangeText={(data, date) => this.setState({ dateInput: data})} />
                             <View style={{flexDirection: 'row', marginVertical:4}}>
                                 <View style={{flex:1}}>
-                                    <Input icon={['fal', 'user']} error={errors['date']} errorBorderOnly placeholder="When does it start?" type="time" value={startInput} onChangeText={(data, date) => this.setState({ startInput: data})} />
+                                    <Input icon={['fal', 'clock']} error={errors['date']} errorBorderOnly placeholder="When does it start?" type="time" value={startInput} onChangeText={(data, date) => this.setState({ startInput: data})} />
                                 </View>
                                 <Text style={{flex:0, color: '#fff', fontSize:24, textAlignVertical:'center', marginHorizontal: 8}}>-</Text>
                                 <View style={{flex:1}}>
-                                    <Input icon={['fal', 'user']} error={errors['date']} errorBorderOnly placeholder="When does it end?" type="time" value={endInput} onChangeText={data => this.setState({ endInput: data})} />
+                                    <Input icon={['fal', 'clock']} error={errors['date']} errorBorderOnly placeholder="When does it end?" type="time" value={endInput} onChangeText={data => this.setState({ endInput: data})} />
                                 </View>
                             </View>
     
-                            <Input label="What's the plan?" icon={['fal', 'user']} error={errors['type']} placeholder="Virtual or IRL?" value={typeInput} type="picker" onChangeText={(value) => {this.setState({typeInput: value})}} pickerOptions={[{label:'Virtual', value:'virtual'}, {label:'Real Life', value:'real'}]}/>
+                            <Input
+                                label="What's the plan?"
+                                icon={['fal', 'compass']}
+                                error={errors['type']}
+                                placeholder="Virtual or IRL?"
+                                value={typeInput}
+                                type="picker"
+                                onChangeText={(value) => {this.setState({typeInput: value})}}
+                                pickerOptions={[
+                                    {label:'It\'s Online!', value:'virtual'},
+                                    {label:'It\'s out there in the real world', value:'real'}
+                                ]}
+                            />
                             <Input
                                 type="multiline"
                                 placeholder="Description"

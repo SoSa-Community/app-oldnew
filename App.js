@@ -134,7 +134,7 @@ export default class SoSa extends Component {
 	}
     
     componentDidMount() {
-        AppState.addEventListener("change", this._handleAppStateChange);
+	    AppState.addEventListener("change", this._handleAppStateChange);
         Linking.addEventListener('url', this.handleDeepLink);
     
         const {apiClient} = this;
