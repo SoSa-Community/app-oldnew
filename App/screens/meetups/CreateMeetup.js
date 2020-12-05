@@ -8,8 +8,8 @@ import {
 
 import withMembersNavigationContext from "../hoc/withMembersNavigationContext";
 import {ActivityButton} from "../../components/ActivityButton";
-import {IconInput} from "../../components/IconInput";
 import {Input} from "../../components/Input";
+
 import Helpers from "../../sosa/Helpers";
 
 const dimensions = Dimensions.get('window');
@@ -67,24 +67,27 @@ const Styles = StyleSheet.create({
 export class CreateMeetup extends Component {
     drawerNavigationContext = {};
     navigationContext = {};
+    appContext = {};
 
     navigation = {};
     drawerNavigation = {};
     apiClient = null;
     previousImage = '';
     imageURI = '';
+    
 
     state = {
         saving: false,
         image: '',
-        nameInput: 'testy test test test',
+        titleInput: 'testy test test test',
         dateInput: Helpers.dateToString(new Date(), 'date'),
         startInput: '19:00',
         endInput: '21:00',
-        descriptionInput: 'asdasdasd kaljsd lkjaslkdj lkasj lkjaslkdj jlkajs lkjaslkdj dlkja slkkldj lklajjloqwoie ioqwj ioqwe oiqwhe oiqhow heoiqh oiahsdoaslkdjkjqwnkibasjkbkajsbdiqbuwdiubdkjasb. sadhkjahsdkjhasdkjh ksakjh KJ Ash k. hjkasd kjhh kjashdkjhsakjdhkja khas kjhkdhskjhd kjaskjdh kjshd kjhh dkjhkjd hkjashd k asdkj h',
+        descriptionInput: '',
         typeInput: 'virtual',
         uploading: false,
-        nameError: null
+        isValid: {title: false, date:true, description: false, type: true},
+        errors: {}
     };
 
     constructor(props) {
@@ -97,18 +100,42 @@ export class CreateMeetup extends Component {
     
         const {appContext} = this.drawerNavigationContext;
         const {apiClient} = appContext;
+        
+        this.appContext = appContext;
         this.apiClient = apiClient;
         this.navigationContext.setMenuOptions({showLeft:true, showRight: false, leftMode: 'back', title: 'Create Meetup'});
     }
     
+    setIsValid = (field, valid) => {
+        const isValid = Object.assign({}, this.state.isValid);
+        isValid[field] = valid;
+        
+        this.setState({isValid});
+    };
+    
+    isValid = () => {
+        return !Object.values(this.state.isValid).includes(false);
+    }
+    
+    setError = (field, value) => {
+        const errors = Object.assign({}, this.state.errors);
+        errors[field] = value;
+        
+        this.setState({errors});
+    };
+    
+    resetErrors = () => {
+        this.setState({errors: {name:'', date:'', description: '', type:''}});
+    };
+    
     save = () => {
         const { apiClient: { services: { meetups } } } = this;
-        const { nameInput: name, descriptionInput: description, dateInput: date, startInput: start, endInput: end, typeInput: type} = this.state;
-        
+        const { titleInput: title, descriptionInput: description, dateInput: date, startInput: start, endInput: end, typeInput: type} = this.state;
+        this.resetErrors();
         this.setState({saving: true});
 
         meetups.create('sosa',
-            name,
+            title,
             description,
             type,
             new Date(`${date}T${start}`),
@@ -118,6 +145,14 @@ export class CreateMeetup extends Component {
             this.navigationContext.popMenuStack();
             this.navigation.replace('Meetup', {id: meetup.id});
         }).catch((errors) => {
+            if(Array.isArray(errors)){
+                errors.forEach(({code, message, field}) => {
+                    if(field){
+                        if(field === 'start' || field === 'end') field = 'date';
+                        this.setError(field, message || code);
+                    }
+                })
+            }
             console.debug('errors', errors);
         }).finally(() => {
             this.setState({saving: false});
@@ -125,10 +160,11 @@ export class CreateMeetup extends Component {
     }
 
     render() {
-        let {nameInput, dateInput, startInput, endInput, typeInput, descriptionInput, uploading, image} = this.state;
+        let {titleInput, dateInput, startInput, endInput, typeInput, descriptionInput, uploading, image} = this.state;
         
         const uploadPicture = () => {
             Helpers.uploadFile(
+                this.appContext,
                 this.apiClient,
                 'sosa',
                 (uploading) => {
@@ -166,6 +202,8 @@ export class CreateMeetup extends Component {
             }
         }
         
+        const { state: { errors } } = this;
+        
         return (
             
                 <View style={{flex:1, backgroundColor: '#121111'}}>
@@ -180,28 +218,47 @@ export class CreateMeetup extends Component {
                             </View>
                         </View>
                         <View style={{flex:1, paddingHorizontal:4, marginTop: 8}}>
-                            <IconInput icon={['fal', 'user']} placeholder="What's it called?" value={nameInput} onChangeText={data => this.setState({ nameInput: data})} style={{flex:1}} validateInput={() => this.state.nameError}/>
+                            <Input
+                                icon={['fal', 'user']}
+                                error={errors['title']}
+                                placeholder="What's it called?"
+                                value={titleInput}
+                                onChangeText={data => this.setState({ titleInput: data})}
+                                style={{flex:1}}
+                                minLength={16}
+                                maxLength={250}
+                                setIsValid={(isValid) => this.setIsValid('title', isValid)}
+                            />
                             
-                            <Text style={{color: '#fff', marginTop: 8, marginBottom: 4, fontSize:16}}>When is it?</Text>
-                            <IconInput icon={['fal', 'user']} placeholder="Date" type="date" value={dateInput} onChangeText={(data, date) => this.setState({ dateInput: data})} />
+                            <Input label="When is it?" icon={['fal', 'user']} error={errors['date']} placeholder="Date" type="date" value={dateInput} onChangeText={(data, date) => this.setState({ dateInput: data})} />
                             <View style={{flexDirection: 'row', marginVertical:4}}>
                                 <View style={{flex:1}}>
-                                    <IconInput icon={['fal', 'user']} placeholder="When does it start?" type="time" value={startInput} onChangeText={(data, date) => this.setState({ startInput: data})} />
+                                    <Input icon={['fal', 'user']} error={errors['date']} errorBorderOnly placeholder="When does it start?" type="time" value={startInput} onChangeText={(data, date) => this.setState({ startInput: data})} />
                                 </View>
                                 <Text style={{flex:0, color: '#fff', fontSize:24, textAlignVertical:'center', marginHorizontal: 8}}>-</Text>
                                 <View style={{flex:1}}>
-                                    <IconInput icon={['fal', 'user']} placeholder="When does it end?" type="time" value={endInput} onChangeText={data => this.setState({ endInput: data})} />
+                                    <Input icon={['fal', 'user']} error={errors['date']} errorBorderOnly placeholder="When does it end?" type="time" value={endInput} onChangeText={data => this.setState({ endInput: data})} />
                                 </View>
                             </View>
     
-                            <Text style={{color: '#fff', marginTop: 8, marginBottom: 4, fontSize:16}}>What's the plan?</Text>
-                            <IconInput icon={['fal', 'user']}  placeholder="Virtual or IRL?" value={typeInput} type="picker" onChangeText={(value) => {this.setState({typeInput: value})}} pickerOptions={[{label:'Virtual', value:'virtual'}, {label:'Real Life', value:'real'}]}/>
-                            <Input placeholder="Description" value={descriptionInput} onChangeText={data => this.setState({ descriptionInput: data})} multiline={true} />
+                            <Input label="What's the plan?" icon={['fal', 'user']} error={errors['type']} placeholder="Virtual or IRL?" value={typeInput} type="picker" onChangeText={(value) => {this.setState({typeInput: value})}} pickerOptions={[{label:'Virtual', value:'virtual'}, {label:'Real Life', value:'real'}]}/>
+                            <Input
+                                type="multiline"
+                                placeholder="Description"
+                                value={descriptionInput}
+                                error={errors['description']}
+                                onChangeText={data => this.setState({ descriptionInput: data})}
+                                multiline={true}
+                                minLength={16}
+                                maxLength={0}
+                                setIsValid={(isValid) => this.setIsValid('description', isValid)}
+                                containerStyle={{marginTop: 8}}
+                            />
                         </View>
                     </ScrollView>
                     <View style={Styles.buttonContainer}>
                         <View style={{flex:1}}>
-                            <ActivityButton text="Save" style={{backgroundColor: '#28a745'}} onPress={this.save} showActivity={this.state.saving} />
+                            <ActivityButton text="Create" style={{}} onPress={this.save} showActivity={this.state.saving} disabled={!this.isValid()}/>
                         </View>
                     </View>
                 </View>

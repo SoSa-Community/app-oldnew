@@ -60,7 +60,7 @@ const ModalStyles = StyleSheet.create({
         borderWidth: 1,
         flex:1,
         paddingVertical: 10,
-        paddingHorizontal: 24
+        paddingHorizontal: 24,
     },
     
     okButtonText: {
@@ -78,7 +78,7 @@ export default class SoSa extends Component {
     middleware = {};
 	
 	apiClient = new Client(
-		{providers: SoSaConfig.providers},
+		{errors: SoSaConfig.errors, providers: SoSaConfig.providers},
 		io,
         (response) => new Promise((resolve, reject) => {
                 parseXMLString(response, function (err, result) {
@@ -305,11 +305,12 @@ export default class SoSa extends Component {
             
             const closeModal = () => {
                 let modals = [...this.state.modals];
+                console.debug(index, modals);
                 modals.splice(index, 1);
                 this.setState({modals});
             };
             
-            return (<Modal visible={true} transparent={true} onRequestClose={() => this.setState({previewEmbed: null})} key={index}>
+            return (<Modal visible={true} transparent={true} key={index}>
                 <View style={ModalStyles.container}>
                     <View style={ModalStyles.innerContainer}>
                         <View style={ModalStyles.bodyContainer}>
@@ -317,7 +318,7 @@ export default class SoSa extends Component {
                             <Text style={ModalStyles.description}>{description}</Text>
                         </View>
                         <View style={ModalStyles.buttonContainer}>
-                            <TouchableHighlight onPress={closeModal} style={ModalStyles.okButton}>
+                            <TouchableHighlight onPress={() => { console.debug('hello',index); closeModal() }} style={ModalStyles.okButton}>
                                 <Text style={ModalStyles.okButtonText}>OK</Text>
                             </TouchableHighlight>
                         </View>
