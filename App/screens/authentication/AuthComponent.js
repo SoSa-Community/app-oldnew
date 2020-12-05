@@ -180,18 +180,22 @@ export default class AuthComponent extends Component {
             if(forLogin){
                 return <View>
                     <FormError errorState={error} />
-                    <Input icon={['fal', 'user']} placeholder="Username or e-mail address" value={usernameInput} onChangeText={data => this.setState({ usernameInput: data})} enabled={!processing} />
+                    <Input containerStyle={{marginBottom: 4}} icon={['fal', 'user']} placeholder="Username or e-mail address" value={usernameInput} onChangeText={data => this.setState({ usernameInput: data})} enabled={!processing} />
                     <SecureTextInput icon={['fal', 'key']} placeholder="Password" onChangeText={data => this.setState({ passwordInput: data})} value={passwordInput} enabled={!processing} />
-                    { buttonContainer }
+                    <View style={{marginTop: 4}}>
+                        { buttonContainer }
+                    </View>
                 </View>;
             }else{
                 return <View>
                     <FormError errorState={error} />
-                    <Input icon={['fal', 'user']} placeholder="Username" value={usernameInput} onChangeText={data => this.setState({ usernameInput: data})} enabled={!processing} />
+                    <Input containerStyle={{marginBottom: 4}} icon={['fal', 'user']} placeholder="Username" value={usernameInput} onChangeText={data => this.setState({ usernameInput: data})} enabled={!processing} />
                     <SecureTextInput icon={['fal', 'key']} placeholder="Password" onChangeText={data => this.setState({ passwordInput: data})} validateInput={() => this.validatePassword()} enabled={!processing} />
-                    <Input icon={['fal', 'envelope']} placeholder="E-mail" value={emailInput} onChangeText={data => this.setState({ emailInput: data})} enabled={!processing} />
+                    <Input containerStyle={{marginTop: 4}} icon={['fal', 'envelope']} placeholder="E-mail" value={emailInput} onChangeText={data => this.setState({ emailInput: data})} enabled={!processing} />
                     <FormError errorState={passwordError} />
-                    { buttonContainer }
+                    <View style={{marginTop: 4}}>
+                        { buttonContainer }
+                    </View>
                 </View>;
             }
         }
