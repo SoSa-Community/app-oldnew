@@ -167,7 +167,12 @@ export class CreateMeetup extends Component {
             this.setState({saving: false});
         })
     }
-
+    
+    buildWrapper = (children) => {
+        if(Platform.OS !== "ios") return <>{children}</>;
+        return <KeyboardAvoidingView style={{flex: 1, backgroundColor: '#121111'}} behavior="padding" keyboardVerticalOffset={Math.floor(dimensions.height / 100 * 9)}>{children}</KeyboardAvoidingView>;
+    }
+    
     render() {
         let {titleInput, dateInput, startInput, endInput, typeInput, descriptionInput, uploading, image} = this.state;
         
@@ -215,7 +220,7 @@ export class CreateMeetup extends Component {
         
         return (
                 <View style={{flex:1, backgroundColor: '#121111'}}>
-                    <KeyboardAvoidingView style={{flex: 1, backgroundColor: '#121111'}} behavior="padding" keyboardVerticalOffset={Math.floor(dimensions.height / 100 * 9)}>
+                    { this.buildWrapper(
                         <ScrollView style={{flex:1}} scrollEnabled={true} contentContainerStyle={{ flexGrow: 1 }}>
                             <View style={{flex:0}}>
                                 <View style={{height: imageHeight, width: imageWidth}}>
@@ -277,7 +282,7 @@ export class CreateMeetup extends Component {
                                 />
                             </View>
                         </ScrollView>
-                    </KeyboardAvoidingView>
+                    ) }
                     <View style={Styles.buttonContainer}>
                         <View style={{flex:1}}>
                             <ActivityButton text="Create" style={{}} onPress={this.save} showActivity={this.state.saving} disabled={!this.isValid()}/>

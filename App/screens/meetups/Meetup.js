@@ -185,6 +185,10 @@ export class Meetup extends Component {
             });
     }
     
+    buildWrapper = (children) => {
+        if(Platform.OS !== "ios") return <>{children}</>;
+        return <KeyboardAvoidingView style={{flex: 1, backgroundColor: '#121111'}} behavior="padding" keyboardVerticalOffset={Math.floor(dimensions.height / 100 * 9)}>{children}</KeyboardAvoidingView>;
+    }
 
     render() {
         let {meetup, comments} = this.state;
@@ -227,83 +231,84 @@ export class Meetup extends Component {
                 this.setState({saving: false, meetup:currentMeetup});
             }, 100);
         };
-
+    
         return (
-            <KeyboardAvoidingView style={{flex: 1, backgroundColor: '#121111'}} behavior="padding" keyboardVerticalOffset={Math.floor(dimensions.height / 100 * 9)}>
-                <View style={{flex:1, backgroundColor: '#121111'}}>
-                    <View style={{flex:0}}>
-                        <View style={{height:175}}>
-                            <ImageBackground source={imageSource} style={Styles.image}>
-                                <View style={Styles.imageOverlay} />
-                                <View style={Styles.imageTitleContainer}>
-                                    <View style={Styles.imageTitleInnerContainer}>
-                                        <Text style={Styles.title}>{meetup.title}</Text>
-                                        <Text style={Styles.meetupDate}>{ Helpers.dateToLongForm(meetup.start_datetime) }</Text>
-                                    </View>
-                                </View>
-                                <View style={Styles.imageBottomContainer}>
-                                    <View style={Styles.imageBottomInnerContainer}>
-                                        <View style={Styles.infoIconContainer}>
-                                            <Icon icon={meetup.type === 'virtual' ? ['fas', 'trees'] : ['far', 'wifi']} style={{opacity: 0.95}} size={28} color='#cccccc' />
+                this.buildWrapper(
+                    <View style={{flex:1, backgroundColor: '#121111'}}>
+                        <View style={{flex:0}}>
+                            <View style={{height:175}}>
+                                <ImageBackground source={imageSource} style={Styles.image}>
+                                    <View style={Styles.imageOverlay} />
+                                    <View style={Styles.imageTitleContainer}>
+                                        <View style={Styles.imageTitleInnerContainer}>
+                                            <Text style={Styles.title}>{meetup.title}</Text>
+                                            <Text style={Styles.meetupDate}>{ Helpers.dateToLongForm(meetup.start_datetime) }</Text>
                                         </View>
                                     </View>
-                                </View>
-                            </ImageBackground>
-                        </View>
-                    </View>
-                    <View style={Styles.buttonContainer}>
-                        <View style={Styles.viewButtonContainer}>
-                            { hasAttendees &&
-                            <View style={Styles.attendeesContainer}>
-                                { attendees }
-                            </View>}
-                        </View>
-                        <View style={{flex:1}}>
-                            <ActivityButton text={buttonText} style={{backgroundColor: meetup.going ? '#dc3545' : '#28a745'}} onPress={toggleGoing} showActivity={this.state.saving} />
-                        </View>
-                    </View>
-                    <View style={{flex:1, alignItems:'flex-start'}}>
-                        <FlatList
-                            ref={(ref) => { this.flatListRef = ref; }}
-                            data={this.state.items}
-                            extraData={this.state.items}
-                            keyExtractor={(item) => item.type}
-                            renderItem={
-                                ({item, index}) => {
-                                    const {type} = item;
-                                    if(type === 'description'){
-                                        return <View style={{flex:1, marginTop: 16}}>
-                                            <Text style={{color:'#fff'}}>{this.state.meetup.description}</Text>
-                                        </View>
-                                    }else{
-                                        if(comments.length){
-                                            return <View style={{flex:1}}>
-                                                <Text style={{fontSize:18, color:'#fff', marginLeft:4, marginTop: 16, marginBottom:8}}>Comments</Text>
-                                                {renderComments()}
+                                    <View style={Styles.imageBottomContainer}>
+                                        <View style={Styles.imageBottomInnerContainer}>
+                                            <View style={Styles.infoIconContainer}>
+                                                <Icon icon={meetup.type === 'virtual' ? ['fas', 'trees'] : ['far', 'wifi']} style={{opacity: 0.95}} size={28} color='#cccccc' />
                                             </View>
+                                        </View>
+                                    </View>
+                                </ImageBackground>
+                            </View>
+                        </View>
+                        <View style={Styles.buttonContainer}>
+                            <View style={Styles.viewButtonContainer}>
+                                { hasAttendees &&
+                                <View style={Styles.attendeesContainer}>
+                                    { attendees }
+                                </View>}
+                            </View>
+                            <View style={{flex:1}}>
+                                <ActivityButton text={buttonText} style={{backgroundColor: meetup.going ? '#dc3545' : '#28a745'}} onPress={toggleGoing} showActivity={this.state.saving} />
+                            </View>
+                        </View>
+                        <View style={{flex:1, alignItems:'flex-start'}}>
+                            <FlatList
+                                ref={(ref) => { this.flatListRef = ref; }}
+                                data={this.state.items}
+                                extraData={this.state.items}
+                                keyExtractor={(item) => item.type}
+                                renderItem={
+                                    ({item, index}) => {
+                                        const {type} = item;
+                                        if(type === 'description'){
+                                            return <View style={{flex:1, marginTop: 16}}>
+                                                <Text style={{color:'#fff'}}>{this.state.meetup.description}</Text>
+                                            </View>
+                                        }else{
+                                            if(comments.length){
+                                                return <View style={{flex:1}}>
+                                                    <Text style={{fontSize:18, color:'#fff', marginLeft:4, marginTop: 16, marginBottom:8}}>Comments</Text>
+                                                    {renderComments()}
+                                                </View>
+                                            }
                                         }
+                            
                                     }
-
                                 }
-                            }
-                            style={{paddingHorizontal:8, width:'100%'}}
-                            contentContainerStyle={{paddingBottom:8}}
-                        />
+                                style={{paddingHorizontal:8, width:'100%'}}
+                                contentContainerStyle={{paddingBottom:8}}
+                            />
+                        </View>
+                        <View style={Styles.footer}>
+                            <MessageInput
+                                onChangeText={data => this.setState({commentInput: data})}
+                                sendAction={this.sendComment}
+                                value={this.state.commentInput}
+                                placeholder="Leave a comment"
+                                canSend={!this.state.sending}
+                            />
+                        </View>
+        
                     </View>
-                    <View style={Styles.footer}>
-                        <MessageInput
-                            onChangeText={data => this.setState({commentInput: data})}
-                            sendAction={this.sendComment}
-                            value={this.state.commentInput}
-                            placeholder="Leave a comment"
-                            canSend={!this.state.sending}
-                        />
-                    </View>
-
-                </View>
-            </KeyboardAvoidingView>
-        );
-    }
+                )
+            )
+    };
+    
 }
 
 const MeetupScreen = withMembersNavigationContext(Meetup);
