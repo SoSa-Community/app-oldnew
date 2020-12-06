@@ -156,7 +156,7 @@ const Styles = StyleSheet.create({
     buttonBottom: {
         flex: 1,
         justifyContent: 'flex-end',
-        marginBottom: Platform.OS === 'ios' ? 108 : 36
+        marginBottom: Platform.OS === 'ios' ? 68 : 36
     },
 
     newToSoSaButton: {
