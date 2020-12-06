@@ -66,5 +66,11 @@
 	<string>Light</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>SoSa would like to be able to share your pictures with the community</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SoSa would like to be able to share your pictures with the community</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>SoSa would like to be able to share your pictures with the community</string>
 </dict>
 </plist>
