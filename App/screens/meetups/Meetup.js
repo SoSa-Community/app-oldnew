@@ -174,7 +174,7 @@ export class Meetup extends Component {
             .then(comment => {
                 let comments = [...this.state.comments];
                 comments.unshift(comment);
-                this.setState({comments});
+                this.setState({comments, commentInput: ''});
                 this.flatListRef.scrollToIndex({animated: true, index: 1});
                 
                 
