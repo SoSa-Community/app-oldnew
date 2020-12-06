@@ -5,7 +5,10 @@ const headerTextColour = '#fff';
 
 const BaseStyles = StyleSheet.create({
     header: {
-        backgroundColor: backgroundColour1
+        backgroundColor: backgroundColour1,
+        elevation: 0,
+        shadowOpacity: 0,
+        borderBottomWidth: 0
     },
 
     headerPadding: {
