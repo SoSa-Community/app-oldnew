@@ -111,7 +111,7 @@ export const Input = (
 					testID="dateTimePicker"
 					value={Platform.OS === 'ios' && tempPickerValue ? tempPickerValue : dateInputValue}
 					mode={type}
-					display="default"
+					display={Platform.OS === 'ios' ? "spinner" : "default"}
 					onChange={(event, selectedDate) => {
 						if(Platform.OS === 'ios'){
 							setTempPickerValue(selectedDate);
