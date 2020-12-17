@@ -1,6 +1,7 @@
 import {Alert} from 'react-native';
 import APIError from "./APIError";
 import ImagePicker from "react-native-image-picker";
+import {SoSaConfig} from "./config";
 
 export default class Helpers {
 
@@ -80,6 +81,14 @@ export default class Helpers {
             if(typeof(isUploading) !== 'function') isUploading = () => {};
             if(typeof(beforeUpload) !== 'function') beforeUpload = () => {};
             
+            const fileTooBigError = () => {
+                isUploading(false);
+                const title = 'Ooops! that\'s a bit too big!';
+                const message = 'The max image size is 10mb';
+                appContext.createModal(title, message);
+            };
+            
+            const { maxFileSize } = SoSaConfig;
             
             const doUpload = (file) => {
                 isUploading(true);
@@ -93,8 +102,7 @@ export default class Helpers {
     
                         if(Array.isArray(code)){
                             if(code[0] === 'EntityTooLarge'){
-                                title = 'Ooops! that\'s a bit too big!';
-                                message = 'The max image size is 10mb';
+                                return fileTooBigError();
                             }else{
                                 message = 'Invalid image';
                             }
@@ -131,9 +139,10 @@ export default class Helpers {
                 } else if (response.customButton) {
                     reject(new Error('custom_button'));
                 } else {
-                    let {uri, fileName, type} = response;
-                    beforeUpload(response);
+                    let {uri, fileName, fileSize, type, data, height, width, originalRotation} = response;
+                    if(Math.floor(fileSize / 1024) > maxFileSize) return fileTooBigError();
                     
+                    beforeUpload(response);
                     if(!fileName){
                         const uriSplit = uri.split('/');
                         fileName = uriSplit[uriSplit.length - 1];
