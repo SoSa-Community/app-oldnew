@@ -1,5 +1,6 @@
 import React from 'react';
-import {Image, Linking, Text, TouchableOpacity, View, Dimensions} from "react-native";
+import {Linking, Text, TouchableOpacity, View, Dimensions} from "react-native";
+import FastImage from "react-native-fast-image";
 
 import {StyleSheet} from 'react-native';
 import HTML from 'react-native-render-html';
@@ -79,12 +80,13 @@ export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePr
     };
 
     const renderEmbeds = () => {
-        let embeds = message.embeds.map((embed, index) => {
+        let e = [...message.embeds];
+        let embeds = e.map((embed, index) => {
             if(embed.image && embed.image.length){
-                return <View style={{height:100, flexDirection: 'row', justifyContent:'flex-start'}} key={index}>
-                            <TouchableOpacity onPress={() => Linking.openURL(embed.image)}>
-                                <Image source={{uri : embed.image}} style={{width:100, aspectRatio: 1/1}} resizeMethod="resize" resizeMode="stretch"/>
-                            </TouchableOpacity>
+                return <View style={{flex:1, justifyContent:'flex-start', flexWrap: 'wrap', marginBottom: 10}} key={index}>
+                    <TouchableOpacity onPress={() => Linking.openURL(embed.image)}>
+                        <FastImage source={{uri : embed.image}} style={{width:250, aspectRatio: 1/1}} resizeMethod="resize" resizeMode="stretch"/>
+                    </TouchableOpacity>
                 </View>
             }
         });
@@ -95,7 +97,7 @@ export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePr
         <View style={Styles.inner}>
             <View style={{marginRight: 10}}>
                 <TouchableOpacity onPress={onFacePress} onLongPress={onLongFacePress} style={{backgroundColor: '#444442', padding: 4, borderRadius: 100/2}}>
-                    <Image source={{uri : message.picture}} style={Styles.picture} />
+                    <FastImage source={{uri : message.picture}} style={Styles.picture} />
                 </TouchableOpacity>
             </View>
             <View style={{flex:1}}>
@@ -104,7 +106,7 @@ export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePr
                 </TouchableOpacity>
                 <View>
                     {renderMessage()}
-                    <View style={{flexDirection: 'row', marginTop: 8}}>
+                    <View style={{marginTop: 8}}>
                         {renderEmbeds()}
                     </View>
                 </View>

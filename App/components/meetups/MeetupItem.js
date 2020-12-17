@@ -1,9 +1,11 @@
 import React, {useState} from 'react';
-import {Image, ImageBackground, Text, View, TouchableHighlight} from "react-native";
+import {ImageBackground, Text, View, TouchableHighlight} from "react-native";
 
 import {StyleSheet} from 'react-native';
 import {ActivityButton} from "../ActivityButton";
 import {Icon} from "../Icon";
+import FastImage from "react-native-fast-image";
+
 import Helpers from "../../sosa/Helpers";
 
 const Styles = StyleSheet.create({
@@ -115,7 +117,7 @@ export const MeetupItem = ({meetup, onChange, onTellMeMorePress}) =>{
     };
 
     const attendees = meetup.attendees.map((attendee, index) => {
-        return <View style={Styles.attendeeImageContainer} key={index}><Image source={{uri : attendee.picture}} style={Styles.attendeeImage}  /></View>
+        return <View style={Styles.attendeeImageContainer} key={index}><FastImage source={{uri : attendee.picture}} style={Styles.attendeeImage}  /></View>
     });
     
     let imageSource = {};

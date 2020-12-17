@@ -39,23 +39,53 @@ const Styles = StyleSheet.create({
         marginBottom: 4
     },
 
-    inputParentContainer: {height: 45},
+    inputParentContainer: {height: 45, zIndex: 1},
     inputContainer: {
         backgroundColor: '#fff',
         borderRadius: 8,
-        marginBottom: 4,
         flex: 1,
         flexDirection: 'row',
         paddingHorizontal: 4,
-        alignItems: 'center'
+        alignItems: 'center',
+    },
+    
+    inputContainerHasError: {
+        borderColor: '#dc3545',
+        borderWidth: 2,
     },
 
     input:{
         flex: 1,
-        color: '#121111'
+        color: '#121111',
+        height:42
     },
 
     inputIcon:{color: '#ccc', marginHorizontal:4},
+    
+    multiline: {
+        minHeight: 180,
+        width: '100%',
+        textAlignVertical: 'top',
+        borderRadius: 8,
+    },
+    
+    lengthIndicator: {
+        alignSelf:'center',
+        paddingRight:12
+    },
+    
+    lengthIndicatorWarning: {
+        color: '#f0ad4e'
+    },
+    
+    lengthIndicatorDanger: {
+        color: '#dc3545'
+    },
+    
+    lengthIndicatorNeutral: {
+        color: '#ccc'
+    },
+    
     viewPasswordIcon: {
 
     },
@@ -127,7 +157,7 @@ const Styles = StyleSheet.create({
     buttonBottom: {
         flex: 1,
         justifyContent: 'flex-end',
-        marginBottom: Platform.OS === 'ios' ? 108 : 36
+        marginBottom: Platform.OS === 'ios' ? 68 : 36
     },
 
     newToSoSaButton: {

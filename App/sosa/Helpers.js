@@ -31,10 +31,49 @@ export default class Helpers {
 	};
 
 	static base64Decode(input) {
+	    if(typeof(atob) !== 'function'){
+            let keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+            let output = null;
+            let chr1, chr2, chr3 = "";
+            let enc1, enc2, enc3, enc4 = "";
+            let i = 0;
+        
+            // remove all characters that are not A-Z, a-z, 0-9, +, /, or =
+            let base64test = /[^A-Za-z0-9\+\/\=]/g;
+            if (!base64test.exec(input)) {
+                output = "";
+                input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+            
+                do {
+                    enc1 = keyStr.indexOf(input.charAt(i++));
+                    enc2 = keyStr.indexOf(input.charAt(i++));
+                    enc3 = keyStr.indexOf(input.charAt(i++));
+                    enc4 = keyStr.indexOf(input.charAt(i++));
+                
+                    chr1 = (enc1 << 2) | (enc2 >> 4);
+                    chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+                    chr3 = ((enc3 & 3) << 6) | enc4;
+                
+                    output = output + String.fromCharCode(chr1);
+                
+                    if (enc3 !== 64) {
+                        output = output + String.fromCharCode(chr2);
+                    }
+                    if (enc4 !== 64) {
+                        output = output + String.fromCharCode(chr3);
+                    }
+                
+                    chr1 = chr2 = chr3 = "";
+                    enc1 = enc2 = enc3 = enc4 = "";
+                
+                } while (i < input.length);
+            }
+            return output;
+        }
         return atob(input.replace(/[^A-Za-z0-9\+\/\=]/g, ""));
 	}
     
-    static uploadFile = (apiClient, communityId, isUploading, beforeUpload) => {
+    static uploadFile = (appContext, apiClient, communityId, isUploading, beforeUpload) => {
 	    return new Promise((resolve, reject) => {
             const { services: { general } } = apiClient;
         
@@ -46,6 +85,29 @@ export default class Helpers {
                 isUploading(true);
                 general.handleUpload(communityId, file).then(resolve).catch((errors) => {
                     console.info('App::UploadFile::error', errors);
+                    
+                    if(appContext){
+                        const code = errors?.message?.Code;
+                        let title = 'Error uploading image';
+                        let message = '';
+    
+                        if(Array.isArray(code)){
+                            if(code[0] === 'EntityTooLarge'){
+                                title = 'Ooops! that\'s a bit too big!';
+                                message = 'The max image size is 10mb';
+                            }else{
+                                message = 'Invalid image';
+                            }
+                        }else{
+                            message = error?.message;
+                        }
+    
+                        if(message.length && message !== 'user_cancelled'){
+                            appContext.createModal(title, message);
+                        }
+                    }
+                    
+                    
                     reject(errors);
                 }).finally(() => {
                     isUploading(false);

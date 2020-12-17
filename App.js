@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import {AppState, StatusBar, View, Linking, Alert} from "react-native";
+import {AppState, StatusBar, View, Linking, Alert, Text, TouchableHighlight, Modal, StyleSheet} from "react-native";
 
 import SplashScreen from "./App/screens/Splash";
 import LoginScreen from './App/screens/authentication/login';
@@ -27,6 +27,48 @@ import {parseString as parseXMLString} from "react-native-xml2js";
 
 const Stack = createStackNavigator();
 
+const ModalStyles = StyleSheet.create({
+    container: {
+        backgroundColor:'rgba(0,0,0,0.5)',
+        flex:1,
+        justifyContent:'center'
+    },
+    
+    innerContainer: {
+        flex:1,
+        maxHeight:200,
+        backgroundColor:'#444442',
+        borderRadius:12,
+        overflow:'hidden',
+        paddingHorizontal: 20,
+        marginHorizontal: 20
+    },
+    
+    bodyContainer: {
+        flex:1,
+        paddingVertical: '5%'
+    },
+    
+    title: {fontSize: 20, marginBottom:5, color:'#fff'},
+    description: {fontSize: 16, color:'#fff'},
+    buttonContainer: {width:'100%', flexDirection: 'row', justifyContent:'flex-end', alignItems:'flex-end', marginBottom: 16},
+    okButton: {
+        alignItems:'center',
+        borderRadius: 8,
+        borderColor: '#f0ad4e',
+    
+        borderWidth: 1,
+        flex:1,
+        paddingVertical: 10,
+        paddingHorizontal: 24,
+    },
+    
+    okButtonText: {
+        color: '#fff'
+    }
+    
+});
+
 export default class SoSa extends Component {
 	coldBoot = true;
 	appNavigation = null;
@@ -36,7 +78,7 @@ export default class SoSa extends Component {
     middleware = {};
 	
 	apiClient = new Client(
-		{providers: SoSaConfig.providers},
+		{errors: SoSaConfig.errors, providers: SoSaConfig.providers},
 		io,
         (response) => new Promise((resolve, reject) => {
                 parseXMLString(response, function (err, result) {
@@ -74,7 +116,8 @@ export default class SoSa extends Component {
 	state = {
 		initializing: false,
 		defaultScreen: 'Splash',
-		appState: AppState.currentState
+		appState: AppState.currentState,
+        modals: []
 	};
 
 	constructor() {
@@ -91,7 +134,7 @@ export default class SoSa extends Component {
 	}
     
     componentDidMount() {
-        AppState.addEventListener("change", this._handleAppStateChange);
+	    AppState.addEventListener("change", this._handleAppStateChange);
         Linking.addEventListener('url', this.handleDeepLink);
     
         const {apiClient} = this;
@@ -249,13 +292,47 @@ export default class SoSa extends Component {
             }
         });
     };
+    
+    createModal = (title, description, onClose) => {
+        let modals = [...this.state.modals];
+        modals.push({title, description, onClose});
+        this.setState({modals});
+    };
 
 	render() {
+        const modals = this.state.modals.map((modal, index) => {
+            const {title, description} = modal;
+            
+            const closeModal = () => {
+                let modals = [...this.state.modals];
+                console.debug(index, modals);
+                modals.splice(index, 1);
+                this.setState({modals});
+            };
+            
+            return (<Modal visible={true} transparent={true} key={index}>
+                <View style={ModalStyles.container}>
+                    <View style={ModalStyles.innerContainer}>
+                        <View style={ModalStyles.bodyContainer}>
+                            <Text style={ModalStyles.title}>{title}</Text>
+                            <Text style={ModalStyles.description}>{description}</Text>
+                        </View>
+                        <View style={ModalStyles.buttonContainer}>
+                            <TouchableHighlight onPress={() => { console.debug('hello',index); closeModal() }} style={ModalStyles.okButton}>
+                                <Text style={ModalStyles.okButtonText}>OK</Text>
+                            </TouchableHighlight>
+                        </View>
+                    </View>
+                </View>
+            </Modal>)
+        });
+        
         return (
             <View style={BaseStyles.container}>
                 <StatusBar barStyle="light-content" backgroundColor="#121211"/>
                 <View style={{flex:1}}>
-                    <AppContext.Provider value={{apiClient: this.apiClient, clearMiddlewareNamespace: this.clearMiddlewareNamespace, addMiddleware: this.addMiddleware, triggerMiddleware: this.triggerMiddleware, logout: this.logout}}>
+                    {modals}
+                    <AppContext.Provider value={{apiClient: this.apiClient, clearMiddlewareNamespace: this.clearMiddlewareNamespace, addMiddleware: this.addMiddleware, triggerMiddleware: this.triggerMiddleware, logout: this.logout, createModal: this.createModal}}>
                         <NavigationContainer ref={this.appNavigation}>
                             <Stack.Navigator initialRouteName={this.state.defaultScreen} screenOptions={{headerStyle: BaseStyles.header, headerTitleStyle: BaseStyles.headerTitle, headerTintColor: 'white', headerTitleContainerStyle: { left: 10 }}} >
                                 <Stack.Screen name="Splash" component={SplashScreen} options={{ headerShown: false }}/>

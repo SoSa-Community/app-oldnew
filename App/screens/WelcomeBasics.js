@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Text, View, TouchableOpacity, Switch, KeyboardAvoidingView} from 'react-native';
 
-import {IconInput} from "../components/IconInput";
+import {Input} from "../components/Input";
 import {ActivityButton} from "../components/ActivityButton";
 import {Preferences} from "../sosa/Preferences";
 
@@ -40,15 +40,15 @@ class WelcomeBasicsScreen extends Component {
 						<View style={{marginTop:32}}>
 							<View style={{marginTop: 12}}>
 								<Text style={{marginBottom: 8}}>When were you born?</Text>
-								<IconInput icon={['fal', 'calendar-star']} placeholder="Date Of Birth" value={dateOfBirthInput} onChangeText={data => this.setState({ dateOfBirthInput: data})} enabled={!this.state.saving} type="date" allowClear={true}/>
+								<Input icon={['fal', 'calendar-star']} placeholder="Date Of Birth" value={dateOfBirthInput} onChangeText={data => this.setState({ dateOfBirthInput: data})} enabled={!this.state.saving} type="date" allowClear={true}/>
 							</View>
 							<View style={{marginTop: 12}}>
 								<Text style={{marginBottom: 8}}>Where do you live?</Text>
-								<IconInput icon={['fal', 'map-marker-smile']} placeholder="Location" value={locationInput} onChangeText={data => this.setState({ locationInput: data})} enabled={!this.state.saving} allowClear={true} alwaysShowClear={false}/>
+								<Input icon={['fal', 'map-marker-smile']} placeholder="Location" value={locationInput} onChangeText={data => this.setState({ locationInput: data})} enabled={!this.state.saving} allowClear={true} alwaysShowClear={false}/>
 							</View>
 							<View style={{marginTop: 12}}>
 								<Text style={{marginBottom: 8}}>How do you identify?</Text>
-								<IconInput icon={['fal', 'genderless']} placeholder="Gender Identity" value={genderInput} onChangeText={data => this.setState({ genderInput: data})} enabled={!this.state.saving} type="picker"/>
+								<Input icon={['fal', 'genderless']} placeholder="Gender Identity" value={genderInput} onChangeText={data => this.setState({ genderInput: data})} enabled={!this.state.saving} type="picker"/>
 							</View>
 						</View>
 					</View>
