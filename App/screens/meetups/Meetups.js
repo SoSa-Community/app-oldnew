@@ -1,85 +1,68 @@
-import React, {Component} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
     FlatList,
     View,
-    Button,
 } from 'react-native';
 
-import withMembersNavigationContext from "../hoc/withMembersNavigationContext";
+import {MembersNavigationContext} from "../context/MembersNavigationContext";
 import {MeetupItem} from "../../components/meetups/MeetupItem";
 import { useFocusEffect } from '@react-navigation/native';
 
-
-function FocusComponent({addHeaderIcon, removeHeaderIcon, navigate}) {
+const MeetupsScreen = ({navigation}) => {
+    
+    const membersNavigationContext = useContext(MembersNavigationContext);
+    
+    const { addHeaderIcon, removeHeaderIcon, drawerNavigationContext } = membersNavigationContext;
+    const { appContext } = drawerNavigationContext;
+    const { apiClient } = appContext;
+    
+    const [meetups, setMeetups] = useState([]);
+    const { services: { meetups: meetupService } } = apiClient;
+    
     useFocusEffect(
         React.useCallback(() => {
-            addHeaderIcon('create_meetup', ['fal', 'plus'], () => navigate('CreateMeetup'));
+            let isActive = true;
             
-            return () => removeHeaderIcon('create_meetup');
+            if(isActive){
+                addHeaderIcon('create_meetup', ['fal', 'plus'], () => {
+                    const { navigate } = navigation;
+                    navigate('CreateMeetup')
+                });
+                
+                meetupService.search('sosa')
+                    .then((records) => {
+                        records.sort((meetup1, meetup2) => meetup2.created.getTime() - meetup1.created.getTime());
+                        setMeetups(records);
+                    })
+                    .catch(errors => console.debug(errors));
+            }
+            return () => {
+                removeHeaderIcon('create_meetup');
+                isActive = false;
+            }
         }, [])
     );
-    return null;
-}
-
-export class Meetups extends Component {
-    drawerNavigationContext = {};
-    navigationContext = {};
-
-    navigation = {};
-    drawerNavigation = {};
     
-    apiClient = null;
-
-    state = {
-        meetups: []
-    };
-
-    constructor(props) {
-        super();
-
-        this.navigation = props.navigation;
-        this.navigationContext = props.navigationContext;
-        this.drawerNavigation = this.navigationContext.drawerNavigation;
-        this.drawerNavigationContext = props.navigationContext.drawerNavigationContext;
     
-        const {appContext} = this.drawerNavigationContext;
-        const {apiClient} = appContext;
-        this.apiClient = apiClient;
-    }
-    
-    componentDidMount(){
-        const { apiClient: { services: { meetups } } } = this;
-        meetups.search('sosa').then((meetups) => {
-            this.setState({meetups});
-        }).catch((errors) => {
-            console.debug(errors);
-        })
-    }
-    
-    render() {
-
-        return (
-            <View style={{flex:1}}>
-                <FocusComponent addHeaderIcon={this.navigationContext.addHeaderIcon} removeHeaderIcon={this.navigationContext.removeHeaderIcon} navigate={this.navigation.navigate} />
-                <FlatList
-                    data={this.state.meetups}
-                    extraData={this.state.meetups}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={
-                        ({item, index}) => {
-                            return <MeetupItem key={item.id} meetup={item} onChange={(meetup) => {
-                                let meetups = this.state.meetups;
-                                meetups[index] = meetup;
-                                this.setState({meetups: meetups});
-                            }} onTellMeMorePress={() => this.navigation.navigate('Meetup', {id: item.id})} />;
-                        }
+    return (
+        <View style={{flex:1}}>
+            <FlatList
+                data={meetups}
+                extraData={meetups}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={
+                    ({item, index}) => {
+                        return <MeetupItem key={item.id} meetup={item} onChange={(meetup) => {
+                            const ogState = [...meetups];
+                            ogState[index] = meetup;
+                            setMeetups(ogState);
+                        }} onTellMeMorePress={() => this.navigation.navigate('Meetup', {id: item.id})} />;
                     }
-                    style={{flex: 1, backgroundColor: '#121111'}}
-                />
-            </View>
-        );
-    }
-}
+                }
+                style={{flex: 1, backgroundColor: '#121111'}}
+            />
+        </View>
+    );
+};
 
-const MeetupsScreen = withMembersNavigationContext(Meetups);
 export default MeetupsScreen;
