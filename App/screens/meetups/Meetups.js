@@ -19,13 +19,14 @@ const MeetupsScreen = ({navigation}) => {
     const [meetups, setMeetups] = useState([]);
     const { services: { meetups: meetupService } } = apiClient;
     
+    const { navigate } = navigation;
+    
     useFocusEffect(
         React.useCallback(() => {
             let isActive = true;
             
             if(isActive){
                 addHeaderIcon('create_meetup', ['fal', 'plus'], () => {
-                    const { navigate } = navigation;
                     navigate('CreateMeetup')
                 });
                 
@@ -56,7 +57,7 @@ const MeetupsScreen = ({navigation}) => {
                             const ogState = [...meetups];
                             ogState[index] = meetup;
                             setMeetups(ogState);
-                        }} onTellMeMorePress={() => this.navigation.navigate('Meetup', {id: item.id})} />;
+                        }} onTellMeMorePress={() => navigate('Meetup', {id: item.id})} />;
                     }
                 }
                 style={{flex: 1, backgroundColor: '#121111'}}
