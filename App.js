@@ -19,7 +19,7 @@ import { AppContext } from "./App/screens/context/AppContext";
 import WelcomeScreen from "./App/screens/Welcome";
 import Session from "./App/sosa/Session";
 import { Client } from "sosa-chat-client";
-import {SoSaConfig} from "./App/sosa/config";
+import {AppConfig} from "./App/config";
 import io from "socket.io-client";
 import jwt from "react-native-pure-jwt";
 import Device from "./App/sosa/Device";
@@ -78,7 +78,7 @@ export default class SoSa extends Component {
     middleware = {};
 	
 	apiClient = new Client(
-		{errors: SoSaConfig.errors, providers: SoSaConfig.providers},
+		{errors: AppConfig.errors, providers: AppConfig.providers},
 		io,
         (response) => new Promise((resolve, reject) => {
                 parseXMLString(response, function (err, result) {
@@ -162,17 +162,19 @@ export default class SoSa extends Component {
                 });
             }
         });
+        setTimeout(() => {
+            this.validateSession()
+                .then(({user}) => {
+                    if(user?.welcome){
+                        this.resetRoot('Welcome', {user, welcome: user.welcome});
+                    }else{
+                        this.resetRoot('MembersArea', {user});
+                    }
+                })
+                .catch(() => this.resetRoot('Login', {}));
+            this.coldBoot = false;
+        }, 5000);
         
-        this.validateSession()
-            .then(({user}) => {
-                if(user?.welcome){
-                    this.resetRoot('Welcome', {user, welcome: user.welcome});
-                }else{
-                    this.resetRoot('MembersArea', {user});
-                }
-            })
-            .catch(() => this.resetRoot('Login', {}));
-        this.coldBoot = false;
     }
 
 	resetRoot = (name, params) => {

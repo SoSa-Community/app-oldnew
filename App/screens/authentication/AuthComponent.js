@@ -9,7 +9,7 @@ import {Input} from "../../components/Input";
 import SecureTextInput from "../../components/SecureTextInput";
 import {FormError} from "../../components/FormError";
 
-import {SoSaConfig} from "../../sosa/config";
+import {AppConfig} from "../../config";
 import {SocialButton} from "../../components/SocialButton";
 import Helpers from "../../sosa/Helpers";
 
@@ -130,7 +130,7 @@ export default class AuthComponent extends Component {
 
     CredentialInput = () => {
         const {screenType, navigation, state: {usernameInput, passwordInput, processing, error, passwordError, emailInput}} = this;
-        const { forgotPassword, credentials } = SoSaConfig.features[screenType];
+        const { forgotPassword, credentials } = AppConfig.features[screenType];
         
         const forLogin = screenType === 'login';
         
@@ -204,7 +204,7 @@ export default class AuthComponent extends Component {
     };
 
     SocialButtons = () => {
-        const {social: {imgur, reddit, google, twitter, facebook}} = SoSaConfig.features[this.screenType];
+        const {social: {imgur, reddit, google, twitter, facebook}} = AppConfig.features[this.screenType];
         const onboardingPath = '../../assets/onboarding/';
         
         let login = (network) => {

@@ -7,14 +7,14 @@ import Styles from '../styles/onboarding'
 import {Text, View, TouchableHighlight, KeyboardAvoidingView} from 'react-native';
 
 import withAppContext from '../hoc/withAppContext';
-import {SoSaConfig} from "../../sosa/config";
+import {AppConfig} from "../../config";
 
 class Login extends AuthComponent {
     
     screenType = 'login';
     
     RegisterButton = () => {
-        if(!SoSaConfig.features.general.canRegister) return <View style={Styles.buttonBottom}></View>;
+        if(!AppConfig.features.general.canRegister) return <View style={Styles.buttonBottom}></View>;
         
         return <View style={Styles.buttonBottom}>
             <TouchableHighlight onPress={() => this.navigation.navigate('Register', {})} style={Styles.newToSoSaButton}>

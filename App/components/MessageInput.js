@@ -2,7 +2,7 @@ import React from 'react';
 
 import {ActivityIndicator, TextInput, View, TouchableOpacity, Dimensions, Text, StyleSheet} from "react-native";
 import {Icon} from './Icon';
-import {SoSaConfig} from "../sosa/config";
+import {AppConfig} from "../config";
 
 
 const Styles = StyleSheet.create({
@@ -95,7 +95,7 @@ export const MessageInput = ({canSend, sendAction, maxLength, lengthIndicatorSho
     return (
         <View style={Styles.container}>
             {
-                SoSaConfig.features.general.canUpload && uploadAction &&
+                AppConfig.features.general.canUpload && uploadAction &&
                 <TouchableOpacity onPress={() => uploadAction(uploadComplete)} style={{alignSelf:'center', backgroundColor: '#444442', height:38, width:38, borderRadius:24, alignItems: 'center', justifyContent: 'center', marginRight: 8}}>
                     <Icon icon={['fal','image']}  style={Styles.icon} size={24}  />
                 </TouchableOpacity>

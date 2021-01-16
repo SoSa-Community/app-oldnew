@@ -1,7 +1,7 @@
 import {Alert} from 'react-native';
 import APIError from "./APIError";
 import ImagePicker from "react-native-image-picker";
-import {SoSaConfig} from "./config";
+import {AppConfig} from "../config";
 
 export default class Helpers {
 
@@ -88,7 +88,7 @@ export default class Helpers {
                 appContext.createModal(title, message);
             };
             
-            const { maxFileSize } = SoSaConfig;
+            const { maxFileSize } = AppConfig;
             
             const doUpload = (file) => {
                 isUploading(true);

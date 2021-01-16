@@ -57,6 +57,4 @@ buck-out/
 
 # CocoaPods
 /ios/Pods/
-
-App/sosa/config.js
 android/app/src/main/assets/appcenter-config.json
