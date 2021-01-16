@@ -3,7 +3,7 @@ import {Keyboard, Text, View, StyleSheet, BackHandler} from "react-native";
 
 import { useFocusEffect } from '@react-navigation/native';
 
-import {IconButton} from "./IconButton";
+import IconButton from "./IconButton";
 import BaseStyles from "../screens/styles/base";
 
 const Styles = StyleSheet.create({

@@ -4,9 +4,9 @@ import {Text, View} from 'react-native';
 
 import BaseStyles from "../styles/base";
 import Helpers from "../../sosa/Helpers";
-import {Input} from "../../components/Input";
-import {ActivityButton} from "../../components/ActivityButton";
-import {FormError} from "../../components/FormError";
+import Input from "../../components/Input";
+import ActivityButton from "../../components/ActivityButton";
+import FormError from "../../components/FormError";
 
 export default class ForgotPassword extends Component {
 
@@ -69,7 +69,7 @@ export default class ForgotPassword extends Component {
                     <Text style={Styles.header}>What's your e-mail?</Text>
 
                     <View style={Styles.content_container}>
-                        <FormError errorState={this.state.requestError} />
+                        <FormError message={this.state.requestError} />
                         <Input icon={['fal', 'envelope']} placeholder="Your e-mail address" value={this.state.emailInput} onChangeText={data => this.setState({ emailInput: data})} />
                         <ActivityButton showActivity={this.state.requesting} onPress={this.resetPassword} text="Reset My Password!"/>
                     </View>

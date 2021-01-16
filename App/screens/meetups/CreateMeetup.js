@@ -14,8 +14,8 @@ import {
 } from 'react-native';
 
 import withMembersNavigationContext from "../hoc/withMembersNavigationContext";
-import {ActivityButton} from "../../components/ActivityButton";
-import {Input} from "../../components/Input";
+import ActivityButton from "../../components/ActivityButton";
+import Input from "../../components/Input";
 
 import Helpers from "../../sosa/Helpers";
 

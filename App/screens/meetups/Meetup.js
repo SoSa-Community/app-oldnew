@@ -7,11 +7,11 @@ import {
 } from 'react-native';
 
 import withMembersNavigationContext from "../hoc/withMembersNavigationContext";
-import {ActivityButton} from "../../components/ActivityButton";
-import {Icon} from "../../components/Icon";
+import ActivityButton from "../../components/ActivityButton";
+import Icon from "../../components/Icon";
 import {CommentItem} from "../../components/comments/CommentItem";
 import Helpers from "../../sosa/Helpers";
-import {MessageInput} from "../../components/MessageInput";
+import MessageInput from "../../components/MessageInput";
 
 const dimensions = Dimensions.get('window');
 

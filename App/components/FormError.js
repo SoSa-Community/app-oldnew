@@ -1,10 +1,19 @@
 import React from 'react';
-import Styles from "../screens/styles/onboarding";
-import {Text} from "react-native";
+import { Text } from "react-native";
 
-export const FormError = ({errorState}) => {
-    if(errorState && errorState.length > 0){
-        return <Text style={Styles.error}>{errorState}</Text>;
+import PropTypes from 'prop-types';
+import Styles from "../screens/styles/onboarding";
+
+const FormError = ({message}) => {
+    if(message && message.length > 0){
+        return <Text style={Styles.error}>{message}</Text>;
     }
     return null;
 }
+
+FormError.propTypes = {
+    message: PropTypes.string.isRequired
+}
+
+export default FormError;
+

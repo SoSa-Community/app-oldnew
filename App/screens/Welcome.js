@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
 import {Text, View, TouchableOpacity, Switch, KeyboardAvoidingView} from 'react-native';
 
-import {Input} from "../components/Input";
-import {ActivityButton} from "../components/ActivityButton";
+import Input from "../components/Input";
+import ActivityButton from "../components/ActivityButton";
 import withAppContext from "./hoc/withAppContext";
-import {InfoBox} from "../components/InfoBox";
-import Helpers from "../sosa/Helpers";
-import {FormError} from "../components/FormError";
+import InfoBox from "../components/InfoBox";
+import FormError from "../components/FormError";
+
 
 
 class Welcome extends Component {
@@ -84,13 +84,13 @@ class Welcome extends Component {
 							<View>
 								<Text style={{marginBottom: 8}}>Your username</Text>
 								<Input icon={['fal', 'user']} placeholder="Username" value={usernameInput} onChangeText={data => this.setState({ usernameInput: data})} enabled={!this.state.saving}/>
-								<FormError errorState={fieldErrors.username} />
+								<FormError message={fieldErrors.username} />
 							</View>
 							{ !this.haveEmail &&
 							<View style={{marginTop: 12}}>
 								<Text style={{marginBottom: 8}}>Your e-mail</Text>
 								<Input icon={['fal', 'envelope']} placeholder="E-mail" value={emailInput} onChangeText={data => this.setState({ emailInput: data})} enabled={!this.state.saving}/>
-								<FormError errorState={fieldErrors.email} />
+								<FormError message={fieldErrors.email} />
 								<InfoBox
 									title="Why do you need my e-mail address?"
 									text1="E-mail addresses are just one way we protect our community from spam and bots."

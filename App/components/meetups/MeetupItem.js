@@ -2,8 +2,8 @@ import React, {useState} from 'react';
 import {ImageBackground, Text, View, TouchableHighlight} from "react-native";
 
 import {StyleSheet} from 'react-native';
-import {ActivityButton} from "../ActivityButton";
-import {Icon} from "../Icon";
+import ActivityButton from "../ActivityButton";
+import Icon from "../Icon";
 import FastImage from "react-native-fast-image";
 
 import Helpers from "../../sosa/Helpers";

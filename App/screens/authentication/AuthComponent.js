@@ -4,13 +4,13 @@ import Styles from '../styles/onboarding'
 
 import {Text, View, Linking, TouchableHighlight, KeyboardAvoidingView, Alert} from 'react-native';
 
-import {ActivityButton} from "../../components/ActivityButton";
-import {Input} from "../../components/Input";
+import ActivityButton from "../../components/ActivityButton";
+import Input from "../../components/Input";
 import SecureTextInput from "../../components/SecureTextInput";
-import {FormError} from "../../components/FormError";
+import FormError from "../../components/FormError";
 
-import {AppConfig} from "../../config";
-import {SocialButton} from "../../components/SocialButton";
+import AppConfig from "../../config";
+import SocialButton from "../../components/SocialButton";
 import Helpers from "../../sosa/Helpers";
 
 
@@ -179,7 +179,7 @@ export default class AuthComponent extends Component {
         if(credentials){
             if(forLogin){
                 return <View>
-                    <FormError errorState={error} />
+                    <FormError message={error} />
                     <Input containerStyle={{marginBottom: 4}} icon={['fal', 'user']} placeholder="Username or e-mail address" value={usernameInput} onChangeText={data => this.setState({ usernameInput: data})} enabled={!processing} />
                     <SecureTextInput icon={['fal', 'key']} placeholder="Password" onChangeText={data => this.setState({ passwordInput: data})} value={passwordInput} enabled={!processing} />
                     <View style={{marginTop: 4}}>
@@ -188,11 +188,11 @@ export default class AuthComponent extends Component {
                 </View>;
             }else{
                 return <View>
-                    <FormError errorState={error} />
+                    <FormError message={error} />
                     <Input containerStyle={{marginBottom: 4}} icon={['fal', 'user']} placeholder="Username" value={usernameInput} onChangeText={data => this.setState({ usernameInput: data})} enabled={!processing} />
                     <SecureTextInput icon={['fal', 'key']} placeholder="Password" onChangeText={data => this.setState({ passwordInput: data})} validateInput={() => this.validatePassword()} enabled={!processing} />
                     <Input containerStyle={{marginTop: 4}} icon={['fal', 'envelope']} placeholder="E-mail" value={emailInput} onChangeText={data => this.setState({ emailInput: data})} enabled={!processing} />
-                    <FormError errorState={passwordError} />
+                    <FormError message={passwordError} />
                     <View style={{marginTop: 4}}>
                         { buttonContainer }
                     </View>
@@ -233,7 +233,7 @@ export default class AuthComponent extends Component {
         };
         
         return <View>
-            <FormError errorState={this.state.socialMediaError} />
+            <FormError message={this.state.socialMediaError} />
             <View style={{marginTop: 20, flexDirection:'row', justifyContent: 'center'}}>
                 {imgur ? createSocialButton('imgur', require(`${onboardingPath}imgur_icon.png`)) : null}
                 {reddit ? createSocialButton('reddit', require(`${onboardingPath}reddit_icon.png`)) : null}

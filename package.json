@@ -32,6 +32,7 @@
     "appcenter-analytics": "4.0.2",
     "appcenter-crashes": "4.0.2",
     "patch-package": "^6.2.2",
+    "prop-types": "^15.7.2",
     "react": "16.13.1",
     "react-native": "^0.63.2",
     "react-native-device-info": "^5.6.1",

@@ -1,6 +1,8 @@
-import React, {useState} from 'react';
-import {Text, View, StyleSheet, Image, TouchableHighlight} from "react-native";
-import {Icon} from "./Icon";
+import React, { useState } from 'react';
+import { Text, View, StyleSheet, TouchableHighlight } from "react-native";
+import PropTypes from 'prop-types';
+
+import Icon from "./Icon";
 
 const Styles = StyleSheet.create({
 	container: {
@@ -20,7 +22,7 @@ const Styles = StyleSheet.create({
 	}
 });
 
-export const InfoBox = ({title, text1, text2, text3, type}) => {
+const InfoBox = ({title, text1, text2, text3, type}) => {
 
 	const [show, setShowing] = useState(false);
 
@@ -44,3 +46,20 @@ export const InfoBox = ({title, text1, text2, text3, type}) => {
 		</TouchableHighlight>
 	);
 }
+
+InfoBox.propTypes = {
+    title: PropTypes.string.isRequired,
+    text1: PropTypes.string,
+    text2: PropTypes.string,
+    text3: PropTypes.string,
+    type: PropTypes.string,
+};
+
+InfoBox.defaultProps = {
+    text1: '',
+    text2: '',
+    text3: '',
+    type: '',
+}
+
+export default InfoBox;

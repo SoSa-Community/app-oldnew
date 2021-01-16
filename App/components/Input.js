@@ -1,12 +1,15 @@
 import React, {useState, useEffect} from 'react';
-import Styles from "../screens/styles/onboarding";
-import {TextInput, View, TouchableOpacity, Text, Keyboard, Platform, Modal, Button} from "react-native";
-import {Icon} from './Icon';
+import { TextInput, View, TouchableOpacity, Text, Keyboard, Platform, Modal, Button } from "react-native";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {Picker} from '@react-native-community/picker';
-import Helpers from "../sosa/Helpers";
+import { Picker } from '@react-native-community/picker';
+import PropTypes from 'prop-types';
 
-export const Input = (
+import Helpers from "../sosa/Helpers";
+import Icon from './Icon';
+
+import Styles from "../screens/styles/onboarding";
+
+const Input = (
     {
         icon, placeholder, value, onChangeText, validateInput, error,
         errorBorderOnly, enabled, allowClear, alwaysShowClear, type, pickerOptions=[],
@@ -14,18 +17,8 @@ export const Input = (
         lengthIndicatorShowPercentage, lengthWarningPercentage, lengthDangerPercentage, setIsValid,
         label, labelStyle, containerStyle, outerContainerStyle, innerContainerStyle, inputStyle
 }) => {
-    if(!maxLength) maxLength = 1000;
-    if(!minLength) minLength = 0;
     if(enabled !== true && enabled !== false) enabled = true;
     let dateValue = value;
-    
-    if(!lengthIndicatorShowPercentage) lengthIndicatorShowPercentage = 80;
-    if(!lengthWarningPercentage) lengthWarningPercentage = 90;
-    if(!lengthDangerPercentage) lengthDangerPercentage = 95;
-    
-    
-	if(typeof(value) !== 'string') value = '';
-	if(!['text','date', 'time', 'picker', 'multiline'].includes(type)) type = 'text';
  
 	const [inputValue, setInputValue] = useState('');
 	const [dateInputValue, setDateInputValue] = useState(new Date());
@@ -288,3 +281,72 @@ export const Input = (
         </View>
 	);
 }
+
+Input.propTypes = {
+    icon: PropTypes.array,
+    placeholder: PropTypes.string,
+    value: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number
+    ]),
+    onChangeText: PropTypes.func,
+    validateInput: PropTypes.bool,
+    error: PropTypes.string,
+    errorBorderOnly: PropTypes.bool,
+    enabled: PropTypes.bool,
+    allowClear: PropTypes.bool,
+    alwaysShowClear: PropTypes.bool,
+    type: PropTypes.oneOf(['text','date', 'time', 'picker', 'multiline']),
+    pickerOptions: PropTypes.array,
+    minLength: PropTypes.number,
+    maxLength: PropTypes.number,
+    selection: PropTypes.shape({start: PropTypes.number, end: PropTypes.number}),
+    onSelectionChange: PropTypes.func,
+    onBlur: PropTypes.func,
+    onKeyPress: PropTypes.func,
+    autoCorrect: PropTypes.bool,
+    setIsValid: PropTypes.func,
+    label: PropTypes.string,
+    labelStyle: PropTypes.object,
+    containerStyle: PropTypes.object,
+    outerContainerStyle: PropTypes.object,
+    innerContainerStyle: PropTypes.object,
+    inputStyle: PropTypes.object,
+    lengthIndicatorShowPercentage: PropTypes.number,
+    lengthWarningPercentage: PropTypes.number,
+    lengthDangerPercentage: PropTypes.number,
+};
+
+Input.defaultProps = {
+    icon: null,
+    placeholder: '',
+    value: '',
+    onChangeText: null,
+    validateInput: false,
+    error: PropTypes.string,
+    errorBorderOnly: false,
+    enabled: true,
+    allowClear: false,
+    alwaysShowClear: false,
+    type: 'text',
+    pickerOptions: [],
+    minLength: 0,
+    maxLength: 255,
+    selection: null,
+    onSelectionChange: null,
+    onBlur: null,
+    onKeyPress: null,
+    autoCorrect: true,
+    setIsValid: null,
+    label: '',
+    labelStyle: null,
+    containerStyle: null,
+    outerContainerStyle: null,
+    innerContainerStyle: null,
+    inputStyle: null,
+    lengthIndicatorShowPercentage: 80,
+    lengthWarningPercentage: 90,
+    lengthDangerPercentage: 95,
+};
+
+export default Input;

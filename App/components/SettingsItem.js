@@ -1,6 +1,8 @@
-import React, {useState, useEffect} from 'react';
-import {StyleSheet, Switch, Text, View} from "react-native";
-import {Preferences} from "../sosa/Preferences";
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Switch, Text, View } from "react-native";
+import PropTypes from "prop-types";
+
+import { Preferences } from "../sosa/Preferences";
 
 const Styles = StyleSheet.create({
     itemContainer: {
@@ -21,13 +23,13 @@ const Styles = StyleSheet.create({
     }
 });
 
-export const SettingsItem = ({settingName, title, description, onChange}) => {
+const SettingsItem = ({name, title, description, onChange}) => {
 
     const [getValue, setValue] = useState(false);
 
     useEffect(() => {
         try {
-            Preferences.get(settingName, (value) => {
+            Preferences.get(name, (value) => {
                 setValue(value);
             });
         } catch (e) {
@@ -47,7 +49,7 @@ export const SettingsItem = ({settingName, title, description, onChange}) => {
                     trackColor={{ true: "#28a745", false: "#767577" }}
                     thumbColor={getValue ? "#fff" : "#f4f3f4"}
                     onValueChange={(value) => {
-                        Preferences.set(settingName, value);
+                        Preferences.set(name, value);
                         setValue(value);
                         if(onChange) onChange(value);
                     }}
@@ -57,3 +59,17 @@ export const SettingsItem = ({settingName, title, description, onChange}) => {
         </View>
     );
 }
+
+SettingsItem.propTypes = {
+    name: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string,
+    onChange: PropTypes.func
+};
+
+SettingsItem.defaultProps = {
+    description: '',
+    onChange: null
+}
+
+export default SettingsItem;

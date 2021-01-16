@@ -1,7 +1,6 @@
 import React from 'react';
-
-import {TextInput, View, TouchableOpacity, Dimensions, Text, StyleSheet, Image, Modal} from "react-native";
-import {Icon} from './Icon';
+import { View, TouchableOpacity, Text, StyleSheet, Image, Modal } from "react-native";
+import PropTypes from "prop-types";
 
 const Styles = StyleSheet.create({
     container: {flex:1, justifyContent:'flex-end', marginTop:48},
@@ -13,8 +12,7 @@ const Styles = StyleSheet.create({
     picture: {width: 128, height: 128, borderRadius: 128/2}
 });
 
-export const ProfileModal = ({visible, profile, dismissTouch}) => {
-
+const ProfileModal = ({visible, profile, dismissTouch}) => {
     return (
         <Modal animationType="slide" visible={visible} transparent={true} hardwareAccelerated={true}>
             {visible &&
@@ -35,3 +33,14 @@ export const ProfileModal = ({visible, profile, dismissTouch}) => {
         </Modal>
     )
 }
+
+ProfileModal.propTypes = {
+    visible: PropTypes.bool.isRequired,
+    profile: PropTypes.shape({
+        picture: PropTypes.string,
+        nickname: PropTypes.string
+    }).isRequired,
+    dismissTouch: PropTypes.func.isRequired
+};
+
+export default ProfileModal;

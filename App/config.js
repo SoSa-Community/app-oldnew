@@ -4,7 +4,7 @@ import {
     PROVIDER_AUTH_HOST, PROVIDER_AUTH_TOKEN
 } from "@env"
 
-export let AppConfig = new class Config {
+const AppConfig = new class Config {
     
     errors = {
         'meetups/invalid_title': 'The title should be between 16 and 254 characters',
@@ -62,3 +62,5 @@ export let AppConfig = new class Config {
         console.debug('sausage', PROVIDER_GENERAL_HOST);
     }
 }();
+
+export default AppConfig;

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Linking, Text, TouchableOpacity, View, Dimensions} from "react-native";
+import { Linking, Text, TouchableOpacity, View, Dimensions } from "react-native";
 import FastImage from "react-native-fast-image";
 
 import {StyleSheet} from 'react-native';

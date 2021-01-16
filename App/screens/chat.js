@@ -17,14 +17,14 @@ import {Message} from 'sosa-chat-client';
 import Session from "../sosa/Session";
 
 import Helpers from '../sosa/Helpers';
-import {MessageInput} from "../components/MessageInput";
+import MessageInput from "../components/MessageInput";
 import {UserList} from "../components/chat/UserList";
 
 import {RoomItem} from "../components/chat/RoomItem";
 
 import withMembersNavigationContext from "./hoc/withMembersNavigationContext";
 
-import {ProfileModal} from "../components/ProfileModal";
+import ProfileModal from "../components/ProfileModal";
 import {MessageItem} from "../components/chat/MessageItem";
 import Styles from './styles/chat'
 

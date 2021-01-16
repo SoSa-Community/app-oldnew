@@ -1,8 +1,9 @@
 import React from 'react';
+import { ActivityIndicator, TextInput, View, TouchableOpacity, Dimensions, Text, StyleSheet } from "react-native";
+import PropTypes from 'prop-types';
 
-import {ActivityIndicator, TextInput, View, TouchableOpacity, Dimensions, Text, StyleSheet} from "react-native";
-import {Icon} from './Icon';
-import {AppConfig} from "../config";
+import Icon from './Icon';
+import AppConfig from "../config";
 
 
 const Styles = StyleSheet.create({
@@ -53,11 +54,10 @@ let fucking = false;
 let buttonLeft = 0;
 let text = '';
 
-export const MessageInput = ({canSend, sendAction, maxLength, lengthIndicatorShowPercentage, lengthWarningPercentage,
-    lengthDangerPercentage, onChangeText, selection, value, onSelectionChange, onBlur, onKeyPress, autoCorrect, fuckWith, uploadComplete, uploadAction, uploading, placeholder}) => {
-
-    if(!maxLength) maxLength = 1000;
-
+const MessageInput = ({canSend, sendAction, maxLength, lengthIndicatorShowPercentage, lengthWarningPercentage,
+    lengthDangerPercentage, onChangeText, selection, value, onSelectionChange, onBlur, onKeyPress, autoCorrect,
+    fuckWith, uploadComplete, uploadAction, uploading, placeholder}) =>
+{
     if(uploading) canSend = false;
 
     const buttonBackgroundColor = canSend ? '#7ac256' : '#ccc';
@@ -77,10 +77,6 @@ export const MessageInput = ({canSend, sendAction, maxLength, lengthIndicatorSho
         sendAction();
         fucking = false;
     };
-
-    if(!lengthIndicatorShowPercentage) lengthIndicatorShowPercentage = 80;
-    if(!lengthWarningPercentage) lengthWarningPercentage = 90;
-    if(!lengthDangerPercentage) lengthDangerPercentage = 95;
 
     let lengthIndicatorStyles = [Styles.lengthIndicator];
     const lengthPercentage = ((text.length / maxLength) * 100);
@@ -131,3 +127,46 @@ export const MessageInput = ({canSend, sendAction, maxLength, lengthIndicatorSho
         </View>
     )
 }
+
+MessageInput.propTypes = {
+    canSend: PropTypes.bool,
+    sendAction: PropTypes.func.isRequired,
+    maxLength: PropTypes.number,
+    lengthIndicatorShowPercentage: PropTypes.number,
+    lengthWarningPercentage: PropTypes.number,
+    lengthDangerPercentage: PropTypes.number,
+    onChangeText: PropTypes.func,
+    selection: PropTypes.shape({start: PropTypes.number, end: PropTypes.number}),
+    value: PropTypes.string,
+    onSelectionChange: PropTypes.func,
+    onBlur: PropTypes.func,
+    onKeyPress: PropTypes.func,
+    autoCorrect: PropTypes.bool,
+    fuckWith: PropTypes.bool,
+    uploadComplete: PropTypes.func,
+    uploadAction: PropTypes.func,
+    uploading: PropTypes.bool,
+    placeholder: PropTypes.string
+};
+
+MessageInput.defaultTypes = {
+    canSend: true,
+    maxLength: 1000,
+    lengthIndicatorShowPercentage: 80,
+    lengthWarningPercentage: 90,
+    lengthDangerPercentage: 95,
+    onChangeText: null,
+    selection: null,
+    value: '',
+    onSelectionChange: null,
+    onBlur: null,
+    onKeyPress: null,
+    autoCorrect: true,
+    fuckWith: false,
+    uploadComplete: null,
+    uploadAction: null,
+    uploading: false,
+    placeholder: ''
+}
+
+export default MessageInput;
