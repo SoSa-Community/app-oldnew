@@ -1,7 +1,8 @@
-import {Alert} from 'react-native';
-import APIError from "./APIError";
+import { Alert } from 'react-native';
 import ImagePicker from "react-native-image-picker";
-import {AppConfig} from "../config";
+
+import APIError from "./APIError";
+import AppConfig from "../config";
 
 export default class Helpers {
 

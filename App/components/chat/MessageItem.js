@@ -1,8 +1,7 @@
 import React from 'react';
-import { Linking, Text, TouchableOpacity, View, Dimensions } from "react-native";
+import { Linking, Text, TouchableOpacity, View, Dimensions, StyleSheet } from "react-native";
 import FastImage from "react-native-fast-image";
-
-import {StyleSheet} from 'react-native';
+import PropTypes from "prop-types";
 import HTML from 'react-native-render-html';
 
 const Styles = StyleSheet.create({
@@ -27,6 +26,10 @@ const Styles = StyleSheet.create({
         flexDirection: 'row',
         paddingHorizontal: 4
     },
+    
+    pictureContainer: {
+        marginRight: 10
+    },
 
     message: {
         color: '#ffffff',
@@ -41,10 +44,28 @@ const Styles = StyleSheet.create({
         fontWeight: 'bold'
     },
 
-    picture: {width: 42, height: 42, borderRadius: 48/2}
+    pictureButton: {
+        backgroundColor: '#444442',
+        padding: 4,
+        borderRadius: 100/2
+    },
+    
+    picture: {
+        width: 42,
+        height: 42,
+        borderRadius: 48/2
+    },
+    
+    messageContainer: {
+        flex:1
+    },
+    
+    embedView: {
+        marginTop: 8
+    }
 });
 
-export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePress, myNickname, showSeparator, showSlim}) =>{
+const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePress, myNickname, showSeparator, showSlim}) =>{
 
     let containerStyles = [Styles.container];
     if(message.mentions.length > 0 && message.mentions.indexOf(myNickname) !== -1){
@@ -81,33 +102,32 @@ export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePr
 
     const renderEmbeds = () => {
         let e = [...message.embeds];
-        let embeds = e.map((embed, index) => {
+        return  e.map((embed, index) => {
             if(embed.image && embed.image.length){
                 return <View style={{flex:1, justifyContent:'flex-start', flexWrap: 'wrap', marginBottom: 10}} key={index}>
                     <TouchableOpacity onPress={() => Linking.openURL(embed.image)}>
-                        <FastImage source={{uri : embed.image}} style={{width:250, aspectRatio: 1/1}} resizeMethod="resize" resizeMode="stretch"/>
+                        <FastImage source={{uri : embed.image}} style={{width:250, aspectRatio: 1}} resizeMethod="resize" resizeMode="stretch"/>
                     </TouchableOpacity>
                 </View>
             }
         });
-        return embeds;
     };
 
     return  <View style={containerStyles}>
         <View style={Styles.inner}>
-            <View style={{marginRight: 10}}>
-                <TouchableOpacity onPress={onFacePress} onLongPress={onLongFacePress} style={{backgroundColor: '#444442', padding: 4, borderRadius: 100/2}}>
+            <View style={Styles.pictureContainer}>
+                <TouchableOpacity onPress={onFacePress} onLongPress={onLongFacePress} style={Styles.pictureButton}>
                     <FastImage source={{uri : message.picture}} style={Styles.picture} />
                 </TouchableOpacity>
             </View>
-            <View style={{flex:1}}>
+            <View style={Styles.messageContainer}>
                 <TouchableOpacity onPress={onUsernamePress}>
                     <Text style={Styles.username}>{message.nickname}</Text>
                 </TouchableOpacity>
                 <View>
                     {renderMessage()}
-                    <View style={{marginTop: 8}}>
-                        {renderEmbeds()}
+                    <View style={Styles.embedView}>
+                        { renderEmbeds() }
                     </View>
                 </View>
             </View>
@@ -115,3 +135,29 @@ export const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePr
     </View>
 
 }
+
+MessageItem.propTypes = {
+    message: PropTypes.shape({
+        nickname: PropTypes.string.isRequired,
+        picture: PropTypes.string,
+        parsed_content: PropTypes.string,
+        mentions: PropTypes.array
+    }),
+    onFacePress: PropTypes.func,
+    onLongFacePress: PropTypes.func,
+    onUsernamePress: PropTypes.func,
+    myNickname: PropTypes.string,
+    showSeparator: PropTypes.bool,
+    showSlim: PropTypes.bool
+};
+
+MessageItem.defaultProps = {
+    onFacePress: null,
+    onLongFacePress: null,
+    onUsernamePress: null,
+    myNickname: '',
+    showSeparator: false,
+    showSlim: false
+}
+
+export default MessageItem;

@@ -2,7 +2,7 @@ import React from 'react';
 import { TouchableHighlight } from 'react-native';
 
 import PropTypes from 'prop-types';
-import { Icon } from './Icon';
+import Icon from './Icon';
 
 const IconButton = ({onPress, icon, style, size}) => {
     return (

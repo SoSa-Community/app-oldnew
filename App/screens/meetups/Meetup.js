@@ -9,7 +9,7 @@ import {
 import withMembersNavigationContext from "../hoc/withMembersNavigationContext";
 import ActivityButton from "../../components/ActivityButton";
 import Icon from "../../components/Icon";
-import {CommentItem} from "../../components/comments/CommentItem";
+import CommentItem from "../../components/comments/CommentItem";
 import Helpers from "../../sosa/Helpers";
 import MessageInput from "../../components/MessageInput";
 

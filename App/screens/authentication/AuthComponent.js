@@ -180,7 +180,14 @@ export default class AuthComponent extends Component {
             if(forLogin){
                 return <View>
                     <FormError message={error} />
-                    <Input containerStyle={{marginBottom: 4}} icon={['fal', 'user']} placeholder="Username or e-mail address" value={usernameInput} onChangeText={data => this.setState({ usernameInput: data})} enabled={!processing} />
+                    <Input
+                        containerStyle={{marginBottom: 4}}
+                        icon={['fal', 'user']}
+                        placeholder="Username or e-mail address"
+                        value={usernameInput}
+                        onChangeText={data => this.setState({ usernameInput: data})}
+                        enabled={!processing}
+                    />
                     <SecureTextInput icon={['fal', 'key']} placeholder="Password" onChangeText={data => this.setState({ passwordInput: data})} value={passwordInput} enabled={!processing} />
                     <View style={{marginTop: 4}}>
                         { buttonContainer }

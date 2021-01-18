@@ -14,7 +14,7 @@ const SocialButton = ({onPress, icon, enabled}) => {
 
 SocialButton.propTypes = {
     onPress: PropTypes.func.isRequired,
-    icon: PropTypes.array.isRequired,
+    icon: PropTypes.number.isRequired,
     enabled: PropTypes.bool.isRequired
 };
 

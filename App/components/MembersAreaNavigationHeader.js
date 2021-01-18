@@ -30,6 +30,15 @@ const MembersAreaNavigationHeader = forwardRef((
     
     const [headerIcons, setHeaderIcons] = useState(icons);
     
+    useFocusEffect(
+        React.useCallback(() => {
+            if(onBack){
+                BackHandler.addEventListener('hardwareBackPress', onBack);
+                return () => BackHandler.removeEventListener('hardwareBackPress', onBack);
+            }
+        }, [])
+    );
+    
     useImperativeHandle(ref, () => ({
         
         addHeaderIcon(id, icon, onPress){
@@ -62,15 +71,6 @@ const MembersAreaNavigationHeader = forwardRef((
     if(showLeftMenu){
         let menuIcon = null;
         if(leftMenuMode === 'back'){
-            if(onBack) {
-                useFocusEffect(
-                    React.useCallback(() => {
-                        BackHandler.addEventListener('hardwareBackPress', onBack);
-                        return () => BackHandler.removeEventListener('hardwareBackPress', onBack);
-                    }, [])
-                );
-            }
-            
             menuIcon = <IconButton icon={['fal', 'chevron-left']} style={{color: '#CCC'}} size={22} onPress={() => {
                 if(typeof(onBack) === 'function') {
                     try {

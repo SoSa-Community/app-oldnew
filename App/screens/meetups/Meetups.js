@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 
 import {MembersNavigationContext} from "../context/MembersNavigationContext";
-import {MeetupItem} from "../../components/meetups/MeetupItem";
+import MeetupItem from "../../components/meetups/MeetupItem";
 import { useFocusEffect } from '@react-navigation/native';
 
 const MeetupsScreen = ({navigation}) => {

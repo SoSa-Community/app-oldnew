@@ -1,5 +1,6 @@
 import React from 'react';
-import {Text, View, StyleSheet, Image, TouchableHighlight} from "react-native";
+import { Text, View, StyleSheet, Image, TouchableHighlight } from "react-native";
+import PropTypes from "prop-types";
 
 const Styles = StyleSheet.create({
     itemText: {
@@ -37,7 +38,7 @@ const Styles = StyleSheet.create({
     },
 });
 
-export const UserItem = ({onPress, user, slim}) => {
+const UserItem = ({onPress, user, slim}) => {
 
     let userContainerStyle = [Styles.userContainer];
     let imageStyle = [Styles.image];
@@ -56,3 +57,19 @@ export const UserItem = ({onPress, user, slim}) => {
         </TouchableHighlight>
     );
 }
+
+UserItem.propTypes = {
+    onPress: PropTypes.func,
+    user: PropTypes.shape({
+        nickname: PropTypes.string,
+        picture: PropTypes.string,
+    }).isRequired,
+    slim: PropTypes.bool
+};
+
+UserItem.defaultProps = {
+    onPress: null,
+    slim: false
+};
+
+export default UserItem

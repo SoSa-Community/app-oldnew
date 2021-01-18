@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextInput, View, TouchableOpacity, Text, Keyboard, Platform, Modal, Button } from "react-native";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-community/picker';
@@ -17,6 +17,7 @@ const Input = (
         lengthIndicatorShowPercentage, lengthWarningPercentage, lengthDangerPercentage, setIsValid,
         label, labelStyle, containerStyle, outerContainerStyle, innerContainerStyle, inputStyle
 }) => {
+    
     if(enabled !== true && enabled !== false) enabled = true;
     let dateValue = value;
  
@@ -24,38 +25,8 @@ const Input = (
 	const [dateInputValue, setDateInputValue] = useState(new Date());
 	const [showPicker, setShowPicker] = useState(false);
 	const [tempPickerValue, setTempPickerValue] = useState((type === 'date' || type === 'time') ? new Date() : '');
-    
-    let lengthPercentage = 0;
-
-	useEffect(() => {
-		if(type === 'date' || type === 'time'){
-			let date = (new Date(dateValue));
-			if(Object.prototype.toString.call(date) !== '[object Date]' || isNaN(date.getTime())) {
-                date = new Date();
-            }
-            if(type === 'time'){
-                const [hour, minutes] = dateValue.split(':');
-                
-                date.setHours(hour);
-                date.setMinutes(minutes);
-            }
-			
-            value = Helpers.dateToString(date, type);
-			
-			dateValue = date;
-		}
-		setInputValue(value);
-		setDateInputValue(dateValue);
-	}, [value]);
-	
-	useEffect( () => {
-	    lengthPercentage = Math.floor((inputValue.length / maxLength) * 100);
-	    if(typeof(setIsValid) === 'function'){
-            if(inputValue.length <= maxLength && inputValue.length >= minLength) setIsValid(true);
-            else  setIsValid(false);
-        }
-    }, [inputValue] )
-
+	const [lengthPercentage, setLengthPercentage] = useState(0);
+ 
 
 	const displaySuccess = (errorString) => {
 		if(errorString === null){
@@ -217,7 +188,6 @@ const Input = (
         const renderLengthWarning = () => {
             
             let lengthIndicatorStyles = [Styles.lengthIndicator];
-            
             if(inputValue.length >= minLength){
                 if(lengthPercentage >= lengthDangerPercentage){
                     lengthIndicatorStyles.push(Styles.lengthIndicatorDanger);
@@ -248,7 +218,7 @@ const Input = (
                             onBlur={onBlur}
                             onKeyPress={onKeyPress}
                             autoCorrect={autoCorrect}
-                            maxLength={maxLength}
+                            maxLength={maxLength ? maxLength : null}
                 />
                 { renderLengthWarning() }
             </>);
@@ -263,9 +233,43 @@ const Input = (
         return icon && <Icon icon={icon}  style={Styles.inputIcon} size={18}/>
     };
     
+    useEffect(() => {
+        if(type === 'date' || type === 'time'){
+            let date = (new Date(dateValue));
+            if(Object.prototype.toString.call(date) !== '[object Date]' || isNaN(date.getTime())) {
+                date = new Date();
+            }
+            if(type === 'time'){
+                const [hour, minutes] = dateValue.split(':');
+                
+                date.setHours(hour);
+                date.setMinutes(minutes);
+            }
+            
+            value = Helpers.dateToString(date, type);
+            
+            dateValue = date;
+        }
+        setInputValue(value);
+        setDateInputValue(dateValue);
+    }, [value]);
+    
+    if(maxLength > 0){
+        useEffect( () => {
+            setLengthPercentage(Math.floor((inputValue.length / maxLength) * 100));
+            if(typeof(setIsValid) === 'function'){
+                if(inputValue.length <= maxLength && inputValue.length >= minLength) setIsValid(true);
+                else  setIsValid(false);
+            }
+        }, [inputValue] )
+    }
+    
 	return (
         <View style={[containerStyle]}>
-            { label && <Text style={[{color: '#fff', marginTop: 8, marginBottom: 4, fontSize:16}, labelStyle]}>{label}</Text> }
+            {   label && label.length ?
+                <Text style={[{color: '#fff', marginTop: 8, marginBottom: 4, fontSize:16}, labelStyle]}>{label}</Text> :
+                null
+            }
             <View style={[outerContainerStyles, outerContainerStyle]}>
                 <View style={[innerContainerStyles, innerContainerStyle]}>
                     { renderIcon() }
@@ -323,7 +327,7 @@ Input.defaultProps = {
     value: '',
     onChangeText: null,
     validateInput: false,
-    error: PropTypes.string,
+    error: null,
     errorBorderOnly: false,
     enabled: true,
     allowClear: false,

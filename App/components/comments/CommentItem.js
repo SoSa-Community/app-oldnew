@@ -1,14 +1,66 @@
-import React, {useState} from 'react';
-import {Text, View, TouchableHighlight} from "react-native";
+import React, { useState } from 'react';
+import { Text, View, StyleSheet } from "react-native";
 import FastImage from "react-native-fast-image";
+import PropTypes from "prop-types"
 
-import {StyleSheet} from 'react-native';
-import {Preferences} from "../../sosa/Preferences";
+import { Preferences } from "../../sosa/Preferences";
 const Styles = StyleSheet.create({
+    container: {
+        flex:1
+    },
+    
+    outerContainer: {
+        flex:1,
+        paddingLeft: 8,
+        paddingVertical: 8,
+        backgroundColor:'#2b2b2b',
+        marginTop:6,
+        borderRadius:6
+    },
+    
+    innerContainer: {
+        flexDirection:'row',
+        flexWrap:'wrap'
+    },
+    
+    pictureContainer: {
+        flex: 0
+    },
+    
+    picture: {
+        width: 36,
+        height: 36,
+        borderRadius: 36/2,
+        borderWidth: 0.25,
+        borderColor:'#121111',
+        marginRight: 8
+    },
+    
+    textContainer: {
+        flex:1
+    },
+    
+    text: {
+        color:'#fff',
+        paddingRight:6,
+        lineHeight: 22
+    },
+    
+    nickname: {
+        color:'#5cb85c'
+    },
+    
+    showMoreText: {
+        color: '#5cb85c'
+    },
+    
+    childrenContainer: {
+        flex:1
+    }
 
 });
 
-export const CommentItem = ({comment, depth}) =>{
+const CommentItem = ({comment, depth}) =>{
     const {id, content, children} = comment;
     let { picture, nickname } = comment;
     
@@ -21,9 +73,7 @@ export const CommentItem = ({comment, depth}) =>{
     const [getHideProfilePicture, setHideProfilePicture] = useState(false);
     const colors = ['#c0392B','#2ECC71','#3498DB','#9B59B6','#D35400','#1ABC9C','#34495E','#8E44AD','#F1C40F','#ECF0F1','#2C3E50','#2980B9','#E74C3C','#C0392B','#2ECC71','#3498DB','#9B59B6','#D35400','#1ABC9C','#34495E'];
 
-    Preferences.get('comments:hide_profile_picture', (value) => setHideProfilePicture((new Boolean(value)).valueOf()));
-
-    if(!depth) depth = 1;
+    Preferences.get('comments:hide_profile_picture', (value) => setHideProfilePicture(Boolean(value)));
 
     const contentSplit = content.split(' ');
     const excerpt = contentSplit.slice(0,30).join(' ');
@@ -37,33 +87,50 @@ export const CommentItem = ({comment, depth}) =>{
         depthStyles = {borderLeftWidth: 5, borderLeftColor: colors[depth], marginLeft: (depth - 1) * 4};
     }
 
-    let childrenViews = null;
+    let childViews = null;
     if(children){
-        childrenViews = children.map((comment, index) => {
+        childViews = children.map((comment, index) => {
             return <CommentItem comment={comment} depth={depth + 1} key={index + id} />;
         });
     }
 
-    return  <View style={{flex:1}}>
-                <View style={[{flex:1, paddingLeft: 8, paddingVertical: 8, backgroundColor:'#2b2b2b', marginTop:6, borderRadius:6}, depthStyles]}>
-                    <View style={{flexDirection:'row', flexWrap:'wrap'}}>
+    return  <View style={Styles.container}>
+                <View style={[Styles.outerContainer, depthStyles]}>
+                    <View style={Styles.innerContainer}>
                         {!getHideProfilePicture &&
-                        <View style={{flex: 0}}>
-                            <FastImage source={{uri: picture}} style={{width: 36, height: 36, borderRadius: 36/2, borderWidth: 0.25, borderColor:'#121111', marginRight: 8}}/>
+                        <View style={Styles.pictureContainer}>
+                            <FastImage source={{uri: picture}} style={Styles.picture}/>
                         </View> }
-                        <View style={{flex:1}}>
-                            <Text style={[{color:'#fff', paddingRight:6, lineHeight: 22}, heightStyles]}>
-                                <Text style={{color:'#5cb85c'}}>{nickname} </Text>
+                        <View style={Styles.textContainer}>
+                            <Text style={[Styles.text, heightStyles]}>
+                                <Text style={Styles.nickname}>{nickname} </Text>
                                 {getContent}
                                 { moreContent &&
                                 <Text onPress={() => {
                                     setContent((getShowingFull ? excerpt : content));
                                     setShowingFull(!getShowingFull);
-                                }} style={{color: '#5cb85c'}}> {getShowingFull ? 'show less' : 'show more'}</Text> }
+                                }} style={Styles.showMoreText}> {getShowingFull ? 'show less' : 'show more'}</Text> }
                             </Text>
                         </View>
                     </View>
                 </View>
-                { getShowingChildren && <View style={{flex:1}}>{childrenViews}</View> }
+                { getShowingChildren && <View style={Styles.childrenContainer}>{childViews}</View> }
             </View>
 };
+
+CommentItem.propTypes = {
+    comment: PropTypes.shape({
+        id: PropTypes.string,
+        content: PropTypes.string,
+        children: PropTypes.array,
+        picture: PropTypes.string,
+        nickname: PropTypes.string
+    }).isRequired,
+    depth: PropTypes.number
+};
+
+CommentItem.defaultProps = {
+    depth: 1
+}
+
+export default CommentItem;

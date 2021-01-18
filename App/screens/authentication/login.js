@@ -1,13 +1,13 @@
 import React from 'react';
+import {Text, View, TouchableHighlight, KeyboardAvoidingView} from 'react-native';
+
 import AuthComponent from './AuthComponent';
 
 import BaseStyles from '../styles/base'
-import Styles from '../styles/onboarding'
-
-import {Text, View, TouchableHighlight, KeyboardAvoidingView} from 'react-native';
-
 import withAppContext from '../hoc/withAppContext';
-import {AppConfig} from "../../config";
+import AppConfig from "../../config";
+
+import Styles from '../styles/onboarding'
 
 class Login extends AuthComponent {
     

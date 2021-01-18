@@ -1,5 +1,5 @@
 import React from 'react';
-import {UserItem} from "./UserItem";
+import UserItem from "./UserItem";
 import {View} from "react-native";
 
 export const UserList = ({onPress, slim, userList}) => {

@@ -1,7 +1,11 @@
 import React, {Component} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
-import {AppState, StatusBar, View, Linking, Alert, Text, TouchableHighlight, Modal, StyleSheet} from "react-native";
+import { createStackNavigator } from '@react-navigation/stack';
+import { AppState, StatusBar, View, Linking, Alert, Text, TouchableHighlight, Modal, StyleSheet } from "react-native";
+import io from "socket.io-client";
+import jwt from "react-native-pure-jwt";
+import { parseString as parseXMLString } from "react-native-xml2js";
+import { Client } from "sosa-chat-client";
 
 import SplashScreen from "./App/screens/Splash";
 import LoginScreen from './App/screens/authentication/login';
@@ -11,19 +15,16 @@ import ForgotPasswordCode from './App/screens/authentication/forgot_password_cod
 import MembersArea from "./App/screens/MembersDrawerWrapper";
 import SettingsScreen from "./App/screens/Settings";
 
-
 import BaseStyles from './App/screens/styles/base';
 import Helpers from "./App/sosa/Helpers";
 
 import { AppContext } from "./App/screens/context/AppContext";
 import WelcomeScreen from "./App/screens/Welcome";
+
 import Session from "./App/sosa/Session";
-import { Client } from "sosa-chat-client";
-import {AppConfig} from "./App/config";
-import io from "socket.io-client";
-import jwt from "react-native-pure-jwt";
 import Device from "./App/sosa/Device";
-import {parseString as parseXMLString} from "react-native-xml2js";
+
+import AppConfig from "./App/config";
 
 const Stack = createStackNavigator();
 
@@ -173,7 +174,7 @@ export default class SoSa extends Component {
                 })
                 .catch(() => this.resetRoot('Login', {}));
             this.coldBoot = false;
-        }, 5000);
+        }, 500);
         
     }
 

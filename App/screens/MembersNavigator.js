@@ -12,7 +12,7 @@ import ChatScreen from "./chat";
 
 import { NavigationContainer } from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import { Icon } from "../components/Icon";
+import Icon from "../components/Icon";
 import MeetupsScreen from "./meetups/Meetups";
 import MeetupScreen from "./meetups/Meetup";
 import {Preferences} from "../sosa/Preferences";

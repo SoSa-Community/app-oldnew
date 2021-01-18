@@ -20,12 +20,12 @@ import Helpers from '../sosa/Helpers';
 import MessageInput from "../components/MessageInput";
 import {UserList} from "../components/chat/UserList";
 
-import {RoomItem} from "../components/chat/RoomItem";
+import RoomItem from "../components/chat/RoomItem";
 
 import withMembersNavigationContext from "./hoc/withMembersNavigationContext";
 
 import ProfileModal from "../components/ProfileModal";
-import {MessageItem} from "../components/chat/MessageItem";
+import MessageItem from "../components/chat/MessageItem";
 import Styles from './styles/chat'
 
 
@@ -321,7 +321,7 @@ export class Chat extends Component {
 						     this.drawerNavigation.dangerouslyGetParent().closeDrawer();
 					     }}
 					     room={room}
-					     roomActive={(this.state.currentRoom !== null && room.id === this.state.currentRoom.id)}
+					     active={(this.state.currentRoom !== null && room.id === this.state.currentRoom.id)}
 			/>
 		});
 
@@ -712,7 +712,7 @@ export class Chat extends Component {
                             }}
 						/>
 					</View>
-					<ProfileModal visible={this.state.profileModalVisible} profile={this.selectedProfile} dismissTouch={() => this.setState({profileModalVisible: false})} />
+                    {this.state.profileModalVisible && this.selectedProfile && <ProfileModal visible={this.state.profileModalVisible} profile={this.selectedProfile} dismissTouch={() => this.setState({profileModalVisible: false})} />}
 				</View>
 			)
 		);
