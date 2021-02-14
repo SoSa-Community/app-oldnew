@@ -6,12 +6,12 @@ import {
     ImageBackground, StyleSheet, Image, FlatList, Platform, KeyboardAvoidingView, Dimensions
 } from 'react-native';
 
-import withMembersNavigationContext from "../hoc/withMembersNavigationContext";
-import ActivityButton from "../../components/ActivityButton";
-import Icon from "../../components/Icon";
-import CommentItem from "../../components/comments/CommentItem";
-import Helpers from "../../sosa/Helpers";
-import MessageInput from "../../components/MessageInput";
+import withMembersNavigationContext from "../../hoc/withMembersNavigationContext";
+import ActivityButton from "../../../components/ActivityButton";
+import Icon from "../../../components/Icon";
+import CommentItem from "../../../components/comments/CommentItem";
+import Helpers from "../../../sosa/Helpers";
+import MessageInput from "../../../components/MessageInput";
 
 const dimensions = Dimensions.get('window');
 
@@ -215,7 +215,7 @@ export class Meetup extends Component {
     
         let imageSource = {};
         if(meetup.image) imageSource = {uri : meetup.image};
-        else imageSource = require('../../assets/choose_meetup_image_v2.jpg');
+        else imageSource = require('../../../assets/choose_meetup_image_v2.jpg');
     
         const toggleGoing = () => {
             this.setState({saving: true});

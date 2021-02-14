@@ -1,5 +1,5 @@
 import React from 'react';
-import { MembersNavigationContext } from '../context/MembersNavigationContext'
+import { MembersNavigationContext } from '../../context/MembersNavigationContext'
 
 const withMembersNavigationContext = (WrappedComponent) => {
     class HOC extends React.Component {

@@ -2,44 +2,25 @@ import AsyncStorage from "@react-native-community/async-storage";
 
 export default class Session {
 
-    static instance = null;
-    
-    initialized = false;
     id = '';
     expiry = '';
     refresh_token = '';
     username = '';
     nickname = '';
 
-    /**
-     * @returns {Session}
-     */
-    static getInstance() {
-        if (Session.instance == null)   Session.instance = new Session();
-        return this.instance;
-    }
-
-    init(){
+    static init(){
         return new Promise((resolve, reject) => {
-            let session = this;
-            if(this.initialized) {
+            let session = new Session();
+            
+            Session.retrieve((obj) => {
+                console.info('App::Session::init', obj);
+                if(obj !== null) obj.forEach((value, key) => session[key] = value);
                 resolve(session);
-            }else{
-                Session.retrieve((obj) => {
-                    console.info('App::Session::init', obj);
-                    
-                    if(obj !== null){
-                        obj.forEach((value, key) => session[key] = value);
-                    }
-                    resolve(session);
-                });
-            }
+            });
         });
     }
 
-    getExpiry(){
-        return this.expiry;
-    }
+    getExpiry() { return this.expiry; }
 
     setExpiry(expiry){
         this.expiry = expiry;
@@ -54,10 +35,7 @@ export default class Session {
 
     hasExpired(){
         let parsedExpiry = this.getParsedExpiry();
-        if(parsedExpiry !== null && parsedExpiry.getTime() < (new Date()).getUTCMilliseconds()){
-            return false;
-        }
-        return true;
+        return parsedExpiry === null || parsedExpiry.getTime() >= (new Date()).getUTCMilliseconds();
     }
 
     logout(){

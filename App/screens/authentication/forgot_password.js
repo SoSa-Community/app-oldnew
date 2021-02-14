@@ -69,7 +69,7 @@ export default class ForgotPassword extends Component {
                     <Text style={Styles.header}>What's your e-mail?</Text>
 
                     <View style={Styles.content_container}>
-                        <FormError message={this.state.requestError} />
+                        <FormError errors={this.state.requestError} />
                         <Input icon={['fal', 'envelope']} placeholder="Your e-mail address" value={this.state.emailInput} onChangeText={data => this.setState({ emailInput: data})} />
                         <ActivityButton showActivity={this.state.requesting} onPress={this.resetPassword} text="Reset My Password!"/>
                     </View>

@@ -13,11 +13,11 @@ import {
     KeyboardAvoidingView
 } from 'react-native';
 
-import withMembersNavigationContext from "../hoc/withMembersNavigationContext";
-import ActivityButton from "../../components/ActivityButton";
-import Input from "../../components/Input";
+import withMembersNavigationContext from "../../hoc/withMembersNavigationContext";
+import ActivityButton from "../../../components/ActivityButton";
+import Input from "../../../components/Input";
 
-import Helpers from "../../sosa/Helpers";
+import Helpers from "../../../sosa/Helpers";
 
 const dimensions = Dimensions.get('window');
 const imageHeight = Math.round(dimensions.width * 9 / 16);
@@ -200,7 +200,7 @@ export class CreateMeetup extends Component {
         
         let source = {};
         if(image) source = {uri : image};
-        else source = require('../../assets/choose_meetup_image_v2.jpg');
+        else source = require('../../../assets/choose_meetup_image_v2.jpg');
         
         const buttons = () => {
             const resetButton = image ? <ActivityButton text="Reset" style={{backgroundColor: 'rgba(125, 125, 200, 0.70)', paddingHorizontal: 24, borderRadius: 16, marginRight: 8}} onPress={() => {this.setState({image: ''})}} /> : null;

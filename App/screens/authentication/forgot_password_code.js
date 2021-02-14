@@ -158,7 +158,7 @@ export default class ForgotPasswordCode extends Component {
 
                     <View style={Styles.content_container}>
 
-                        <FormError message={this.state.checkError} />
+                        <FormError errors={this.state.checkError} />
                         {
                             this.state.emailProvided ?
                                     null :
@@ -179,7 +179,7 @@ export default class ForgotPasswordCode extends Component {
                             validateInput={() => this.validateTextField('codeInput', 'code', this.codeLength)}
                         />
 
-                        <FormError message={this.state.passwordError} />
+                        <FormError errors={this.state.passwordError} />
                         <SecureTextInput placeholder="New password" onChangeText={data => this.setState({ passwordInput: data})} validateInput={() => this.validatePassword()} />
 
                         <View style={Styles.buttonRow}>
