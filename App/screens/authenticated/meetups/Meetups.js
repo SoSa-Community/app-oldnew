@@ -4,20 +4,18 @@ import {
     View,
 } from 'react-native';
 
-import {MembersNavigationContext} from "../../../context/MembersNavigationContext";
+import { useAuthenticatedNavigation } from '../../../context/AuthenticatedNavigationContext';
+import { useAPI } from '../../../context/APIContext';
+
 import MeetupItem from "../../../components/meetups/MeetupItem";
 import { useFocusEffect } from '@react-navigation/native';
 
 const MeetupsScreen = ({navigation}) => {
     
-    const membersNavigationContext = useContext(MembersNavigationContext);
-    
-    const { addHeaderIcon, removeHeaderIcon, drawerNavigationContext } = membersNavigationContext;
-    const { appContext } = drawerNavigationContext;
-    const { apiClient } = appContext;
+    const { addHeaderIcon, removeHeaderIcon, drawerNavigationContext } = useAuthenticatedNavigation();
+    const { client: { services: { meetups: meetupService } } } = useAPI();
     
     const [meetups, setMeetups] = useState([]);
-    const { services: { meetups: meetupService } } = apiClient;
     
     const { navigate } = navigation;
     
