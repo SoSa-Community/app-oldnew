@@ -80,30 +80,6 @@ const AuthenticatedNavigationProvider = ({navigator: Navigator, ...props}) => {
         }
     }
     
-    const RightDrawer = () => {
-        return (
-            <View style={{flex:1}}>
-                <Drawer
-                    navigator={DrawerR.Navigator}
-                    drawerContent={props => <DrawerMenu {...props} scrollable ref={rightDrawerMenu} /> }
-                    drawerPosition="right"
-                    drawerType="slide"
-                    edgeWidth={38}
-                    ref={rightDrawer}
-                >
-                    <DrawerR.Screen name="Navigator">
-                        { (props) => {
-                            return <>
-                                <NavigationHeader ref={topBar} />
-                                <Navigator {...props} {...{setStackNavigation, setDrawerNavigation}} />
-                            </>
-                        } }
-                    </DrawerR.Screen>
-                </Drawer>
-            </View>
-        );
-    }
-    
     const addHeaderIcon = (id, icon, onPress) => { topBar?.current.addHeaderIcon(id, icon, onPress); };
     const removeHeaderIcon = (id) => { topBar?.current.removeHeaderIcon(id); }
     const setMenuOptions = (options, justUpdate, resetOnBack) => {
@@ -132,6 +108,10 @@ const AuthenticatedNavigationProvider = ({navigator: Navigator, ...props}) => {
             openRightDrawer,
             closeLeftDrawer,
             closeRightDrawer,
+            closeDrawers: () => {
+                closeLeftDrawer();
+                closeRightDrawer();
+            },
             addHeaderIcon,
             removeHeaderIcon,
             setMenuOptions,
@@ -148,7 +128,29 @@ const AuthenticatedNavigationProvider = ({navigator: Navigator, ...props}) => {
                     edgeWidth={38}
                     ref={leftDrawer}
                 >
-                    <DrawerL.Screen name="RightDrawer" component={RightDrawer} />
+                    <DrawerL.Screen name="RightDrawer">
+                        {() =>
+                            <View style={{flex:1}}>
+                                <Drawer
+                                    navigator={DrawerR.Navigator}
+                                    drawerContent={props => <DrawerMenu {...props} scrollable ref={rightDrawerMenu} /> }
+                                    drawerPosition="right"
+                                    drawerType="slide"
+                                    edgeWidth={38}
+                                    ref={rightDrawer}
+                                >
+                                    <DrawerR.Screen name="Navigator">
+                                        { (props) => {
+                                            return <>
+                                                <NavigationHeader ref={topBar} />
+                                                <Navigator {...props} {...{setStackNavigation, setDrawerNavigation}} />
+                                            </>
+                                        } }
+                                    </DrawerR.Screen>
+                                </Drawer>
+                            </View>
+                       }
+                    </DrawerL.Screen>
                 </Drawer>
             </NavigationContainer>
         </AuthenticatedNavigationContext.Provider>

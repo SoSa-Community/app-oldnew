@@ -26,9 +26,7 @@ const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, set
     const topBar = useRef();
     
     const [ isLoading, setIsLoading ] = useState(false);
-    const [ firstRun, setFirstRun ] = useState(false);
-    
-    
+    const [ firstRun, setFirstRun ] = useState(true);
     
     const showSettings = () => {
         closeLeftDrawer();
@@ -52,46 +50,45 @@ const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, set
     const isFocused = useIsFocused();
     
     useEffect(() => {
-        setStackNavigation(stackNavigation);
-        setDrawerNavigation(drawerNavigation);
-        console.debug('Re-rendering members navigator');
-
-        addDrawerItem('community', (
-            <View style={{marginBottom: 16}} key={'community'}>
-                <TouchableHighlight style={{}} onPress={showMeetups}>
-                    <View style={{
-                        textAlign: 'center',
-                        color: '#000000',
-                        paddingVertical: 12,
-                        paddingLeft: 10,
-                        flexDirection: 'row',
-                        justifyContent:'center',
-                        alignItems:'center'
-                    }}>
-                        <Icon icon={['fal', 'calendar-star']} size={18} style={{marginRight:14, color:'#fff'}}/>
-                        <Text style={{flex: 1, fontSize: 16, color:'#fff'}}>Meetups</Text>
-                    </View>
+        if(firstRun) {
+            setStackNavigation(stackNavigation);
+            setDrawerNavigation(drawerNavigation);
+            console.debug('Re-rendering members navigator', firstRun);
+            setFirstRun(false);
+    
+            addDrawerItem('community', (
+                <View style={{marginBottom: 16}} key={'community'}>
+                    <TouchableHighlight style={{}} onPress={showMeetups}>
+                        <View style={{
+                            textAlign: 'center',
+                            color: '#000000',
+                            paddingVertical: 12,
+                            paddingLeft: 10,
+                            flexDirection: 'row',
+                            justifyContent:'center',
+                            alignItems:'center'
+                        }}>
+                            <Icon icon={['fal', 'calendar-star']} size={18} style={{marginRight:14, color:'#fff'}}/>
+                            <Text style={{flex: 1, fontSize: 16, color:'#fff'}}>Meetups</Text>
+                        </View>
+                    </TouchableHighlight>
+                </View>
+            ));
+    
+            updateDrawerItem('options', (<View style={{justifyContent: 'flex-end', flexDirection:'row', marginBottom: 16}} key={'options'}>
+                <TouchableHighlight onPress={showSettings} style={{paddingHorizontal:14}}>
+                    <Icon icon={['fal', 'cogs']} size={28} style={{color:'#fff', alignSelf:'center'}}/>
                 </TouchableHighlight>
-            </View>
-        ));
-        
-        updateDrawerItem('options', (<View style={{justifyContent: 'flex-end', flexDirection:'row', marginBottom: 16}} key={'options'}>
-            <TouchableHighlight onPress={showSettings} style={{paddingHorizontal:14}}>
-                <Icon icon={['fal', 'cogs']} size={28} style={{color:'#fff', alignSelf:'center'}}/>
-            </TouchableHighlight>
-            <TouchableHighlight onPress={() => {}} style={{paddingHorizontal:14}}>
-                <Icon icon={['fal', 'sign-out-alt']} size={28} style={{color:'#fff', alignSelf:'center'}}/>
-            </TouchableHighlight>
-        </View>),false, true);
+                <TouchableHighlight onPress={() => {}} style={{paddingHorizontal:14}}>
+                    <Icon icon={['fal', 'sign-out-alt']} size={28} style={{color:'#fff', alignSelf:'center'}}/>
+                </TouchableHighlight>
+            </View>),false, true);
+        }
         //
     }, [firstRun]);
     
     
     const screenProps = {closeLeftDrawer, closeRightDrawer};
-    
-    const ChatScreen = (props) => {
-        return <Text>hello</Text>;
-    }
     
     return (
         <View style={BaseStyles.container} >

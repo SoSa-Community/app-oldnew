@@ -10,8 +10,6 @@ import BaseStyles from '../screens/styles/base';
 const Stack = createStackNavigator();
 
 const SoSa = () => {
-    let appNavigation = React.createRef();
-    const [ defaultScreen, setDefaultScreen ] = useState('MembersArea');
     
     return (
         <View style={BaseStyles.container}>

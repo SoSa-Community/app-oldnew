@@ -1,7 +1,8 @@
 import React, {
     createContext,
     useContext,
-    useEffect
+    useEffect,
+    useState
 } from 'react';
 import { Client } from 'sosa-chat-client';
 import AppConfig from '../config';
@@ -12,43 +13,55 @@ import { useApp } from './AppContext';
 
 const APIContext = createContext();
 
+class StaticClient {
+    static instance = null;
+    static getInstance(session, device, setSession, setDevice, validateSession, middleware) {
+        if (StaticClient.instance == null) {
+            StaticClient.instance = new Client(
+                {errors: AppConfig.errors, providers: AppConfig.providers},
+                io,
+                (response) => new Promise((resolve, reject) => {
+                        parseXMLString(response, function (err, result) {
+                            if(err) reject(err);
+                            else{ resolve(result); }
+                        });
+                    }
+                ),
+                {
+                    getDevice: () =>  new Promise(resolve => resolve(device)),
+                    updateDevice: (updatedDevice) => new Promise((resolve, reject) => {
+                        console.info('App::updateDevice', device, updatedDevice);
+                        setDevice(updatedDevice);
+                        resolve(updatedDevice);
+                    }),
+                    getSession: () => new Promise(resolve => resolve(session)),
+                    updateSession: (updatedSession) => new Promise((resolve, reject) => {
+                        setSession(updatedSession);
+                        resolve(updatedSession);
+                    }),
+                    generateJWT: (packet) => {
+                        if(!device?.secret) throw new Error('Device not initialized');
+                        return jwt.sign(packet, device.secret, {alg: "HS256"});
+                    },
+                    reauth: () => validateSession(),
+                    authFailed: () => {
+                        middleware.trigger('logout', 'authentication_failed')
+                            .finally(() => resolve('authentication_failed'));
+                    }
+                }
+            );
+        }
+        
+        return this.instance;
+    }
+}
+
+
 const APIProvider = (props) => {
     
     const { middleware, session, device, setSession, setDevice } = useApp();
     
-    const client = new Client(
-        {errors: AppConfig.errors, providers: AppConfig.providers},
-        io,
-        (response) => new Promise((resolve, reject) => {
-                parseXMLString(response, function (err, result) {
-                    if(err) reject(err);
-                    else{ resolve(result); }
-                });
-            }
-        ),
-        {
-            getDevice: () =>  new Promise(resolve => resolve(device)),
-            updateDevice: (updatedDevice) => new Promise((resolve, reject) => {
-                console.info('App::updateDevice', device, updatedDevice);
-                setDevice(updatedDevice);
-                resolve(updatedDevice);
-            }),
-            getSession: () => new Promise(resolve => resolve(session)),
-            updateSession: (updatedSession) => new Promise((resolve, reject) => {
-                setSession(updatedSession);
-                resolve(updatedSession);
-            }),
-            generateJWT: (packet) => {
-                if(!device?.secret) throw new Error('Device not initialized');
-                return jwt.sign(packet, device.secret, {alg: "HS256"});
-            },
-            reauth: () => validateSession(),
-            authFailed: () => {
-                middleware.trigger('logout', 'authentication_failed')
-                    .finally(() => resolve('authentication_failed'));
-            }
-        }
-    );
+    const [ client, setClient ] = useState(StaticClient.getInstance(session, device, setSession, setDevice, validateSession, middleware));
     
     const validateSession = () => {
         const { services: { auth } } = client;
@@ -64,6 +77,7 @@ const APIProvider = (props) => {
     }
     
     useEffect(() => {
+        console.debug('Re-rendering API Context');
         client.middleware.clear('api');
         client.middleware.add('api', {
             'event': (packet) => {
@@ -85,12 +99,12 @@ const APIProvider = (props) => {
                 });
             }
         });
-        
         return () => middleware.clear('app');
     }, []);
     
+    if(!client) return <></>;
     return (
-        <APIContext.Provider value={{ validateSession, middleware: client?.middleware, client }} {...props}/>
+        <APIContext.Provider value={{ validateSession, ...client }} {...props}/>
     );
 };
 

@@ -8,14 +8,23 @@ import RegistrationScreen from "../screens/authentication/register";
 import ForgotPassword from '../screens/authentication/forgot_password';
 import ForgotPasswordCode from '../screens/authentication/forgot_password_code';
 
+import { useApp } from '../context/AppContext';
+
 import BaseStyles from '../screens/styles/base';
+import SplashScreen from './Splash';
+import {useAuth} from '../context/AuthContext';
 
 const Stack = createStackNavigator();
 
 const SoSa = () => {
+    const { appInitialized } = useApp();
+    const { validatingLogin } = useAuth();
+    
     let appNavigation = React.createRef();
     
     const [ defaultScreen, setDefaultScreen ] = useState('Login');
+    
+    if(!appInitialized || validatingLogin) return <SplashScreen />;
     
     return (
         <View style={BaseStyles.container}>

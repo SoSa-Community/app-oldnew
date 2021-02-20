@@ -10,21 +10,18 @@ import { useAPI } from './APIContext';
 import Session from '../sosa/Session';
 import {useApp} from './AppContext';
 
+let preauthID = null;
 
 const AuthContext = createContext();
-
 const AuthProvider = (props) => {
     const { appInitialized, middleware } = useApp();
-    const { validateSession, client } = useAPI();
-    const { services: { auth: authService } } = client;
+    const { validateSession, services: { auth: authService } } = useAPI();
     
     const [ authenticated, setAuthenticated ] = useState(false);
-    const [ user, setUser ] = useState(null)
-    
-    let preauthID = null;
+    const [ user, setUser ] = useState(null);
+    const [ validatingLogin, setValidatingLogin ] = useState(true);
     
     const logout = (sessionAutoExpired) => {
-        const { services: { auth: authService } } = client;
         
         let clearSession = () => {
             let session = Session.getInstance();
@@ -100,9 +97,14 @@ const AuthProvider = (props) => {
         setUser(null);
     
         if(appInitialized) {
+            setValidatingLogin(true);
+            
             validateSession()
                 .then((json) => completeLogin(json))
-                .catch(() => setUser(null));
+                .catch(() => setUser(null))
+                .finally(() => {
+                    setValidatingLogin(false);
+                });
     
             middleware.add('app', {
                 'logout': (message) => {
@@ -117,8 +119,12 @@ const AuthProvider = (props) => {
         
     }, [appInitialized]);
     
+    useEffect(() => {
+        console.debug('Re-rendering AUTH Context');
+    }, []);
+    
     return (
-        <AuthContext.Provider value={{ socialLogin, authenticated, user, linkPreauth, deviceLogin, logout }} {...props} />
+        <AuthContext.Provider value={{ validatingLogin, socialLogin, authenticated, user, linkPreauth, deviceLogin, logout }} {...props} />
     );
 };
 

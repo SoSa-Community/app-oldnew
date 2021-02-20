@@ -2,14 +2,17 @@ import React, {
     createContext,
     useContext,
     useState,
-    useEffect
+    useEffect,
+    useRef,
+    useImperativeHandle,
+    forwardRef
 } from 'react';
 import {AppState, Linking, Modal, StyleSheet, Text, TouchableHighlight, View} from 'react-native';
 
 import Session from '../sosa/Session';
 import Device from '../sosa/Device';
-import SplashScreen from '../screens/Splash';
 import Helpers from '../sosa/Helpers';
+import SplashScreen from '../screens/Splash';
 
 const AppContext = createContext();
 const middleware = {};
@@ -56,13 +59,55 @@ const ModalStyles = StyleSheet.create({
     
 });
 
+const Modals = forwardRef((props, ref) => {
+    const [ modals, setModals ] = useState([]);
+    
+    const create = (title, description, onClose) => {
+        let existingModals = [...modals];
+        existingModals.push({title, description, onClose});
+        setModals(existingModals);
+    };
+    
+    useImperativeHandle(ref, () => ({
+            create
+    }));
+    
+    return modals.map((modal, index) => {
+            const {title, description} = modal;
+            
+            const closeModal = () => {
+                let existingModals = [...modals];
+                existingModals.splice(index, 1);
+                setModals(existingModals);
+            };
+            
+            return (<Modal visible={true} transparent={true} key={index}>
+                <View style={ModalStyles.container}>
+                    <View style={ModalStyles.innerContainer}>
+                        <View style={ModalStyles.bodyContainer}>
+                            <Text style={ModalStyles.title}>{title}</Text>
+                            <Text style={ModalStyles.description}>{description}</Text>
+                        </View>
+                        <View style={ModalStyles.buttonContainer}>
+                            <TouchableHighlight onPress={() => { console.debug('hello',index); closeModal() }} style={ModalStyles.okButton}>
+                                <Text style={ModalStyles.okButtonText}>OK</Text>
+                            </TouchableHighlight>
+                        </View>
+                    </View>
+                </View>
+            </Modal>)
+        });
+    
+});
+
 const AppProvider = ({children, ...props}) => {
     const [session, setSession] = useState(null);
     const [device, setDevice] = useState(null);
     
     const [appInitialized, setAppInitialized] = useState(false);
     const [ appState, setAppState ] = useState(AppState.currentState);
-    const [ modals, setModals ] = useState([]);
+    
+    const modals = useRef();
     
     const triggerMiddleware = (event, data) => {
         return new Promise((resolve, reject) => {
@@ -110,11 +155,13 @@ const AppProvider = ({children, ...props}) => {
     const clearMiddleware = (namespace) => middleware[namespace] = {};
     
     const setAndSaveSession = (session) => {
+        console.debug('Updating Session');
         session.save();
         setSession(session);
     };
     
     const setAndSaveDevice = (device) => {
+        console.debug('Updating Device');
         device.save();
         setDevice(device);
     };
@@ -144,39 +191,6 @@ const AppProvider = ({children, ...props}) => {
     const _handleAppStateChange = nextAppState => setAppState(nextAppState);
     Linking.getInitialURL().then((result) => handleDeepLink({url: result}, true));
     
-    const createModal = (title, description, onClose) => {
-        let existingModals = [...modals];
-        existingModals.push({title, description, onClose});
-        setModals(existingModals);
-    };
-    
-    const renderModals = () => {
-        modals.map((modal, index) => {
-            const {title, description} = modal;
-            
-            const closeModal = () => {
-                let existingModals = [...modals];
-                existingModals.splice(index, 1);
-                setModals(existingModals);
-            };
-            
-            return (<Modal visible={true} transparent={true} key={index}>
-                <View style={ModalStyles.container}>
-                    <View style={ModalStyles.innerContainer}>
-                        <View style={ModalStyles.bodyContainer}>
-                            <Text style={ModalStyles.title}>{title}</Text>
-                            <Text style={ModalStyles.description}>{description}</Text>
-                        </View>
-                        <View style={ModalStyles.buttonContainer}>
-                            <TouchableHighlight onPress={() => { console.debug('hello',index); closeModal() }} style={ModalStyles.okButton}>
-                                <Text style={ModalStyles.okButtonText}>OK</Text>
-                            </TouchableHighlight>
-                        </View>
-                    </View>
-                </View>
-            </Modal>)
-        });
-    }
     
     useEffect(() => {
         setAppInitialized(false);
@@ -225,13 +239,13 @@ const AppProvider = ({children, ...props}) => {
                 clear: clearMiddleware
             },
             modals: {
-                create: createModal
+                create: (title, description, onClose) => modals?.current?.create(title, description, onClose)
             },
             appInitialized
         }}
         {...props}
         >
-            { renderModals() }
+            <Modals ref={modals} />
             { children }
         </AppContext.Provider>
     );

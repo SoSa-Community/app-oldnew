@@ -75,10 +75,9 @@ export default class Helpers {
         return atob(input.replace(/[^A-Za-z0-9\+\/\=]/g, ""));
 	}
     
-    static uploadFile = (appContext, apiClient, communityId, isUploading, beforeUpload) => {
+    static uploadFile = (createModal, generalService, communityId, isUploading, beforeUpload) => {
 	    return new Promise((resolve, reject) => {
-            const { services: { general } } = apiClient;
-        
+            
             if(typeof(isUploading) !== 'function') isUploading = () => {};
             if(typeof(beforeUpload) !== 'function') beforeUpload = () => {};
             
@@ -86,36 +85,32 @@ export default class Helpers {
                 isUploading(false);
                 const title = 'Ooops! that\'s a bit too big!';
                 const message = 'The max image size is 10mb';
-                appContext.createModal(title, message);
+                createModal(title, message);
             };
             
             const { maxFileSize } = AppConfig;
             
             const doUpload = (file) => {
                 isUploading(true);
-                general.handleUpload(communityId, file).then(resolve).catch((errors) => {
+                generalService.handleUpload(communityId, file).then(resolve).catch((errors) => {
                     console.info('App::UploadFile::error', errors);
                     
-                    if(appContext){
-                        const code = errors?.message?.Code;
-                        let title = 'Error uploading image';
-                        let message = '';
-    
-                        if(Array.isArray(code)){
-                            if(code[0] === 'EntityTooLarge'){
-                                return fileTooBigError();
-                            }else{
-                                message = 'Invalid image';
-                            }
-                        }else{
-                            message = error?.message;
-                        }
-    
-                        if(message.length && message !== 'user_cancelled'){
-                            appContext.createModal(title, message);
-                        }
-                    }
                     
+                    const code = errors?.message?.Code;
+                    let title = 'Error uploading image';
+                    let message = '';
+
+                    if(Array.isArray(code)){
+                        if(code[0] === 'EntityTooLarge'){
+                            return fileTooBigError();
+                        }else{
+                            message = 'Invalid image';
+                        }
+                    }else{
+                        message = error?.message;
+                    }
+
+                    if(message.length && message !== 'user_cancelled') createModal(title, message);
                     
                     reject(errors);
                 }).finally(() => {
@@ -132,7 +127,7 @@ export default class Helpers {
                 },
             };
         
-            ImagePicker.showImagePicker(options, async (response) => {
+            ImagePicker.launchImageLibrary(options, (response) => {
                 if (response.didCancel) {
                     reject(new Error('user_cancelled'));
                 } else if (response.error) {

@@ -8,7 +8,7 @@ import Styles from "../screens/styles/onboarding";
 const FormError = ({errors}) => {
     
     const renderError = (error, index) => {
-        if(error && error.message.length > 0){
+        if(error?.message?.length > 0){
             return <Text style={Styles.error} key={index}>{error.message}</Text>;
         }
     }
