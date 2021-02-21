@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import {Linking, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Alert, Linking, View} from 'react-native';
 
 import { useAuth } from '../../context/AuthContext';
 
@@ -7,13 +7,17 @@ import AppConfig from '../../config';
 
 import SocialButton from '../SocialButton';
 import FormError from '../FormError';
+import {useApp} from '../../context/AppContext';
+const onboardingPath = '../../assets/onboarding/';
 
-const SocialButtons = ({screenType, setError, socialMediaError, setSocialMediaError, processing, setProcessing}) => {
+const SocialButtons = ({forLogin, setError, socialMediaError, setSocialMediaError, processing, setProcessing}) => {
+    const { middleware } = useApp();
+    const { linkPreauth, deviceLogin } = useAuth();
     
     const { socialLogin } = useAuth();
+    const screenType = forLogin ? 'login' : 'register';
     
     const {social: {imgur, reddit, google, twitter, facebook}} = AppConfig.features[screenType];
-    const onboardingPath = '../../assets/onboarding/';
     
     let login = (network) => {
         setError('')
@@ -23,7 +27,7 @@ const SocialButtons = ({screenType, setError, socialMediaError, setSocialMediaEr
         // Protects against state getting out of sync
         setTimeout(() => setProcessing(false),1000);
         
-        socialLogin(screenType, network)
+        socialLogin(forLogin, network)
             .catch(error => {
                 console.debug(error);
                 setSocialMediaError(error?.message)
@@ -33,6 +37,36 @@ const SocialButtons = ({screenType, setError, socialMediaError, setSocialMediaEr
     const createSocialButton = (network, icon) => {
         return <SocialButton onPress={() => login(network)} icon={icon} enabled={!processing} />;
     };
+    
+    useEffect(() => {
+        middleware.clear('login');
+        middleware.add('login', `${screenType}/preauth`, (data) => {
+            const {status, link_token, device_id, unregistered, error} = data;
+            console.info('App::AuthComponent::preauth_trigger', data);
+            
+            if(status === 'success'){
+                if(unregistered){
+                    Alert.alert("You're not registered!","Would you like us to create an account for you?",
+                        [{text: "No", style: "cancel"},
+                            {
+                                text: "Sure! let's do it!",
+                                onPress: () => {
+                                    linkPreauth(link_token)
+                                        .catch((error) => setSocialMediaError(error));
+                                }
+                            }],
+                        { cancelable: true }
+                    );
+                }else{
+                    deviceLogin(device_id)
+                        .catch((error) => setSocialMediaError(error));
+                }
+            }
+            else {
+                setSocialMediaError(error);
+            }
+        }, true);
+    }, []);
     
     return <View>
         <FormError errors={socialMediaError} />

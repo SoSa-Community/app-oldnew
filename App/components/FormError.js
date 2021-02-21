@@ -11,6 +11,7 @@ const FormError = ({errors}) => {
         if(error?.message?.length > 0){
             return <Text style={Styles.error} key={index}>{error.message}</Text>;
         }
+        return <></>;
     }
     
     if(errors) {

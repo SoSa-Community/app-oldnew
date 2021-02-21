@@ -18,12 +18,14 @@ import CreateMeetupScreen from "./authenticated/meetups/CreateMeetup";
 import MyProfileScreen from './authenticated/MyProfile';
 import { useAuthenticatedNavigation } from '../context/AuthenticatedNavigationContext';
 import WelcomeScreen from './authenticated/Welcome';
+import {useAuth} from '../context/AuthContext';
 const Stack = createStackNavigator();
 
 const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, setDrawerNavigation}) => {
     const { add: addDrawerItem, update: updateDrawerItem, closeLeftDrawer, closeRightDrawer } = useAuthenticatedNavigation();
+    const { logout } = useAuth();
+    
     const stackNavigation = useRef();
-    const topBar = useRef();
     
     const [ isLoading, setIsLoading ] = useState(false);
     const [ firstRun, setFirstRun ] = useState(true);
@@ -46,8 +48,6 @@ const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, set
     };
     
     if(isLoading) return <View><Text>Loading</Text></View>
-    
-    const isFocused = useIsFocused();
     
     useEffect(() => {
         if(firstRun) {
@@ -79,7 +79,7 @@ const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, set
                 <TouchableHighlight onPress={showSettings} style={{paddingHorizontal:14}}>
                     <Icon icon={['fal', 'cogs']} size={28} style={{color:'#fff', alignSelf:'center'}}/>
                 </TouchableHighlight>
-                <TouchableHighlight onPress={() => {}} style={{paddingHorizontal:14}}>
+                <TouchableHighlight onPress={() => logout()} style={{paddingHorizontal:14}}>
                     <Icon icon={['fal', 'sign-out-alt']} size={28} style={{color:'#fff', alignSelf:'center'}}/>
                 </TouchableHighlight>
             </View>),false, true);

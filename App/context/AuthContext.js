@@ -14,7 +14,7 @@ let preauthID = null;
 
 const AuthContext = createContext();
 const AuthProvider = (props) => {
-    const { appInitialized, middleware } = useApp();
+    const { appInitialized, middleware, session } = useApp();
     const { validateSession, services: { auth: authService } } = useAPI();
     
     const [ authenticated, setAuthenticated ] = useState(false);
@@ -24,8 +24,9 @@ const AuthProvider = (props) => {
     const logout = (sessionAutoExpired) => {
         
         let clearSession = () => {
-            let session = Session.getInstance();
-            session.logout().then(() => setUser(null));
+            session.logout().then(() => setUser(null)).catch(error => {
+                console.debug(error);
+            });
         };
         
         if(sessionAutoExpired === true){
@@ -50,11 +51,41 @@ const AuthProvider = (props) => {
         }
     };
     
-    
     const completeLogin = (json) => {
         const { user } = json;
         setUser(user);
     }
+    
+    const login = (username, password) => {
+        return new Promise((resolve, reject) => {
+            if(!username) reject(new Error('provide_username'));
+            else if(!password) reject(new Error('provide_password'))
+            else {
+                authService.login(username, password)
+                    .then((response) => {
+                        completeLogin(response)
+                        resolve(response);
+                    })
+                    .catch((error) => reject(error))
+            }
+        })
+    };
+    
+    const register = (username, password, email) => {
+        return new Promise((resolve, reject) => {
+            if(!username) reject(new Error('provide_username'));
+            else if(!password) reject(new Error('provide_password'))
+            else if(!email) reject(new Error('provide_email'))
+            else {
+                authService.register(username, password, email)
+                    .then((response) => {
+                        completeLogin(response)
+                        resolve(response);
+                    })
+                    .catch((error) => reject(error))
+            }
+        })
+    };
     
     const deviceLogin = (device_id) => {
         return new Promise((resolve, reject) => {
@@ -79,11 +110,11 @@ const AuthProvider = (props) => {
         });
     }
     
-    const socialLogin = (type, network) => {
+    const socialLogin = (forLogin, network) => {
         return authService.createPreauth()
             .then(id => {
                 preauthID = id;
-                Linking.openURL(authService.getPreauthURI(type, network, id));
+                Linking.openURL(authService.getPreauthURI(forLogin ? 'login' : 'register', network, id));
                 return id;
             })
     }
@@ -124,7 +155,7 @@ const AuthProvider = (props) => {
     }, []);
     
     return (
-        <AuthContext.Provider value={{ validatingLogin, socialLogin, authenticated, user, linkPreauth, deviceLogin, logout }} {...props} />
+        <AuthContext.Provider value={{ login, register, validatingLogin, socialLogin, authenticated, user, linkPreauth, deviceLogin, logout }} {...props} />
     );
 };
 
