@@ -13,7 +13,7 @@ import { useFocusEffect } from '@react-navigation/native';
 const MeetupsScreen = ({navigation}) => {
     
     const { addHeaderIcon, removeHeaderIcon, drawerNavigationContext } = useAuthenticatedNavigation();
-    const { client: { services: { meetups: meetupService } } } = useAPI();
+    const { services: { meetups: meetupService } } = useAPI();
     
     const [meetups, setMeetups] = useState([]);
     

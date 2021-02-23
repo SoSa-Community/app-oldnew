@@ -107,7 +107,9 @@ const NavigationHeader = forwardRef((
             else toggleSwipe(true);
         
             if(!justUpdate) menuStack.push(currentState);
-        }
+        },
+    
+        popMenuStack
     }))
     
     if(!showTopBar) return <></>;

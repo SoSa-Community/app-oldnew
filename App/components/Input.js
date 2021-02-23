@@ -122,7 +122,7 @@ const Input = (
 
 		const picker = (
 			<Picker
-				selectedValue={Platform.OS === 'ios' && tempPickerValue ? tempPickerValue : dateInputValue}
+				selectedValue={Platform.OS === 'ios' && tempPickerValue ? tempPickerValue : inputValue}
 				placeholder={placeholder}
 				prompt={placeholder}
 				style={{flex: 1, color: '#121111'}}
@@ -233,6 +233,24 @@ const Input = (
         return icon && <Icon icon={icon}  style={Styles.inputIcon} size={18}/>
     };
     
+    const validateLength = () => {
+        if(typeof(setIsValid) === 'function'){
+            if((!maxLength || inputValue.length <= maxLength) && inputValue.length >= minLength) setIsValid(true);
+            else  setIsValid(false);
+        }
+    }
+    
+    
+    useEffect( () => {
+        if(maxLength || minLength) {
+            if (maxLength > 0) {
+                setLengthPercentage(Math.floor((inputValue.length / maxLength) * 100));
+            }
+            validateLength();
+        }
+    }, [inputValue] );
+    
+    
     useEffect(() => {
         if(type === 'date' || type === 'time'){
             let date = (new Date(dateValue));
@@ -254,17 +272,7 @@ const Input = (
         setDateInputValue(dateValue);
     }, [value]);
     
-    if(maxLength > 0){
-        useEffect( () => {
-            setLengthPercentage(Math.floor((inputValue.length / maxLength) * 100));
-            if(typeof(setIsValid) === 'function'){
-                if(inputValue.length <= maxLength && inputValue.length >= minLength) setIsValid(true);
-                else  setIsValid(false);
-            }
-        }, [inputValue] )
-    }
-    
-	return (
+    return (
         <View style={[containerStyle]}>
             {   label && label.length ?
                 <Text style={[{color: '#fff', marginTop: 8, marginBottom: 4, fontSize:16}, labelStyle]}>{label}</Text> :

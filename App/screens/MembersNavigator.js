@@ -93,7 +93,7 @@ const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, set
     return (
         <View style={BaseStyles.container} >
             <NavigationContainer independent={true} ref={stackNavigation} onStateChange={(state) => {if (!state) return;}}>
-                <Stack.Navigator>
+                <Stack.Navigator initialRouteName="Meetups">
                     <Stack.Screen name="Chat" options={{ headerShown: false }} component={ChatScreen} />
                     <Stack.Screen name="Meetups" options={{ headerShown: false}} component={MeetupsScreen} />
                     <Stack.Screen name="Meetup" options={{ headerShown: false}} component={MeetupScreen} />

@@ -85,6 +85,7 @@ const AuthenticatedNavigationProvider = ({navigator: Navigator, ...props}) => {
     const setMenuOptions = (options, justUpdate, resetOnBack) => {
         topBar?.current?.setMenuOptions(options, justUpdate, resetOnBack);
     };
+    const popMenuStack = () => { topBar?.current.popMenuStack(); }
     
     return (
         <AuthenticatedNavigationContext.Provider value={{
@@ -114,8 +115,9 @@ const AuthenticatedNavigationProvider = ({navigator: Navigator, ...props}) => {
             },
             addHeaderIcon,
             removeHeaderIcon,
+            popMenuStack,
             setMenuOptions,
-            getStackNavigator: () => stackNavigation
+            getStackNavigator: () => stackNavigation,
         }}
                                     {...props}
         >

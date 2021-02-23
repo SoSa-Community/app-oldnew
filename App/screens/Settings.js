@@ -33,11 +33,7 @@ const SettingsScreen = () => {
     const { setMenuOptions } = useAuthenticatedNavigation();
     
     useEffect(() => {
-        console.debug('hello2');
         setMenuOptions({showLeft:true, showRight: false, leftMode: 'back', title: 'Settings'})
-        return () => {
-            console.debug('cancelled')
-        }
     }, [])
     
     
