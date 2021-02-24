@@ -5,10 +5,10 @@ import {
     View,
     ImageBackground, StyleSheet, Image, FlatList, Platform, KeyboardAvoidingView, Dimensions
 } from 'react-native';
+import Helpers from "../../../sosa/Helpers";
 
 import { useAuthenticatedNavigation } from '../../../context/AuthenticatedNavigationContext';
 import { useAPI } from '../../../context/APIContext';
-import Helpers from "../../../sosa/Helpers";
 
 import ActivityButton from "../../../components/ActivityButton";
 import Icon from "../../../components/Icon";
@@ -109,15 +109,45 @@ const Styles = StyleSheet.create({
     },
 });
 
-const MeetupScreen = () => {
+const Comments = ({comments}) => {
+    if(Array.isArray(comments) && comments.length){
+        return comments.map((item, index) => (<CommentItem comment={item} key={item.id} />));
+    }
+}
+
+const Attendees = ({attendees}) => {
+    if(Array.isArray(attendees) && attendees.length){
+        return (
+            <View style={Styles.attendeesContainer}>
+                {
+                    attendees.map((attendee) => (
+                        <View style={Styles.attendeeImageContainer} key={attendee?.id}>
+                            <Image source={{uri : attendee.picture}} style={Styles.attendeeImage}  />
+                        </View>
+                    ))
+                }
+            </View>
+        );
+    }
+    return <></>;
+}
+
+const AttendingButton = ({meetup, attendees, toggleGoing, saving}) => {
+    const buttonText = meetup?.going ? 'Not Going' : (attendees.length ? 'Going' : 'Be the first to go!');
+    return <ActivityButton text={buttonText} style={{backgroundColor: meetup?.going ? '#dc3545' : '#28a745'}} onPress={toggleGoing} showActivity={saving} />;
+}
+
+const MeetupImage = ({meetup, children}) => {
+    let imageSource = {};
+    if(meetup?.image) imageSource = {uri : meetup.image};
+    else imageSource = require('../../../assets/choose_meetup_image_v2.jpg');
+    
+    return <ImageBackground source={imageSource} style={Styles.image}>{children}</ImageBackground>;
+}
+
+const MeetupScreen = ({navigation, route}) => {
     const { setMenuOptions } = useAuthenticatedNavigation();
-    const { client } = useAPI();
-    const { services: { meetupService, commentsService } } = client;
-    
-    
-    const id = null;
-    let hasAttendees = false;
-    let attendees = null;
+    const { services: { meetups: meetupService, comments: commentsService } } = useAPI();
     
     const flatListRef = createRef();
     const [saving, setSaving] = useState(false);
@@ -130,27 +160,29 @@ const MeetupScreen = () => {
     const [meetup, setMeetup] = useState(null);
     const [comments, setComments] = useState([]);
     const [comment, setComment] = useState('');
+    const [attendees, setAttendees] = useState([]);
     
     
     useEffect(() => {
+        
         setMenuOptions({showLeft:true, showRight: false, leftMode: 'back', title: ''});
     
-        meetupService.get(id).then((meetup) => {
-            meetup.attendees = [
-                {id:1, picture: `https://botface.io/generate?seed=${Math.random()}`},
-                {id:2, picture: `https://botface.io/generate?seed=${Math.random()}`},
-                {id:3, picture: `https://botface.io/generate?seed=${Math.random()}`},
-                {id:4, picture: `https://botface.io/generate?seed=${Math.random()}`},
-                {id:5, picture: `https://botface.io/generate?seed=${Math.random()}`},
-            ];
-            meetup.going = false;
-            setMeetup(meetup);
-            setComments(meetup.comments);
-            setMenuOptions({title: meetup.title}, true);
-        })
-        .catch((errors) => {
-            console.debug(errors);
-        })
+        const id = route?.params?.id;
+        meetupService.get(id)
+            .then(meetup => {
+                setAttendees([
+                    {id:1, picture: `https://botface.io/generate?seed=${Math.random()}`},
+                    {id:2, picture: `https://botface.io/generate?seed=${Math.random()}`},
+                    {id:3, picture: `https://botface.io/generate?seed=${Math.random()}`},
+                    {id:4, picture: `https://botface.io/generate?seed=${Math.random()}`},
+                    {id:5, picture: `https://botface.io/generate?seed=${Math.random()}`},
+                ]);
+                meetup.going = false;
+                setMeetup(meetup);
+                setComments(meetup?.comments);
+                setMenuOptions({title: meetup?.title}, true);
+            })
+            .catch((errors) => console.debug(errors))
         
     }, [])
     
@@ -158,15 +190,19 @@ const MeetupScreen = () => {
         Keyboard.dismiss();
         
         setSending(true);
-        commentsService.create('sosa', comment,'meetup', id)
+        commentsService.create('sosa', comment,'meetup', meetup?.id)
             .then(comment => {
                 let existingComments = [...comments];
                 existingComments.unshift(comment);
+                
                 setComments(existingComments);
                 setComment('');
-                flatListRef.scrollToIndex({animated: true, index: 1});
+                flatListRef?.current?.scrollToIndex({animated: true, index: 1});
             })
-            .finally(() => sending(false));
+            .catch(error => {
+                console.error('Meetup::sendComment', error);
+            })
+            .finally(() => setSending(false));
     }
     
     const buildWrapper = (children) => {
@@ -174,40 +210,29 @@ const MeetupScreen = () => {
         return <KeyboardAvoidingView style={{flex: 1, backgroundColor: '#121111'}} behavior="padding" keyboardVerticalOffset={Math.floor(dimensions.height / 100 * 9)}>{children}</KeyboardAvoidingView>;
     }
     
-    const renderComments = () => {
-        if(Array.isArray(comments) && comments.length){
-            return comments.map((item, index) => (<CommentItem comment={item} key={item.id} />));
-        }
-    }
     
-    if(Array.isArray(meetup.attendees)){
-        if(meetup.attendees.length) hasAttendees = true;
-        attendees = meetup.attendees.map((attendee) => {
-            return <View style={Styles.attendeeImageContainer} key={attendee.id}><Image source={{uri : attendee.picture}} style={Styles.attendeeImage}  /></View>
-        });
-    }
-    
-    
-    
-    const buttonText = meetup.going ? 'Not Going' : (hasAttendees ? 'Going' : 'Be the first to go!');
-    
-    let imageSource = {};
-    if(meetup.image) imageSource = {uri : meetup.image};
-    else imageSource = require('../../../assets/choose_meetup_image_v2.jpg');
     
     const toggleGoing = () => {
         setSaving(true);
         setTimeout(() => {
-            let currentMeetup = Object.assign({}, meetup);
+            let currentMeetup = {...meetup};
+            let currentAttendees = [...attendees];
         
             currentMeetup.going = !currentMeetup.going;
         
-            if(currentMeetup.going && !hasAttendees) currentMeetup.attendees = [ {picture: `https://botface.io/generate?seed=${Math.random()}`} ];
-            if(currentMeetup.going && hasAttendees) currentMeetup.attendees.push({picture: `https://botface.io/generate?seed=${Math.random()}`});
-            if(!currentMeetup.going) meetup.attendees.pop();
+            if(currentMeetup.going && !attendees.length) {
+                currentAttendees = [ {picture: `https://botface.io/generate?seed=${Math.random()}`} ];
+            }
+            
+            if(currentMeetup.going && attendees.length) {
+                currentAttendees.push({picture: `https://botface.io/generate?seed=${Math.random()}`});
+            }
+            
+            if(!currentMeetup.going) currentAttendees.pop();
         
             setSaving(false);
             setMeetup(currentMeetup);
+            setAttendees(currentAttendees);
             
         }, 100);
     };
@@ -217,33 +242,30 @@ const MeetupScreen = () => {
             <View style={{flex:1, backgroundColor: '#121111'}}>
                 <View style={{flex:0}}>
                     <View style={{height:175}}>
-                        <ImageBackground source={imageSource} style={Styles.image}>
+                        <MeetupImage {...{ meetup } }>
                             <View style={Styles.imageOverlay} />
                             <View style={Styles.imageTitleContainer}>
                                 <View style={Styles.imageTitleInnerContainer}>
-                                    <Text style={Styles.title}>{meetup.title}</Text>
-                                    <Text style={Styles.meetupDate}>{ Helpers.dateToLongForm(meetup.start_datetime) }</Text>
+                                    <Text style={Styles.title}>{meetup?.title}</Text>
+                                    <Text style={Styles.meetupDate}>{ Helpers.dateToLongForm(meetup?.start_datetime) }</Text>
                                 </View>
                             </View>
                             <View style={Styles.imageBottomContainer}>
                                 <View style={Styles.imageBottomInnerContainer}>
                                     <View style={Styles.infoIconContainer}>
-                                        <Icon icon={meetup.type === 'virtual' ? ['fas', 'trees'] : ['far', 'wifi']} style={{opacity: 0.95}} size={28} color='#cccccc' />
+                                        <Icon icon={meetup?.type === 'virtual' ? ['fas', 'trees'] : ['far', 'wifi']} style={{opacity: 0.95}} size={28} color='#cccccc' />
                                     </View>
                                 </View>
                             </View>
-                        </ImageBackground>
+                        </MeetupImage>
                     </View>
                 </View>
                 <View style={Styles.buttonContainer}>
                     <View style={Styles.viewButtonContainer}>
-                        { hasAttendees &&
-                        <View style={Styles.attendeesContainer}>
-                            { attendees }
-                        </View>}
+                        <Attendees {...{ attendees } }/>
                     </View>
                     <View style={{flex:1}}>
-                        <ActivityButton text={buttonText} style={{backgroundColor: meetup?.going ? '#dc3545' : '#28a745'}} onPress={toggleGoing} showActivity={saving} />
+                        <AttendingButton {...{ meetup, attendees, toggleGoing, saving } } />
                     </View>
                 </View>
                 <View style={{flex:1, alignItems:'flex-start'}}>
@@ -263,7 +285,7 @@ const MeetupScreen = () => {
                                     if(comments.length){
                                         return <View style={{flex:1}}>
                                             <Text style={{fontSize:18, color:'#fff', marginLeft:4, marginTop: 16, marginBottom:8}}>Comments</Text>
-                                            {renderComments()}
+                                            <Comments {...{ comments } } />
                                         </View>
                                     }
                                 }
