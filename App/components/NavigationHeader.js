@@ -22,7 +22,7 @@ const Styles = StyleSheet.create({
 });
 
 const NavigationHeader = forwardRef((
-    { onBack, ...props },
+    { ...props },
     ref
 ) =>
 {
@@ -57,8 +57,8 @@ const NavigationHeader = forwardRef((
     };
     
     useEffect(() => {
-            BackHandler.addEventListener('hardwareBackPress', popMenuStack);
-            return () => BackHandler.removeEventListener('hardwareBackPress', popMenuStack);
+        BackHandler.addEventListener('hardwareBackPress', popMenuStack);
+        return () => BackHandler.removeEventListener('hardwareBackPress', popMenuStack);
     }, [popMenuStack]);
     
     useImperativeHandle(ref, () => ({
@@ -91,12 +91,13 @@ const NavigationHeader = forwardRef((
         },
     
         setMenuOptions(options, justUpdate, resetOnBack) {
+            
             let currentState = {...menu};
             let updateState = false;
             
             for(let key in options){
                 let option = options[key];
-                if(currentState.hasOwnProperty(key) && currentState[key] !== option){
+                if(!currentState.hasOwnProperty(key) || currentState[key] !== option){
                     updateState = true;
                     currentState[key] = option;
                 }
@@ -114,20 +115,24 @@ const NavigationHeader = forwardRef((
     
     if(!showTopBar) return <></>;
     
-    const {title, leftMode, showLeft, showRight} = menu;
+    const {title, leftMode, showLeft, showRight, onBack, backIgnoreStack, leftIcon} = menu;
     if(showLeft){
         let menuIcon = null;
         if(leftMode === 'back'){
-            menuIcon = <IconButton icon={['fal', 'chevron-left']} style={{color: '#CCC'}} size={22} onPress={() => {
-                if(typeof(onBack) === 'function') {
-                    try {
-                        onBack();
-                    } catch (e) {
-                        console.debug('Go Back Went Wrong', e);
+            menuIcon = <IconButton icon={leftIcon || ['fal', 'chevron-left']} style={{color: '#CCC'}} size={22} onPress={() => {
+                const goBack = () => {
+                    if(!backIgnoreStack){
+                        popMenuStack();
+                        getStackNavigator()?.current?.goBack();
                     }
+                };
+                console.debug(typeof(onBack));
+                if(typeof(onBack) === 'function') {
+                    onBack()
+                        .catch(e => console.debug('Go Back Went Wrong', e))
+                        .finally(() =>  goBack());
                 }
-                popMenuStack();
-                getStackNavigator()?.current?.goBack();
+                else { goBack(); }
             }}/>
         }else{
             menuIcon = <IconButton icon={['fal', 'bars']} style={{color: '#CCC'}} size={22} onPress={() => {

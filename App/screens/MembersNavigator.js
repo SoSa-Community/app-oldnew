@@ -1,19 +1,18 @@
 import React, { useState, useRef, useEffect, memo } from 'react';
-import {Button, Text, View, TouchableHighlight} from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
+import {Text, View, TouchableHighlight} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import BaseStyles from "./styles/base";
 
-import ChatScreen from "./authenticated/chat";
 
-import { NavigationContainer } from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+
 import Icon from "../components/Icon";
 import MeetupsScreen from "./authenticated/meetups/Meetups";
 import MeetupScreen from "./authenticated/meetups/Meetup";
 import SettingsScreen from './Settings';
 
-
+import ChatScreen from "./authenticated/chat";
 import CreateMeetupScreen from "./authenticated/meetups/CreateMeetup";
 import MyProfileScreen from './authenticated/MyProfile';
 import { useAuthenticatedNavigation } from '../context/AuthenticatedNavigationContext';
@@ -87,13 +86,10 @@ const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, set
         //
     }, [firstRun]);
     
-    
-    const screenProps = {closeLeftDrawer, closeRightDrawer};
-    
     return (
         <View style={BaseStyles.container} >
             <NavigationContainer independent={true} ref={stackNavigation} onStateChange={(state) => {if (!state) return;}}>
-                <Stack.Navigator initialRouteName="Meetups">
+                <Stack.Navigator initialRouteName="Chat">
                     <Stack.Screen name="Chat" options={{ headerShown: false }} component={ChatScreen} />
                     <Stack.Screen name="Meetups" options={{ headerShown: false}} component={MeetupsScreen} />
                     <Stack.Screen name="Meetup" options={{ headerShown: false}} component={MeetupScreen} />
