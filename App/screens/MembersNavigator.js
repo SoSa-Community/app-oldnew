@@ -1,11 +1,9 @@
 import React, { useState, useRef, useEffect, memo } from 'react';
-import {Text, View, TouchableHighlight} from 'react-native';
+import {StyleSheet, Text, View, TouchableHighlight} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import BaseStyles from "./styles/base";
-
-
 
 import Icon from "../components/Icon";
 import MeetupsScreen from "./authenticated/meetups/Meetups";
@@ -17,8 +15,53 @@ import CreateMeetupScreen from "./authenticated/meetups/CreateMeetup";
 import MyProfileScreen from './authenticated/MyProfile';
 import { useAuthenticatedNavigation } from '../context/AuthenticatedNavigationContext';
 import WelcomeScreen from './authenticated/Welcome';
-import {useAuth} from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 const Stack = createStackNavigator();
+
+const Styles = StyleSheet.create({
+    menuItem: {
+        textAlign: 'center',
+        color: '#000000',
+        paddingVertical: 12,
+        paddingLeft: 10,
+        flexDirection: 'row',
+        justifyContent:'center',
+        alignItems:'center'
+    },
+    
+    menuItemText: {
+        flex: 1,
+        fontSize: 16,
+        color:'#fff'
+    },
+    
+    menuItemIcon: {
+        marginRight:14,
+        color:'#fff'
+    },
+    
+    menuFooterIcon: {
+        color:'#fff',
+        alignSelf:'center'
+    },
+    
+    menuFooterButtons: {
+        justifyContent: 'flex-end',
+        flexDirection:'row',
+        marginBottom: 16
+    },
+    
+    menuFooterButton: {
+        paddingHorizontal:14
+    }
+    
+});
+
+const FooterButton = ({icon, onPress}) => {
+    return <TouchableHighlight onPress={onPress} style={Styles.menuFooterButton}>
+        <Icon icon={icon} size={28} style={Styles.menuFooterIcon}/>
+    </TouchableHighlight>
+}
 
 const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, setDrawerNavigation}) => {
     const { add: addDrawerItem, update: updateDrawerItem, closeLeftDrawer, closeRightDrawer } = useAuthenticatedNavigation();
@@ -57,31 +100,21 @@ const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, set
     
             addDrawerItem('community', (
                 <View style={{marginBottom: 16}} key={'community'}>
-                    <TouchableHighlight style={{}} onPress={showMeetups}>
-                        <View style={{
-                            textAlign: 'center',
-                            color: '#000000',
-                            paddingVertical: 12,
-                            paddingLeft: 10,
-                            flexDirection: 'row',
-                            justifyContent:'center',
-                            alignItems:'center'
-                        }}>
-                            <Icon icon={['fal', 'calendar-star']} size={18} style={{marginRight:14, color:'#fff'}}/>
-                            <Text style={{flex: 1, fontSize: 16, color:'#fff'}}>Meetups</Text>
+                    <TouchableHighlight onPress={showMeetups}>
+                        <View style={Styles.menuItem}>
+                            <Icon icon={['fal', 'calendar-star']} size={18} style={Styles.menuItemIcon}/>
+                            <Text style={Styles.menuItemText}>Meetups</Text>
                         </View>
                     </TouchableHighlight>
                 </View>
             ));
     
-            updateDrawerItem('options', (<View style={{justifyContent: 'flex-end', flexDirection:'row', marginBottom: 16}} key={'options'}>
-                <TouchableHighlight onPress={showSettings} style={{paddingHorizontal:14}}>
-                    <Icon icon={['fal', 'cogs']} size={28} style={{color:'#fff', alignSelf:'center'}}/>
-                </TouchableHighlight>
-                <TouchableHighlight onPress={() => logout()} style={{paddingHorizontal:14}}>
-                    <Icon icon={['fal', 'sign-out-alt']} size={28} style={{color:'#fff', alignSelf:'center'}}/>
-                </TouchableHighlight>
-            </View>),false, true);
+            updateDrawerItem('options', (
+                <View style={Styles.menuFooterButtons} key={'options'}>
+                    <FooterButton onPress={showSettings} icon={['fal', 'cogs']} />
+                    <FooterButton onPress={() => logout()} icon={['fal', 'sign-out-alt']} />
+                </View>
+            ),false, true);
         }
         //
     }, [firstRun]);
