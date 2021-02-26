@@ -10,7 +10,7 @@ import MeetupsScreen from "./authenticated/meetups/Meetups";
 import MeetupScreen from "./authenticated/meetups/Meetup";
 import SettingsScreen from './Settings';
 
-import ChatScreen from "./authenticated/chat";
+import ChatScreen from "./authenticated/Chat";
 import CreateMeetupScreen from "./authenticated/meetups/CreateMeetup";
 import MyProfileScreen from './authenticated/MyProfile';
 import { useAuthenticatedNavigation } from '../context/AuthenticatedNavigationContext';
