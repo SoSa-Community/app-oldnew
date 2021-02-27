@@ -119,7 +119,7 @@ const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePress, my
                 </TouchableOpacity>
             </View>
             <View style={Styles.messageContainer}>
-                <TouchableOpacity onPress={onUsernamePress}>
+                <TouchableOpacity onPress={onUsernamePress} onLongPress={onLongFacePress}>
                     <Text style={Styles.username}>{message?.user?.nickname}</Text>
                 </TouchableOpacity>
                 <View>

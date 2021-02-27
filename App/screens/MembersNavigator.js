@@ -137,7 +137,9 @@ const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, set
                         { (props) => <ChatScreen {...props} showMemberProfile={showMemberProfile}  /> }
                     </Stack.Screen>
                     <Stack.Screen name="Meetups" options={{ headerShown: false}} component={MeetupsScreen} />
-                    <Stack.Screen name="Meetup" options={{ headerShown: false}} component={MeetupScreen} />
+                    <Stack.Screen name="Meetup" options={{ headerShown: false }}>
+                        { (props) => <MeetupScreen {...props} showMemberProfile={showMemberProfile}  /> }
+                    </Stack.Screen>
                     <Stack.Screen name="CreateMeetup" options={{ headerShown: false}} component={CreateMeetupScreen} />
                     <Stack.Screen name="MyProfile" options={{ headerShown: false}} component={MyProfileScreen} />
                     <Stack.Screen name="Settings" options={{ headerShown: false}} component={SettingsScreen} />

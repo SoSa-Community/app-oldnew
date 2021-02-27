@@ -103,11 +103,14 @@ const ChatScreen = ({navigation, showMemberProfile}) => {
     const updateUserList = () => {
         updateDrawerItem('user_list', (
             <View style={{flex:1}} key={'user_list'}>
-                <UserList userList={userList} onPress={
-                    (user) => {
+                <UserList
+                    userList={userList}
+                    onPress={({nickname}) => {
                         closeDrawers();
-                        addTag(user?.nickname);
-                    }} />
+                        addTag(nickname);
+                    }}
+                    onLongPress={({user_id}) => showMemberProfile(user_id)}
+                />
             </View>
         ), true);
     };
@@ -321,15 +324,12 @@ const ChatScreen = ({navigation, showMemberProfile}) => {
     
     
     const onFacePress = (message) => {
-        console.debug(message);
-        showMemberProfile(message?.user?.user_id);
-        /*
         const { touch_face_for_profile } = preferences;
-		!touch_face_for_profile ? addTag(message?.nickname) : onLongFacePress(message);*/
+		!touch_face_for_profile ? addTag(message?.nickname) : onLongFacePress(message);
 	};
     
     const onLongFacePress = (message) => {
-        showMemberProfile(message);
+        showMemberProfile(message?.user?.user_id)
 	};
     
     const addListeners = () => {
@@ -547,7 +547,12 @@ const ChatScreen = ({navigation, showMemberProfile}) => {
                         </TouchableHighlight>
                     }
                 </View>
-                <UserList userList={tagSearchData} onPress={({nickname}) => addTag(nickname, true)} slim={true}/>
+                <UserList
+                    userList={tagSearchData}
+                    onPress={({nickname}) => addTag(nickname, true)}
+                    onLongPress={({user_id}) => showMemberProfile(user_id)}
+                    slim={true}
+                />
                 <View style={Styles.footer}>
                     <MessageInput
                         onChangeText={data => setMessageInput(data)}

@@ -109,9 +109,9 @@ const Styles = StyleSheet.create({
     },
 });
 
-const Comments = ({comments}) => {
+const Comments = ({comments, showMemberProfile}) => {
     if(Array.isArray(comments) && comments.length){
-        return comments.map((item, index) => (<CommentItem comment={item} key={item.id} />));
+        return comments.map((item, index) => (<CommentItem comment={item} key={item.id} onFacePress={() => showMemberProfile(item?.user?.user_id)}/>));
     }
 }
 
@@ -145,7 +145,7 @@ const MeetupImage = ({meetup, children}) => {
     return <ImageBackground source={imageSource} style={Styles.image}>{children}</ImageBackground>;
 }
 
-const MeetupScreen = ({navigation, route}) => {
+const MeetupScreen = ({navigation, route, showMemberProfile}) => {
     const { setMenuOptions } = useAuthenticatedNavigation();
     const { services: { meetups: meetupService, comments: commentsService } } = useAPI();
     
@@ -285,7 +285,7 @@ const MeetupScreen = ({navigation, route}) => {
                                     if(comments.length){
                                         return <View style={{flex:1}}>
                                             <Text style={{fontSize:18, color:'#fff', marginLeft:4, marginTop: 16, marginBottom:8}}>Comments</Text>
-                                            <Comments {...{ comments } } />
+                                            <Comments {...{ comments, showMemberProfile } } />
                                         </View>
                                     }
                                 }

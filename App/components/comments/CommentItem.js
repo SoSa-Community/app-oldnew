@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet } from "react-native";
+import {Text, View, StyleSheet, TouchableOpacity} from 'react-native';
 import FastImage from "react-native-fast-image";
 import PropTypes from "prop-types"
 
@@ -60,7 +60,7 @@ const Styles = StyleSheet.create({
 
 });
 
-const CommentItem = ({comment, depth}) =>{
+const CommentItem = ({comment, depth, onFacePress}) =>{
     const {id, content, children, user} = comment;
     let { picture, nickname } = user;
     
@@ -98,12 +98,15 @@ const CommentItem = ({comment, depth}) =>{
                 <View style={[Styles.outerContainer, depthStyles]}>
                     <View style={Styles.innerContainer}>
                         {!getHideProfilePicture &&
-                        <View style={Styles.pictureContainer}>
-                            <FastImage source={{uri: picture}} style={Styles.picture}/>
-                        </View> }
+                            <TouchableOpacity onPress={onFacePress}>
+                                <View style={Styles.pictureContainer}>
+                                    <FastImage source={{uri: picture}} style={Styles.picture}/>
+                                </View>
+                            </TouchableOpacity>
+                        }
                         <View style={Styles.textContainer}>
                             <Text style={[Styles.text, heightStyles]}>
-                                <Text style={Styles.nickname}>{nickname} </Text>
+                                <Text onPress={onFacePress} style={Styles.nickname}>{nickname} </Text>
                                 {getContent}
                                 { moreContent &&
                                 <Text onPress={() => {

@@ -38,7 +38,7 @@ const Styles = StyleSheet.create({
     },
 });
 
-const UserItem = ({onPress, user, slim}) => {
+const UserItem = ({onPress, onLongPress, user, slim}) => {
 
     let userContainerStyle = [Styles.userContainer];
     let imageStyle = [Styles.image];
@@ -49,7 +49,7 @@ const UserItem = ({onPress, user, slim}) => {
     }
 
     return (
-        <TouchableHighlight onPress={onPress}>
+        <TouchableHighlight onPress={onPress} onLongPress={onLongPress}>
             <View style={userContainerStyle}>
                 <Image source={{uri : 'https://picsum.photos/seed/picsum/300/300'}} style={imageStyle} />
                 <Text style={Styles.itemText}>{user.nickname}</Text>
@@ -60,6 +60,7 @@ const UserItem = ({onPress, user, slim}) => {
 
 UserItem.propTypes = {
     onPress: PropTypes.func,
+    onLongPress: PropTypes.func,
     user: PropTypes.shape({
         nickname: PropTypes.string,
         picture: PropTypes.string,
