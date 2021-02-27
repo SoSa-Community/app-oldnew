@@ -61,8 +61,8 @@ const Styles = StyleSheet.create({
 });
 
 const CommentItem = ({comment, depth}) =>{
-    const {id, content, children} = comment;
-    let { picture, nickname } = comment;
+    const {id, content, children, user} = comment;
+    let { picture, nickname } = user;
     
     if(!picture) picture = `https://picsum.photos/300/300?seed=${Math.random()}`;
     if(!nickname) nickname = 'anonymous';

@@ -42,7 +42,7 @@ let componentMounted = false;
 
 let community = 'sosa';
 
-const ChatScreen = ({navigation}) => {
+const ChatScreen = ({navigation, showMemberProfile}) => {
     
     const { middleware, modals, session } = useApp();
     const { services: { chat: chatService, general: generalService } } = useAPI();
@@ -65,7 +65,6 @@ const ChatScreen = ({navigation}) => {
     const [ currentRoom, setCurrentRoom ] = useState(null);
     const [ canSend, setCanSend ] = useState(true);
     const [ fuckWith, setCanFuckWith ] = useState(false);
-    const [ profileModalVisible, setProfileModalVisible ] = useState(false);
     const [ uploading, setUploading ] = useState(false);
     
     const [ preferences, setPreferences ] = useState({
@@ -73,7 +72,6 @@ const ChatScreen = ({navigation}) => {
         show_separators: false,
         show_slim: false
     });
-    
     
     const setMessageInput = (data) => {
         messageInput = data;
@@ -323,13 +321,15 @@ const ChatScreen = ({navigation}) => {
     
     
     const onFacePress = (message) => {
+        console.debug(message);
+        showMemberProfile(message?.user?.user_id);
+        /*
         const { touch_face_for_profile } = preferences;
-		!touch_face_for_profile ? addTag(message?.nickname) : onLongFacePress(message);
+		!touch_face_for_profile ? addTag(message?.nickname) : onLongFacePress(message);*/
 	};
     
     const onLongFacePress = (message) => {
-		selectedProfile = message;
-		setProfileModalVisible(true);
+        showMemberProfile(message);
 	};
     
     const addListeners = () => {
@@ -564,11 +564,6 @@ const ChatScreen = ({navigation}) => {
                         uploadAction={() => handleUpload()}
                     />
                 </View>
-                {
-                    profileModalVisible &&
-                    selectedProfile &&
-                    <ProfileModal visible={profileModalVisible} profile={selectedProfile} dismissTouch={() => setProfileModalVisible(false)} />
-                }
             </View>
         )
     );

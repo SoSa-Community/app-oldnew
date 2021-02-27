@@ -84,22 +84,22 @@ const MessageList = forwardRef(({onFacePress, onLongFacePress, onMessageAdded, o
                 message={item}
                 onFacePress={() => onFacePress(item)}
                 onLongFacePress={() => onLongFacePress(item)}
-                onUsernamePress={() => addTag(item.nickname)}
+                onUsernamePress={() => addTag(item?.user?.nickname)}
                 myNickname={session.nickname}
                 showSeparator={show_separators}
                 showSlim={show_slim}
             />
         }else{
-            return <Text style={Styles.status}>{item.message}</Text>
+            return <Text style={Styles.status}>{item?.message}</Text>
         }
     };
     
     const addMessage = (item, forceUpdate) => {
         console.debug('Message', item);
         return new Promise((resolve, reject) => {
-            if (!item.id) {
-                if (item.uuid) item.id = item.uuid;
-                else if (item._id) item.id = item._id;
+            if (!item?.id) {
+                if (item?.uuid) item.id = item.uuid;
+                else if (item?._id) item.id = item._id;
                 else item.id = Helpers.generateId();
             }
             
@@ -135,7 +135,7 @@ const MessageList = forwardRef(({onFacePress, onLongFacePress, onMessageAdded, o
                 removeClippedSubviews={true}
                 data={messages}
                 extraData={messages}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item?.id}
                 renderItem={renderItem}
                 style={Styles.message_list}
             />

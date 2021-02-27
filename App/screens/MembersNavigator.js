@@ -5,6 +5,10 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import BaseStyles from "./styles/base";
 
+import { useAuth } from '../context/AuthContext';
+import { useAuthenticatedNavigation } from '../context/AuthenticatedNavigationContext';
+import { useAPI } from '../context/APIContext';
+
 import Icon from "../components/Icon";
 import MeetupsScreen from "./authenticated/meetups/Meetups";
 import MeetupScreen from "./authenticated/meetups/Meetup";
@@ -13,9 +17,9 @@ import SettingsScreen from './Settings';
 import ChatScreen from "./authenticated/Chat";
 import CreateMeetupScreen from "./authenticated/meetups/CreateMeetup";
 import MyProfileScreen from './authenticated/MyProfile';
-import { useAuthenticatedNavigation } from '../context/AuthenticatedNavigationContext';
 import WelcomeScreen from './authenticated/Welcome';
-import { useAuth } from '../context/AuthContext';
+
+import ProfileModal from '../components/ProfileModal';
 const Stack = createStackNavigator();
 
 const Styles = StyleSheet.create({
@@ -71,6 +75,12 @@ const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, set
     
     const [ isLoading, setIsLoading ] = useState(false);
     const [ firstRun, setFirstRun ] = useState(true);
+    const [ selectedProfileId, setSelectedProfileId ] = useState(null);
+    
+    const showMemberProfile = (id) => {
+        console.debug(id);
+        setSelectedProfileId(id);
+    }
     
     const showSettings = () => {
         closeLeftDrawer();
@@ -123,7 +133,9 @@ const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, set
         <View style={BaseStyles.container} >
             <NavigationContainer independent={true} ref={stackNavigation} onStateChange={(state) => {if (!state) return;}}>
                 <Stack.Navigator initialRouteName="Chat">
-                    <Stack.Screen name="Chat" options={{ headerShown: false }} component={ChatScreen} />
+                    <Stack.Screen name="Chat" options={{ headerShown: false }}>
+                        { (props) => <ChatScreen {...props} showMemberProfile={showMemberProfile}  /> }
+                    </Stack.Screen>
                     <Stack.Screen name="Meetups" options={{ headerShown: false}} component={MeetupsScreen} />
                     <Stack.Screen name="Meetup" options={{ headerShown: false}} component={MeetupScreen} />
                     <Stack.Screen name="CreateMeetup" options={{ headerShown: false}} component={CreateMeetupScreen} />
@@ -132,6 +144,7 @@ const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, set
                     <Stack.Screen name="Welcome" component={ WelcomeScreen } options={{title: 'Welcome To SoSa!'}} />
                 </Stack.Navigator>
             </NavigationContainer>
+            <ProfileModal profileId={selectedProfileId} onDismiss={() => setSelectedProfileId(null)} />
         </View>
     );
 }

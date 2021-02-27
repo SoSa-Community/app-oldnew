@@ -72,9 +72,7 @@ const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePress, my
         containerStyles.push(Styles.containerWithMention);
     }
 
-    if(!message.picture || message.picture.length === 0){
-        message.picture = `https://picsum.photos/300/300?seed=${Math.random()}`;
-    }
+    if(!message?.user?.picture) message.user.picture = `https://picsum.photos/300/300?seed=${Math.random()}`;
 
     if(showSlim) containerStyles.push(Styles.containerSlim);
     if(showSeparator)  containerStyles.push(Styles.containerSeparator);
@@ -117,12 +115,12 @@ const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePress, my
         <View style={Styles.inner}>
             <View style={Styles.pictureContainer}>
                 <TouchableOpacity onPress={onFacePress} onLongPress={onLongFacePress} style={Styles.pictureButton}>
-                    <FastImage source={{uri : message.picture}} style={Styles.picture} />
+                    <FastImage source={{uri : message?.user?.picture}} style={Styles.picture} />
                 </TouchableOpacity>
             </View>
             <View style={Styles.messageContainer}>
                 <TouchableOpacity onPress={onUsernamePress}>
-                    <Text style={Styles.username}>{message.nickname}</Text>
+                    <Text style={Styles.username}>{message?.user?.nickname}</Text>
                 </TouchableOpacity>
                 <View>
                     {renderMessage()}
@@ -138,8 +136,10 @@ const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePress, my
 
 MessageItem.propTypes = {
     message: PropTypes.shape({
-        nickname: PropTypes.string.isRequired,
-        picture: PropTypes.string,
+        user: PropTypes.shape({
+            nickname: PropTypes.string.isRequired,
+            picture: PropTypes.string,
+        }),
         parsed_content: PropTypes.string,
         mentions: PropTypes.array
     }),

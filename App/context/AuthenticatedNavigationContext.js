@@ -13,6 +13,7 @@ import {createDrawerNavigator } from '@react-navigation/drawer';
 
 import DrawerMenu from '../components/DrawerMenu';
 import NavigationHeader from '../components/NavigationHeader';
+import ProfileModal from '../components/ProfileModal';
 
 const AuthenticatedNavigationContext = createContext();
 const DrawerL = createDrawerNavigator();
@@ -118,6 +119,9 @@ const AuthenticatedNavigationProvider = ({navigator: Navigator, ...props}) => {
             popMenuStack,
             setMenuOptions,
             getStackNavigator: () => stackNavigation,
+            showProfile: (id) => {
+            
+            }
         }}
                                     {...props}
         >
