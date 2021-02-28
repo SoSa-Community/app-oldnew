@@ -325,7 +325,7 @@ const ChatScreen = ({navigation, showMemberProfile}) => {
     
     const onFacePress = (message) => {
         const { touch_face_for_profile } = preferences;
-		!touch_face_for_profile ? addTag(message?.nickname) : onLongFacePress(message);
+		!touch_face_for_profile ? addTag(message?.user?.nickname) : onLongFacePress(message);
 	};
     
     const onLongFacePress = (message) => {
