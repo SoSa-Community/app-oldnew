@@ -1,12 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import {View, TouchableOpacity, Text, StyleSheet, Image, ActivityIndicator, ImageBackground} from 'react-native';
+import {
+    View,
+    TouchableOpacity,
+    Text,
+    StyleSheet,
+    Image,
+    ActivityIndicator,
+    ImageBackground,
+    Platform
+} from 'react-native';
 import Modal from "react-native-modal";
 import PropTypes from "prop-types";
-import {useAPI} from '../context/APIContext';
-import {useApp} from '../context/AppContext';
+import { useAPI } from '../context/APIContext';
+import { useApp } from '../context/AppContext';
 
 const Styles = StyleSheet.create({
-    body: { backgroundColor:'#121211' },
+    body: {
+        backgroundColor:'#121211',
+        paddingBottom: Platform.OS === 'ios' ? 24 : 0
+    },
     pictureContainer: { marginBottom: 12 },
     textContainer: {},
     text: {color:'#fff', fontSize:30, textAlign:'left'},
@@ -68,6 +80,7 @@ const ProfileModal = ({profileId, onDismiss}) => {
     const { services: { profiles: profileService } } = useAPI();
     const [ isLoading, setIsLoading ] = useState(true);
     const [ profile, setProfile ] = useState(null);
+    const [ error, setError ] = useState(null);
     
     const handleDismiss = () => {
         setProfile(null);
@@ -159,17 +172,25 @@ const ProfileModal = ({profileId, onDismiss}) => {
     };
     
     useEffect(() => {
-        setIsLoading(true);
-        setProfile(null);
         if(profileId) {
+            setIsLoading(true);
+            setProfile(null);
+    
             profileService.get(profileId)
-                .then((profile) => {
-                    console.debug(profile);
-                    setProfile(profile);
-                })
+                .then((profile) => setProfile(profile))
                 .catch((error) => {
                     handleDismiss();
-                    modals?.create('Profile unavailable', 'This user\'s profile is not available to you!');
+    
+                    const showModal = () => modals?.create('Profile unavailable', 'This user\'s profile is not available to you!');
+                    
+                    if(Platform.OS === 'ios'){
+                        /* Temp solution until https://github.com/react-native-modal/react-native-modal/issues/523
+                        * is resolve */
+                        setTimeout(showModal, 750);
+                    }else{
+                        showModal();
+                    }
+                    
                 })
                 .finally(() => setIsLoading(false));
         }
@@ -182,12 +203,17 @@ const ProfileModal = ({profileId, onDismiss}) => {
                visible={!!(profileId)}
                transparent={true}
                hardwareAccelerated={true}
+               useNativeDriver={true}
                onBackdropPress={handleDismiss}
                onSwipeComplete={handleDismiss}
+               hideModalContentWhileAnimating={true}
+               onModalHide={() => {
+                   console.debug('hello', error);
+               }}
         >
             <View style={Styles.body}>
                 { isLoading && <ActivityIndicator color="#fff" size="large" style={{alignSelf:'center', marginVertical: 24}}/> }
-                { !isLoading && <Profile /> }
+                { !isLoading && profile && <Profile /> }
             </View>
         </Modal>
     )
