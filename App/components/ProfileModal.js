@@ -20,19 +20,27 @@ const Styles = StyleSheet.create({
         paddingBottom: Platform.OS === 'ios' ? 24 : 0
     },
     pictureContainer: { marginBottom: 12 },
-    textContainer: {},
-    text: {color:'#fff', fontSize:30, textAlign:'left'},
+    textContainer: {
+        flexDirection: 'row',
+        paddingHorizontal: 42
+    },
+    text: {
+        color:'#fff',
+        fontSize: 26,
+        textAlign:'center',
+        flexShrink: 1
+    },
     picture: {width: 128, height: 128, borderRadius: 128/2},
     demographicsContainer: {
         paddingVertical: 18,
         paddingHorizontal: 62,
-        backgroundColor: '#353535'
+        backgroundColor: '#353535',
     },
     
     demographicsTopRow: {
         flexDirection:'row',
         justifyContent:'center',
-        marginBottom: 8
+        marginBottom: 8,
     },
     
     demographicsLocation: {
@@ -98,7 +106,7 @@ const ProfileModal = ({profileId, onDismiss}) => {
     
     const Gender = () => {
         if(!profile?.gender) return <></>;
-        return <View style={{flex: 1, flexDirection:'row'}}>
+        return <View style={{flex: 2, flexDirection:'row'}}>
             <Text style={Styles.demographicsLabel}>Gender:</Text>
             <Text style={Styles.demographicsValue}>{profile?.gender?.name}</Text>
         </View>;
@@ -114,7 +122,7 @@ const ProfileModal = ({profileId, onDismiss}) => {
     
     const About = () => {
         if(!profile?.about) return <></>;
-        let aboutString = profile?.about;
+        let aboutString = profile?.about.replace(/(<([^>]+)>)/gi, '');
         const maxLength = 100;
         
         if(aboutString.length > maxLength){
@@ -137,7 +145,9 @@ const ProfileModal = ({profileId, onDismiss}) => {
             <View style={Styles.pictureContainer}>
                 <Image source={{uri: profile?.picture}} style={Styles.picture}/>
             </View>
-            <Text style={Styles.text}>{profile?.nickname}</Text>
+            <View style={Styles.textContainer}>
+                <Text style={Styles.text}>{profile?.nickname}</Text>
+            </View>
         </View>;
     
         if (profile?.cover_picture) {
@@ -203,7 +213,6 @@ const ProfileModal = ({profileId, onDismiss}) => {
                visible={!!(profileId)}
                transparent={true}
                hardwareAccelerated={true}
-               useNativeDriver={true}
                onBackdropPress={handleDismiss}
                onSwipeComplete={handleDismiss}
                hideModalContentWhileAnimating={true}

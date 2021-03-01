@@ -51,8 +51,8 @@ const UserItem = ({onPress, onLongPress, user, slim}) => {
     return (
         <TouchableHighlight onPress={onPress} onLongPress={onLongPress}>
             <View style={userContainerStyle}>
-                <Image source={{uri : 'https://picsum.photos/seed/picsum/300/300'}} style={imageStyle} />
-                <Text style={Styles.itemText}>{user.nickname}</Text>
+                <Image source={{uri : user?.user?.picture}} style={imageStyle} />
+                <Text style={Styles.itemText}>{user?.user?.nickname}</Text>
             </View>
         </TouchableHighlight>
     );
