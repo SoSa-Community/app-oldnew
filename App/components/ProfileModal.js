@@ -44,7 +44,8 @@ const Styles = StyleSheet.create({
     },
     
     demographicsLocation: {
-        flexDirection:'row'
+        flexDirection:'row',
+        paddingRight: 20
     },
     
     demographicsLabel: {
