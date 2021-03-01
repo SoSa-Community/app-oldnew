@@ -53,7 +53,7 @@
     "react-native-xml2js": "^1.0.3",
     "react-navigation": "^4.4.3",
     "socket.io-client": "^3.1.0",
-    "sosa-chat-client": "git+https://github.com/SoSa-Community/chat-client.git#1.1.1"
+    "sosa-chat-client": "git+https://github.com/SoSa-Community/chat-client.git#1.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
