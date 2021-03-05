@@ -1,15 +1,18 @@
-import React, {useState} from 'react';
-import {ImageBackground, Text, View, TouchableHighlight} from "react-native";
-
-import {StyleSheet} from 'react-native';
-import {ActivityButton} from "../ActivityButton";
-import {Icon} from "../Icon";
+import React, { useState } from 'react';
+import { ImageBackground, Text, View, TouchableHighlight, StyleSheet } from "react-native";
 import FastImage from "react-native-fast-image";
+import PropTypes from "prop-types";
+
+import ActivityButton from "../ActivityButton";
+import Icon from "../Icon";
 
 import Helpers from "../../sosa/Helpers";
 
 const Styles = StyleSheet.create({
-    container: {flex:1, margin:16},
+    container: {
+        flex:1,
+        margin:16
+    },
     attendeeImageContainer: {
         justifyContent:'center',
         marginRight:-18
@@ -95,7 +98,7 @@ const Styles = StyleSheet.create({
     viewButtonText: {textAlign:'center', color:'#fff'}
 });
 
-export const MeetupItem = ({meetup, onChange, onTellMeMorePress}) =>{
+const MeetupItem = ({ meetup, onChange, onTellMeMorePress }) =>{
 
     let hasAttendees = false;
     if(meetup.attendees && meetup.attendees.length) hasAttendees = true;
@@ -108,8 +111,8 @@ export const MeetupItem = ({meetup, onChange, onTellMeMorePress}) =>{
             setSaving(false);
             meetup.going = !meetup.going;
 
-            if(meetup.going && !hasAttendees) meetup.attendees = [ {picture: `https://picsum.photos/300/300?seed=${Math.random()}`} ];
-            if(meetup.going && hasAttendees) meetup.attendees.push({picture: `https://picsum.photos/300/300?seed=${Math.random()}`});
+            if(meetup.going && !hasAttendees) meetup.attendees = [{ picture: `https://picsum.photos/300/300?seed=${Math.random()}` } ];
+            if(meetup.going && hasAttendees) meetup.attendees.push({ picture: `https://picsum.photos/300/300?seed=${Math.random()}` });
             if(!meetup.going) meetup.attendees.pop();
             if(onChange) onChange(meetup);
 
@@ -164,3 +167,24 @@ export const MeetupItem = ({meetup, onChange, onTellMeMorePress}) =>{
     </View>
 
 }
+
+MeetupItem.propTypes = {
+    meetup: PropTypes.shape({
+        meetup: PropTypes.string,
+        title: PropTypes.string,
+        attendees: PropTypes.array,
+        going: PropTypes.bool,
+        image: PropTypes.string,
+        start_timestamp: PropTypes.string
+    
+    }).isRequired,
+    onChange: PropTypes.func,
+    onTellMeMorePress: PropTypes.func
+};
+
+MeetupItem.defaultProps = {
+    onChange: null,
+    onTellMeMorePress: null
+}
+
+export default MeetupItem;

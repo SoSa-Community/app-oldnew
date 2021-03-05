@@ -1,12 +1,15 @@
-import React, {useState, useEffect} from 'react';
-import Styles from "../screens/styles/onboarding";
-import {TextInput, View, TouchableOpacity, Text, Keyboard, Platform, Modal, Button} from "react-native";
-import {Icon} from './Icon';
+import React, { useState, useEffect } from 'react';
+import { TextInput, View, TouchableOpacity, Text, Keyboard, Platform, Modal, Button } from "react-native";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {Picker} from '@react-native-community/picker';
-import Helpers from "../sosa/Helpers";
+import { Picker } from '@react-native-community/picker';
+import PropTypes from 'prop-types';
 
-export const Input = (
+import Helpers from "../sosa/Helpers";
+import Icon from './Icon';
+
+import Styles from "../screens/styles/onboarding";
+
+const Input = (
     {
         icon, placeholder, value, onChangeText, validateInput, error,
         errorBorderOnly, enabled, allowClear, alwaysShowClear, type, pickerOptions=[],
@@ -14,55 +17,16 @@ export const Input = (
         lengthIndicatorShowPercentage, lengthWarningPercentage, lengthDangerPercentage, setIsValid,
         label, labelStyle, containerStyle, outerContainerStyle, innerContainerStyle, inputStyle
 }) => {
-    if(!maxLength) maxLength = 1000;
-    if(!minLength) minLength = 0;
+    
     if(enabled !== true && enabled !== false) enabled = true;
     let dateValue = value;
-    
-    if(!lengthIndicatorShowPercentage) lengthIndicatorShowPercentage = 80;
-    if(!lengthWarningPercentage) lengthWarningPercentage = 90;
-    if(!lengthDangerPercentage) lengthDangerPercentage = 95;
-    
-    
-	if(typeof(value) !== 'string') value = '';
-	if(!['text','date', 'time', 'picker', 'multiline'].includes(type)) type = 'text';
  
 	const [inputValue, setInputValue] = useState('');
 	const [dateInputValue, setDateInputValue] = useState(new Date());
 	const [showPicker, setShowPicker] = useState(false);
 	const [tempPickerValue, setTempPickerValue] = useState((type === 'date' || type === 'time') ? new Date() : '');
-    
-    let lengthPercentage = 0;
-
-	useEffect(() => {
-		if(type === 'date' || type === 'time'){
-			let date = (new Date(dateValue));
-			if(Object.prototype.toString.call(date) !== '[object Date]' || isNaN(date.getTime())) {
-                date = new Date();
-            }
-            if(type === 'time'){
-                const [hour, minutes] = dateValue.split(':');
-                
-                date.setHours(hour);
-                date.setMinutes(minutes);
-            }
-			
-            value = Helpers.dateToString(date, type);
-			
-			dateValue = date;
-		}
-		setInputValue(value);
-		setDateInputValue(dateValue);
-	}, [value]);
-	
-	useEffect( () => {
-	    lengthPercentage = Math.floor((inputValue.length / maxLength) * 100);
-	    if(typeof(setIsValid) === 'function'){
-            if(inputValue.length <= maxLength && inputValue.length >= minLength) setIsValid(true);
-            else  setIsValid(false);
-        }
-    }, [inputValue] )
-
+	const [lengthPercentage, setLengthPercentage] = useState(0);
+ 
 
 	const displaySuccess = (errorString) => {
 		if(errorString === null){
@@ -158,7 +122,7 @@ export const Input = (
 
 		const picker = (
 			<Picker
-				selectedValue={Platform.OS === 'ios' && tempPickerValue ? tempPickerValue : dateInputValue}
+				selectedValue={Platform.OS === 'ios' && tempPickerValue ? tempPickerValue : inputValue}
 				placeholder={placeholder}
 				prompt={placeholder}
 				style={{flex: 1, color: '#121111'}}
@@ -224,7 +188,6 @@ export const Input = (
         const renderLengthWarning = () => {
             
             let lengthIndicatorStyles = [Styles.lengthIndicator];
-            
             if(inputValue.length >= minLength){
                 if(lengthPercentage >= lengthDangerPercentage){
                     lengthIndicatorStyles.push(Styles.lengthIndicatorDanger);
@@ -255,7 +218,7 @@ export const Input = (
                             onBlur={onBlur}
                             onKeyPress={onKeyPress}
                             autoCorrect={autoCorrect}
-                            maxLength={maxLength}
+                            maxLength={maxLength ? maxLength : null}
                 />
                 { renderLengthWarning() }
             </>);
@@ -270,9 +233,51 @@ export const Input = (
         return icon && <Icon icon={icon}  style={Styles.inputIcon} size={18}/>
     };
     
-	return (
+    const validateLength = () => {
+        if(typeof(setIsValid) === 'function'){
+            if((!maxLength || inputValue.length <= maxLength) && inputValue.length >= minLength) setIsValid(true);
+            else  setIsValid(false);
+        }
+    }
+    
+    
+    useEffect( () => {
+        if(maxLength || minLength) {
+            if (maxLength > 0) {
+                setLengthPercentage(Math.floor((inputValue.length / maxLength) * 100));
+            }
+            validateLength();
+        }
+    }, [inputValue] );
+    
+    
+    useEffect(() => {
+        if(type === 'date' || type === 'time'){
+            let date = (new Date(dateValue));
+            if(Object.prototype.toString.call(date) !== '[object Date]' || isNaN(date.getTime())) {
+                date = new Date();
+            }
+            if(type === 'time'){
+                const [hour, minutes] = dateValue.split(':');
+                
+                date.setHours(hour);
+                date.setMinutes(minutes);
+            }
+            
+            value = Helpers.dateToString(date, type);
+            
+            dateValue = date;
+        }
+        setInputValue(value);
+        setDateInputValue(dateValue);
+    }, [value]);
+    
+    return (
         <View style={[containerStyle]}>
-            { label && <Text style={[{color: '#fff', marginTop: 8, marginBottom: 4, fontSize:16}, labelStyle]}>{label}</Text> }
+            {   label && label.length ?
+                <Text style={[{color: '#fff', marginTop: 8, marginBottom: 4, fontSize:16}, labelStyle]}>{label}</Text> :
+                null
+            }
             <View style={[outerContainerStyles, outerContainerStyle]}>
                 <View style={[innerContainerStyles, innerContainerStyle]}>
                     { renderIcon() }
@@ -288,3 +293,72 @@ export const Input = (
         </View>
 	);
 }
+
+Input.propTypes = {
+    icon: PropTypes.array,
+    placeholder: PropTypes.string,
+    value: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number
+    ]),
+    onChangeText: PropTypes.func,
+    validateInput: PropTypes.bool,
+    error: PropTypes.string,
+    errorBorderOnly: PropTypes.bool,
+    enabled: PropTypes.bool,
+    allowClear: PropTypes.bool,
+    alwaysShowClear: PropTypes.bool,
+    type: PropTypes.oneOf(['text','date', 'time', 'picker', 'multiline']),
+    pickerOptions: PropTypes.array,
+    minLength: PropTypes.number,
+    maxLength: PropTypes.number,
+    selection: PropTypes.shape({start: PropTypes.number, end: PropTypes.number}),
+    onSelectionChange: PropTypes.func,
+    onBlur: PropTypes.func,
+    onKeyPress: PropTypes.func,
+    autoCorrect: PropTypes.bool,
+    setIsValid: PropTypes.func,
+    label: PropTypes.string,
+    labelStyle: PropTypes.object,
+    containerStyle: PropTypes.object,
+    outerContainerStyle: PropTypes.object,
+    innerContainerStyle: PropTypes.object,
+    inputStyle: PropTypes.object,
+    lengthIndicatorShowPercentage: PropTypes.number,
+    lengthWarningPercentage: PropTypes.number,
+    lengthDangerPercentage: PropTypes.number,
+};
+
+Input.defaultProps = {
+    icon: null,
+    placeholder: '',
+    value: '',
+    onChangeText: null,
+    validateInput: false,
+    error: null,
+    errorBorderOnly: false,
+    enabled: true,
+    allowClear: false,
+    alwaysShowClear: false,
+    type: 'text',
+    pickerOptions: [],
+    minLength: 0,
+    maxLength: 255,
+    selection: null,
+    onSelectionChange: null,
+    onBlur: null,
+    onKeyPress: null,
+    autoCorrect: true,
+    setIsValid: null,
+    label: '',
+    labelStyle: null,
+    containerStyle: null,
+    outerContainerStyle: null,
+    innerContainerStyle: null,
+    inputStyle: null,
+    lengthIndicatorShowPercentage: 80,
+    lengthWarningPercentage: 90,
+    lengthDangerPercentage: 95,
+};
+
+export default Input;

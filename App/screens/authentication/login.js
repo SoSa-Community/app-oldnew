@@ -1,50 +1,47 @@
-import React from 'react';
-import AuthComponent from './AuthComponent';
+import React, { useState, useEffect } from 'react';
+import {Text, View, TouchableHighlight, KeyboardAvoidingView, Alert} from 'react-native';
 
 import BaseStyles from '../styles/base'
+import AppConfig from "../../config";
+
 import Styles from '../styles/onboarding'
+import CredentialInput from '../../components/auth/CredentialInput';
+import SocialButtons from '../../components/auth/SocialButtons';
 
-import {Text, View, TouchableHighlight, KeyboardAvoidingView} from 'react-native';
-
-import withAppContext from '../hoc/withAppContext';
-import {SoSaConfig} from "../../sosa/config";
-
-class Login extends AuthComponent {
+const LoginScreen = ({navigation}) => {
+    const [ error, setError ] = useState('');
+    const [ socialMediaError, setSocialMediaError ] = useState('');
+    const [ processing, setProcessing ] = useState(false);
     
-    screenType = 'login';
-    
-    RegisterButton = () => {
-        if(!SoSaConfig.features.general.canRegister) return <View style={Styles.buttonBottom}></View>;
+    const RegisterButton = () => {
+        if(!AppConfig.features.general.canRegister) return <View style={Styles.buttonBottom}></View>;
         
         return <View style={Styles.buttonBottom}>
-            <TouchableHighlight onPress={() => this.navigation.navigate('Register', {})} style={Styles.newToSoSaButton}>
+            <TouchableHighlight onPress={() => navigation.navigate('Register', {})} style={Styles.newToSoSaButton}>
                 <View>
                     <Text style={Styles.newToSoSaButtonText}>New to SoSa?</Text>
                 </View>
             </TouchableHighlight>
         </View>;
     }
-
-    render() {
-        return (
-            <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : null}
-                style={{ flex: 1 }}
-            >
-                <View style={BaseStyles.container}>
-                    <View style={{marginTop: 20, paddingHorizontal:20, flex: 1}}>
-                        <View style={[Styles.content_container]}>
-                            <this.CredentialInput />
-                            <this.SocialButtons />
-                        </View>
-                        <this.RegisterButton />
+    
+    return (
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : null}
+            style={{ flex: 1 }}
+        >
+            <View style={BaseStyles.container}>
+                <View style={{marginTop: 20, paddingHorizontal:20, flex: 1}}>
+                    <View style={[Styles.content_container]}>
+                        <CredentialInput forLogin {...{ error, setError, setSocialMediaError, processing, setProcessing} } />
+                        <SocialButtons forLogin {...{ setError, socialMediaError, setSocialMediaError, processing, setProcessing} } />
                     </View>
+                    <RegisterButton />
                 </View>
-            </KeyboardAvoidingView>
+            </View>
+        </KeyboardAvoidingView>
 
-        );
-  }
+    );
 }
 
-const LoginScreen = withAppContext(Login);
 export default LoginScreen;

@@ -1,10 +1,34 @@
 import React from 'react';
-import Styles from "../screens/styles/onboarding";
-import {Text} from "react-native";
+import { Text } from "react-native";
+import PropTypes from 'prop-types';
 
-export const FormError = ({errorState}) => {
-    if(errorState && errorState.length > 0){
-        return <Text style={Styles.error}>{errorState}</Text>;
+
+import Styles from "../screens/styles/onboarding";
+
+const FormError = ({errors}) => {
+    
+    const renderError = (error, index) => {
+        if(error?.message?.length > 0){
+            return <Text style={Styles.error} key={index}>{error.message}</Text>;
+        }
+        return <></>;
     }
-    return null;
+    
+    if(errors) {
+        if(!Array.isArray(errors)) return renderError(errors, 0);
+        else {
+            return <>
+                { errors.map(renderError) }
+            </>
+        }
+    }
+    
+    return <></>;
 }
+
+FormError.propTypes = {
+
+}
+
+export default FormError;
+

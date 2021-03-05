@@ -5,10 +5,10 @@ import Styles from '../styles/onboarding'
 import {TouchableWithoutFeedback, Text, View} from 'react-native';
 
 import Helpers from "../../sosa/Helpers";
-import {FormError} from "../../components/FormError";
-import {Input} from "../../components/Input";
+import FormError from "../../components/FormError";
+import Input from "../../components/Input";
 import SecureTextInput from "../../components/SecureTextInput";
-import {ActivityButton} from "../../components/ActivityButton";
+import ActivityButton from "../../components/ActivityButton";
 
 
 export default class ForgotPasswordCode extends Component {
@@ -158,7 +158,7 @@ export default class ForgotPasswordCode extends Component {
 
                     <View style={Styles.content_container}>
 
-                        <FormError errorState={this.state.checkError} />
+                        <FormError errors={this.state.checkError} />
                         {
                             this.state.emailProvided ?
                                     null :
@@ -179,7 +179,7 @@ export default class ForgotPasswordCode extends Component {
                             validateInput={() => this.validateTextField('codeInput', 'code', this.codeLength)}
                         />
 
-                        <FormError errorState={this.state.passwordError} />
+                        <FormError errors={this.state.passwordError} />
                         <SecureTextInput placeholder="New password" onChangeText={data => this.setState({ passwordInput: data})} validateInput={() => this.validatePassword()} />
 
                         <View style={Styles.buttonRow}>

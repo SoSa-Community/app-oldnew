@@ -1,8 +1,11 @@
 import React from 'react';
-import Styles from "../screens/styles/onboarding";
-import {ActivityIndicator, Text, TouchableWithoutFeedback, View} from "react-native";
+import { ActivityIndicator, Text, TouchableWithoutFeedback, View } from "react-native";
 
-export const ActivityButton = ({showActivity, validateInput, onPress, text, style, disabled}) => {
+import PropTypes from 'prop-types'
+import Styles from "../screens/styles/onboarding";
+
+
+const ActivityButton = ({showActivity, validateInput, onPress, text, style, disabled}) => {
 
     if(showActivity && !disabled){
         return  <TouchableWithoutFeedback>
@@ -32,3 +35,21 @@ export const ActivityButton = ({showActivity, validateInput, onPress, text, styl
         }
     }
 }
+
+ActivityButton.propTypes = {
+    showActivity: PropTypes.bool,
+    validateInput: PropTypes.bool,
+    onPress: PropTypes.func.isRequired,
+    text: PropTypes.string.isRequired,
+    style: PropTypes.object,
+    disabled: PropTypes.bool,
+}
+
+ActivityButton.defaultProps = {
+    showActivity: false,
+    validateInput: false,
+    style: null,
+    disabled: false
+}
+
+export default ActivityButton;

@@ -3,8 +3,6 @@ import AsyncStorage from "@react-native-community/async-storage";
 
 export default class Device {
 
-    static instance = null;
-    
     initialized = false;
     id = '';
     secret = '';
@@ -12,16 +10,22 @@ export default class Device {
     platform = 'other';
     pushService = 'other';
 
-    init(){
+    static init(){
         return new Promise((resolve, reject) => {
-            let device = this;
-            if(this.initialized) {
-                resolve(device);
-            }else{
-                let fullInit = () => {
+            let device = new Device();
+            
+            Device.retrieve((obj) => {
+                console.info('App::Device::init', obj);
+    
+                if(obj !== null && obj?.secret) {
+                    obj.forEach((value, key) => device[key] = value);
+                    device.initialized = true;
+                    resolve(device);
+                }
+                else{
                     let platform = 'other';
                     let pushService = 'other';
-        
+
                     switch(getSystemName()){
                         case 'Android':
                             pushService = platform = 'android';
@@ -29,54 +33,35 @@ export default class Device {
                         case 'iOS':
                         case 'iPhone IS':
                             pushService = platform = 'ios';
-                
+        
                             break;
                     }
-        
-                    this.setPlatform(platform);
-                    this.setPushService(pushService);
-                    this.setSecret(this.generateSecret());
-        
-                    getDeviceName().then(deviceName => {
-                        let name = [];
-                        let brand = getBrand();
-                        let model = getModel();
-            
-                        if(brand) name.push(brand);
-                        if(model) name.push(model);
-            
-                        let fullName = `${name.join(' ')}`;
-            
-                        if(deviceName)  fullName = `${deviceName} (${fullName})`;
-            
-                        this.setName(fullName);
-                        this.save();
-                        this.initialized = true;
-                    }).finally(() => resolve(device));
-                };
-    
-                Device.retrieve((obj) => {
-                    console.info('App::Device::init', obj);
-                    
-                    if(obj === null){
-                        fullInit();
-                    }else{
-                        obj.forEach((value, key) => device[key] = value);
-                        this.initialized = true;
-                        resolve(device);
-                    }
-                });
-            }
-        });
-        
-    }
 
-    /**
-     * @returns {Device}
-     */
-    static getInstance() {
-        if (Device.instance == null)    Device.instance = new Device();
-        return this.instance;
+                    device.setPlatform(platform);
+                    device.setPushService(pushService);
+                    device.setSecret(device.generateSecret());
+
+                    getDeviceName()
+                        .then(deviceName => {
+                            let name = [];
+                            let brand = getBrand();
+                            let model = getModel();
+        
+                            if(brand) name.push(brand);
+                            if(model) name.push(model);
+        
+                            let fullName = `${name.join(' ')}`;
+        
+                            if(deviceName)  fullName = `${deviceName} (${fullName})`;
+        
+                            device.setName(fullName);
+                            device.save();
+                            device.initialized = true;
+                        })
+                        .finally(() => resolve(device));
+                }
+            });
+        });
     }
 
     getId = () => {
@@ -96,8 +81,8 @@ export default class Device {
     }
 
     generateSecret(){
-        let secret = [...Array(64)].map(i=>(~~(Math.random()*36)).toString(36)).join('');
         return 'sausage';
+        return [...Array(64)].map(i=>(~~(Math.random()*36)).toString(36)).join('');
     }
 
     getName(){

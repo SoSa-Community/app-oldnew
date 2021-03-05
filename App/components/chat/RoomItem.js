@@ -1,8 +1,8 @@
 import React from 'react';
-import {Text, View, TouchableHighlight} from "react-native";
-import {Icon} from '../Icon';
+import { Text, View, TouchableHighlight, StyleSheet } from "react-native";
+import PropTypes from "prop-types";
 
-import {StyleSheet} from 'react-native';
+import Icon from '../Icon';
 
 const Styles = StyleSheet.create({
     room: {
@@ -16,18 +16,38 @@ const Styles = StyleSheet.create({
         justifyContent:'center',
         alignItems:'center'
     },
+    
+    text: {
+        flex: 1,
+        fontSize: 16
+    }
 });
 
-export const RoomItem = ({room, roomActive, onPress}) =>{
-
+const RoomItem = ({room, active, onPress}) =>{
         let color =  '#ccc';
-        if(roomActive) color = '#fff';
+        if(active) color = '#fff';
+        const {title, name} = room
 
         return  <TouchableHighlight onPress={onPress}>
             <View style={Styles.room}>
                 <Icon icon={['fal', 'campfire']} size={18} style={{marginRight:14, color}}/>
-                <Text style={{flex: 1, fontSize: 16, color}}>{room.title || room.name}</Text>
+                <Text style={{...Styles.text, color}}>{title || name}</Text>
             </View>
         </TouchableHighlight>
-
 }
+
+RoomItem.propTypes = {
+    room: PropTypes.shape({
+        title: PropTypes.string,
+        name: PropTypes.string
+    }).isRequired,
+    active: PropTypes.bool,
+    onPress: PropTypes.func
+};
+
+RoomItem.defaultProps = {
+    active: false,
+    onPress: null
+}
+
+export default RoomItem;
