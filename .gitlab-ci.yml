@@ -3,7 +3,7 @@ build-job:
   tags:
     - macos
   script:
-    - echo "Hello, $GITLAB_USER_LOGIN!"
+    - ls -l
 
 test-job1:
   stage: test
