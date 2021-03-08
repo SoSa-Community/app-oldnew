@@ -4,7 +4,8 @@ build-job:
     - macos
   script:
     - npm install
-    - ./android/gradlew assemble
+    - cd ./android
+    - ./gradlew assemble
 
 test-job1:
   stage: test
