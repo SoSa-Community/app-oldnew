@@ -3,7 +3,8 @@ build-job:
   tags:
     - macos
   script:
-    - ls -l
+    - npm install
+    - ./android/gradlew assemble
 
 test-job1:
   stage: test
