@@ -6,6 +6,9 @@ build-job:
     - npm install
     - cd ./android
     - ./gradlew assemble
+  artifacts:
+    paths:
+      - app/build/outputs/apk/debug
 
 test-job1:
   stage: test
