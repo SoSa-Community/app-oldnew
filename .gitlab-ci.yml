@@ -1,15 +1,21 @@
 build-job:
   stage: build
+  tags:
+    - macos
   script:
     - echo "Hello, $GITLAB_USER_LOGIN!"
 
 test-job1:
   stage: test
+  tags:
+    - macos
   script:
     - echo "This job tests something"
 
 test-job2:
   stage: test
+  tags:
+    - macos
   script:
     - echo "This job tests something, but takes more time than test-job1."
     - echo "After the echo commands complete, it runs the sleep command for 20 seconds"
@@ -18,5 +24,7 @@ test-job2:
 
 deploy-prod:
   stage: deploy
+  tags:
+    - macos
   script:
     - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
