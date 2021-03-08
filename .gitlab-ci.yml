@@ -1,5 +1,5 @@
 build-android-release:
-  stage: build-android
+  stage: build
   tags:
     - macos
   script:
@@ -11,7 +11,7 @@ build-android-release:
       - android/app/build/outputs/apk/release
 
 build-android-debug:
-  stage: build-android
+  stage: build
   tags:
     - macos
   script:
