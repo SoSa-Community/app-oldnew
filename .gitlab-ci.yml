@@ -1,11 +1,23 @@
-build-job:
-  stage: build
+build-android-release:
+  stage: build-android
   tags:
     - macos
   script:
     - npm install
     - cd ./android
     - ./gradlew assembleRelease
+  artifacts:
+    paths:
+      - android/app/build/outputs/apk/release
+
+build-android-debug:
+  stage: build-android
+  tags:
+    - macos
+  script:
+    - npm install
+    - cd ./android
+    - ./gradlew assembleDebug
   artifacts:
     paths:
       - android/app/build/outputs/apk/debug
