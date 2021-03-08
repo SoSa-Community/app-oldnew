@@ -5,10 +5,10 @@ build-job:
   script:
     - npm install
     - cd ./android
-    - ./gradlew assemble
+    - ./gradlew assembleRelease
   artifacts:
     paths:
-      - app/build/outputs/apk/debug
+      - android/app/build/outputs/apk/debug
 
 test-job1:
   stage: test
