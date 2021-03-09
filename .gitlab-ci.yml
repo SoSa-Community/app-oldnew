@@ -7,8 +7,6 @@ android-release:
     - cd ./android
     - ./gradlew assembleRelease
     - zipalign -v -p 4 ./app/build/outputs/apk/release/app-release-unsigned.apk ./app/build/outputs/apk/release/app-release-unsigned-aligned.apk
-    - apksigner sign --ks-pass env:KEYSTORE_PASS --ks ~/SocialSavanna.jks --out ./app/build/outputs/apk/release/app-release.apk ./app/build/outputs/apk/release/app-release-unsigned-aligned.apk
-    - apksigner verify ./app/build/outputs/apk/release/app-release.apk
   artifacts:
     paths:
       - android/app/build/outputs/apk/release
