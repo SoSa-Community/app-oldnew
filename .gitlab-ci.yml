@@ -1,0 +1,27 @@
+android-release:
+  stage: build
+  tags:
+    - macos
+  script:
+    - npm install
+    - cd ./android
+    - ./gradlew assembleRelease
+    - apksigner sign --ks-pass env:KEYSTORE_PASS --ks ~/SocialSavanna.jks --out ./app/build/outputs/apk/release/app-release.apk ./app/build/outputs/apk/release/app-release-unsigned.apk
+    - apksigner verify ./app/build/outputs/apk/release/app-release.apk
+  artifacts:
+    paths:
+      - android/app/build/outputs/apk/release
+
+test:
+  stage: test
+  tags:
+    - macos
+  script:
+    - echo "Future test job"
+
+deploy:
+  stage: deploy
+  tags:
+    - macos
+  script:
+    - echo "Future deploy job"
