@@ -4,19 +4,19 @@ workflow:
       when: never  # Prevent pipeline run for push event
     - when: always # Run pipeline for all other cases
 
-android-release:
+ios-release:
   stage: build
   tags:
     - macos
   script:
     - npm install
-    - cd ./android
-    - ./gradlew assembleRelease
-    - apksigner sign --ks-pass env:KEYSTORE_PASS --ks ~/SocialSavanna.jks --out ./app/build/outputs/apk/release/app-release.apk ./app/build/outputs/apk/release/app-release-unsigned.apk
-    - apksigner verify ./app/build/outputs/apk/release/app-release.apk
+    - cd ./ios
+    - pod install
+    - xcodebuild -workspace SoSa.xcworkspace -scheme SoSa clean archive -configuration release -sdk iphoneos -archivePath SoSa.xcarchive
+    - xcodebuild -archivePath SoSa.xcarchive -exportPath ./release/SoSa.ipa -exportOptionsPlist ./release/ExportOptions.plist -exportArchive
   artifacts:
     paths:
-      - android/app/build/outputs/apk/release
+      - ios/release
 
 test:
   stage: test
