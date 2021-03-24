@@ -11,6 +11,8 @@ ios-release:
   script:
     - npm install
     - cd ./ios
+    - mkdir release
+    - ls -l ~/
     - pod install
     - xcodebuild -workspace SoSa.xcworkspace -scheme SoSa clean archive -configuration release -sdk iphoneos -archivePath SoSa.xcarchive -allowProvisioningUpdates
     - xcodebuild -archivePath SoSa.xcarchive -exportPath ./release/SoSa.ipa -exportOptionsPlist ~/ExportOptions.plist -exportArchive
