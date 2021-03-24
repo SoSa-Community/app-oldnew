@@ -15,7 +15,7 @@ ios-release:
     - ls -l ~/
     - pod install
     - xcodebuild -workspace SoSa.xcworkspace -scheme SoSa clean archive -configuration release -sdk iphoneos -archivePath SoSa.xcarchive -allowProvisioningUpdates
-    - xcodebuild -archivePath SoSa.xcarchive -exportPath ./release/SoSa.ipa -exportOptionsPlist ~/ExportOptions.plist -exportArchive
+    - xcodebuild -archivePath SoSa.xcarchive -exportPath ./release/SoSa.ipa -exportOptionsPlist ~/ExportOptions.plist -exportArchive -allowProvisioningUpdates
   artifacts:
     paths:
       - ios/release
