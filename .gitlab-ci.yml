@@ -9,13 +9,13 @@ ios-release:
   tags:
     - macos
   script:
+    - export VERSION=$(node -pe "require('./package.json').version")
     - npm install
     - cd ./ios
-    - mkdir release
-    - ls -l ~/
+    - mkdir -p release/$VERSION
     - pod install
     - xcodebuild -workspace SoSa.xcworkspace -scheme SoSa clean archive -configuration release -sdk iphoneos -archivePath SoSa.xcarchive -allowProvisioningUpdates
-    - xcodebuild -archivePath SoSa.xcarchive -exportPath ./release/SoSa.ipa -exportOptionsPlist ~/ExportOptions.plist -exportArchive -allowProvisioningUpdates
+    - xcodebuild -archivePath SoSa.xcarchive -exportPath ./release/$VERSION/SoSa.ipa -exportOptionsPlist ~/ExportOptions.plist -exportArchive -allowProvisioningUpdates
   artifacts:
     paths:
       - ios/release
@@ -32,4 +32,7 @@ deploy:
   tags:
     - macos
   script:
+    - export VERSION=$(node -pe "require('./package.json').version")
+    - echo $VERSION
+    - ls -l ./ios/release
     - echo "Future deploy job"
