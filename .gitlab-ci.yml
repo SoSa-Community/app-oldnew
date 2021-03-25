@@ -35,5 +35,7 @@ deploy-ios:
   script:
     - export VERSION=$(node -pe "require('./package.json').version")
     - ls -l ./ios/release/
-    - appcenter distribute release -f ./ios/release/SoSa.ipa/SoSa.ipa --app $APPCENTER_IOS_APP --group $APPCENTER_DISTRIBUTION
+    - appcenter distribute release -f ./ios/release/SoSa.ipa --app $APPCENTER_IOS_APP --group $APPCENTER_DISTRIBUTION
+    - mkdir -p ~/release/ios/$VERSION
+    - cp -Rax ./ios/release/* ~/release/ios/$VERSION/
     - echo "Future deploy job"
