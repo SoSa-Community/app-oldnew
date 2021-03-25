@@ -14,11 +14,10 @@ ios-release:
     - cd ./ios
     - pod install
     - xcodebuild -workspace SoSa.xcworkspace -scheme SoSa clean archive -configuration release -sdk iphoneos -archivePath SoSa.xcarchive -allowProvisioningUpdates
-    - xcodebuild -archivePath SoSa.xcarchive -exportPath ./ -exportOptionsPlist ~/ExportOptions.plist -exportArchive -allowProvisioningUpdates
-    - ls -l
+    - xcodebuild -archivePath SoSa.xcarchive -exportPath ./$VERSION -exportOptionsPlist ~/ExportOptions.plist -exportArchive -allowProvisioningUpdates
   artifacts:
     paths:
-      - SoSa.ipa
+      - ios/$VERSION/SoSa.ipa
 
 test:
   stage: test
@@ -27,10 +26,11 @@ test:
   script:
     - echo "Future test job"
 
-deploy:
+deploy-ios:
   stage: deploy
   tags:
     - macos
   script:
     - export VERSION=$(node -pe "require('./package.json').version")
+    - appcenter distribute release -f ./ios/$VERSION/SoSa.ipa/SoSa.ipa --app $APPCENTER_IOS_APP --group $APPCENTER_DISTRIBUTION
     - echo "Future deploy job"
