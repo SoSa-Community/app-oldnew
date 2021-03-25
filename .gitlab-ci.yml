@@ -4,6 +4,22 @@ workflow:
       when: never  # Prevent pipeline run for push event
     - when: always # Run pipeline for all other cases
 
+android-release:
+  stage: build
+  tags:
+    - macos
+  script:
+    - npm install
+    - mkdir -p release/android
+    - cd ./android
+    - ./gradlew assembleRelease
+    - apksigner sign --ks-pass env:KEYSTORE_PASS --ks ~/SocialSavanna.jks --out ./app/build/outputs/apk/release/app-release.apk ./app/build/outputs/apk/release/app-release-unsigned.apk
+    - apksigner verify ./app/build/outputs/apk/release/app-release.apk
+    - cp -R ./app/build/outputs/apk/release/* ../release/android/
+  artifacts:
+    paths:
+      - release/android
+
 ios-release:
   stage: build
   tags:
@@ -11,15 +27,14 @@ ios-release:
   script:
     - export VERSION=$(node -pe "require('./package.json').version")
     - npm install
+    - mkdir -p release/ios
     - cd ./ios
     - pod install
-    - mkdir release
     - xcodebuild -workspace SoSa.xcworkspace -scheme SoSa clean archive -configuration release -sdk iphoneos -archivePath SoSa.xcarchive -allowProvisioningUpdates
-    - xcodebuild -archivePath SoSa.xcarchive -exportPath ./release -exportOptionsPlist ~/ExportOptions.plist -exportArchive -allowProvisioningUpdates
-    - ls -l ./release/
+    - xcodebuild -archivePath SoSa.xcarchive -exportPath ../release/ios -exportOptionsPlist ~/ExportOptions.plist -exportArchive -allowProvisioningUpdates
   artifacts:
     paths:
-      - ios/release/
+      - release/ios
 
 test:
   stage: test
@@ -28,14 +43,20 @@ test:
   script:
     - echo "Future test job"
 
+deploy-local:
+  stage: deploy
+  tags:
+    - macos
+  script:
+    - export VERSION=$(node -pe "require('./package.json').version")
+    - mkdir -p ~/release/ios/$VERSION
+    - cp -R ./release ~/release/$VERSION
+
 deploy-ios:
   stage: deploy
   tags:
     - macos
   script:
     - export VERSION=$(node -pe "require('./package.json').version")
-    - ls -l ./ios/release/
-    - appcenter distribute release -f ./ios/release/SoSa.ipa --app $APPCENTER_IOS_APP --group $APPCENTER_DISTRIBUTION
-    - mkdir -p ~/release/ios/$VERSION
-    - cp -R ./ios/release/* ~/release/ios/$VERSION/
+    - appcenter distribute release -f ./release/ios/SoSa.ipa --app $APPCENTER_IOS_APP --group $APPCENTER_DISTRIBUTION
     - echo "Future deploy job"
