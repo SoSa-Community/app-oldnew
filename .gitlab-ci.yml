@@ -12,13 +12,12 @@ ios-release:
     - export VERSION=$(node -pe "require('./package.json').version")
     - npm install
     - cd ./ios
-    - mkdir -p release/$VERSION
     - pod install
     - xcodebuild -workspace SoSa.xcworkspace -scheme SoSa clean archive -configuration release -sdk iphoneos -archivePath SoSa.xcarchive -allowProvisioningUpdates
-    - xcodebuild -archivePath SoSa.xcarchive -exportPath ./release/$VERSION/SoSa.ipa -exportOptionsPlist ~/ExportOptions.plist -exportArchive -allowProvisioningUpdates
+    - xcodebuild -archivePath SoSa.xcarchive -exportPath ./ -exportOptionsPlist ~/ExportOptions.plist -exportArchive -allowProvisioningUpdates
   artifacts:
     paths:
-      - ios/release/$VERSION/*
+      - SoSa.ipa/
 
 test:
   stage: test
