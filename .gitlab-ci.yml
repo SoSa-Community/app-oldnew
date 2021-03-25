@@ -13,11 +13,12 @@ ios-release:
     - npm install
     - cd ./ios
     - pod install
+    - mkdir release
     - xcodebuild -workspace SoSa.xcworkspace -scheme SoSa clean archive -configuration release -sdk iphoneos -archivePath SoSa.xcarchive -allowProvisioningUpdates
     - xcodebuild -archivePath SoSa.xcarchive -exportPath ./$VERSION -exportOptionsPlist ~/ExportOptions.plist -exportArchive -allowProvisioningUpdates
   artifacts:
     paths:
-      - ios/$VERSION/SoSa.ipa
+      - ios/release/SoSa.ipa
 
 test:
   stage: test
@@ -32,5 +33,6 @@ deploy-ios:
     - macos
   script:
     - export VERSION=$(node -pe "require('./package.json').version")
-    - appcenter distribute release -f ./ios/$VERSION/SoSa.ipa/SoSa.ipa --app $APPCENTER_IOS_APP --group $APPCENTER_DISTRIBUTION
+    - ls -l ./ios/release/
+    - appcenter distribute release -f ./ios/release/SoSa.ipa/SoSa.ipa --app $APPCENTER_IOS_APP --group $APPCENTER_DISTRIBUTION
     - echo "Future deploy job"
