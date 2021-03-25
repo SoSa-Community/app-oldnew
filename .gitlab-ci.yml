@@ -18,7 +18,7 @@ ios-release:
     - xcodebuild -archivePath SoSa.xcarchive -exportPath ./release/$VERSION/SoSa.ipa -exportOptionsPlist ~/ExportOptions.plist -exportArchive -allowProvisioningUpdates
   artifacts:
     paths:
-      - ios/release
+      - ios/release/$VERSION/*
 
 test:
   stage: test
@@ -33,6 +33,4 @@ deploy:
     - macos
   script:
     - export VERSION=$(node -pe "require('./package.json').version")
-    - echo $VERSION
-    - ls -l ./ios/release
     - echo "Future deploy job"
