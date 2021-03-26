@@ -17,6 +17,7 @@ cache:
     - node_modules/
 
 prebuild:
+  stage: prebuild
   tags:
     - macos
   script:
