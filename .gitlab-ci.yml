@@ -47,6 +47,7 @@ ios-release:
 
 deploy-local:
   stage: deploy
+  needs: ["android-release", "ios-release"]
   tags:
     - macos
   variables:
@@ -58,6 +59,7 @@ deploy-local:
 
 deploy-ios:
   stage: deploy
+  needs: ["ios-release"]
   tags:
     - macos
   variables:
@@ -68,6 +70,7 @@ deploy-ios:
 
 deploy-android:
   stage: deploy
+  needs: ["android-release"]
   tags:
     - macos
   variables:
