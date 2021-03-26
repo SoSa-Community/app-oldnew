@@ -4,6 +4,16 @@ workflow:
       when: never  # Prevent pipeline run for push event
     - when: always # Run pipeline for all other cases
 
+# Cache modules in between jobs
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .npm/
+    - node_modules/
+
+before_script:
+  - npm ci --cache .npm --prefer-offline
+
 android-release:
   stage: build
   tags:
@@ -11,10 +21,9 @@ android-release:
   script:
     - export VERSION=$(node -pe "require('./package.json').version")
     - mkdir -p release/android
-    - npm install
     - cd ./android
     - ./gradlew assembleRelease
-    - apksigner sign --ks-pass env:KEYSTORE_PASS --ks ~/keystore.jks --out ./app/build/outputs/apk/release/app-release.apk ./app/build/outputs/apk/release/app-release-unsigned.apk
+    - apksigner sign --ks-pass env:KEYSTORE_PASS --ks $ANDROID_KEYSTORE_LOCATION --out ./app/build/outputs/apk/release/app-release.apk ./app/build/outputs/apk/release/app-release-unsigned.apk
     - apksigner verify ./app/build/outputs/apk/release/app-release.apk
     - cp -R ./app/build/outputs/apk/release/* ../release/android/
   artifacts:
@@ -28,7 +37,6 @@ ios-release:
   script:
     - export VERSION=$(node -pe "require('./package.json').version")
     - mkdir -p release/ios
-    - npm install
     - cd ./ios
     - pod install
     - xcodebuild -workspace SoSa.xcworkspace -scheme SoSa clean archive -configuration release -sdk iphoneos -archivePath SoSa.xcarchive -allowProvisioningUpdates
