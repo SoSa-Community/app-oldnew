@@ -1,3 +1,7 @@
+stages:
+  - build
+  - deploy
+
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
