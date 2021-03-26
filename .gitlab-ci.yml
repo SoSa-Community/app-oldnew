@@ -9,8 +9,9 @@ android-release:
   tags:
     - macos
   script:
-    - npm install
+    - export VERSION=$(node -pe "require('./package.json').version")
     - mkdir -p release/android
+    - npm install
     - cd ./android
     - ./gradlew assembleRelease
     - apksigner sign --ks-pass env:KEYSTORE_PASS --ks ~/SocialSavanna.jks --out ./app/build/outputs/apk/release/app-release.apk ./app/build/outputs/apk/release/app-release-unsigned.apk
@@ -26,8 +27,8 @@ ios-release:
     - macos
   script:
     - export VERSION=$(node -pe "require('./package.json').version")
-    - npm install
     - mkdir -p release/ios
+    - npm install
     - cd ./ios
     - pod install
     - xcodebuild -workspace SoSa.xcworkspace -scheme SoSa clean archive -configuration release -sdk iphoneos -archivePath SoSa.xcarchive -allowProvisioningUpdates
@@ -49,7 +50,7 @@ deploy-local:
     - macos
   script:
     - export VERSION=$(node -pe "require('./package.json').version")
-    - mkdir -p ~/release/ios/$VERSION
+    - mkdir -p ~/release/$VERSION
     - cp -R ./release ~/release/$VERSION
 
 deploy-ios:
