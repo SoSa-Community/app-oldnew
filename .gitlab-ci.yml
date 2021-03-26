@@ -82,12 +82,3 @@ deploy-android:
   script:
     - export VERSION=$(node -pe "require('./package.json').version")
     - appcenter distribute release -f ./release/android/app-release.apk --app $APPCENTER_ANDROID_APP --group $APPCENTER_DISTRIBUTION
-
-test:
-  stage: test
-  tags:
-    - macos
-  variables:
-    GIT_STRATEGY: none
-  script:
-    - echo "Future test job"
