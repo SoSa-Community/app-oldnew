@@ -14,7 +14,7 @@ android-release:
     - npm install
     - cd ./android
     - ./gradlew assembleRelease
-    - apksigner sign --ks-pass $KEYSTORE_PASS --ks $ANDROID_KEYSTORE_LOCATION --out ./app/build/outputs/apk/release/app-release.apk ./app/build/outputs/apk/release/app-release-unsigned.apk
+    - apksigner sign --ks-pass env:KEYSTORE_PASS --ks env:ANDROID_KEYSTORE_LOCATION --out ./app/build/outputs/apk/release/app-release.apk ./app/build/outputs/apk/release/app-release-unsigned.apk
     - apksigner verify ./app/build/outputs/apk/release/app-release.apk
     - cp -R ./app/build/outputs/apk/release/* ../release/android/
   artifacts:
