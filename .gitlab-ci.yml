@@ -14,7 +14,7 @@ android-release:
     - npm install
     - cd ./android
     - ./gradlew assembleRelease
-    - apksigner sign --ks-pass env:KEYSTORE_PASS --ks ~/SocialSavanna.jks --out ./app/build/outputs/apk/release/app-release.apk ./app/build/outputs/apk/release/app-release-unsigned.apk
+    - apksigner sign --ks-pass $KEYSTORE_PASS --ks $ANDROID_KEYSTORE_LOCATION --out ./app/build/outputs/apk/release/app-release.apk ./app/build/outputs/apk/release/app-release-unsigned.apk
     - apksigner verify ./app/build/outputs/apk/release/app-release.apk
     - cp -R ./app/build/outputs/apk/release/* ../release/android/
   artifacts:
@@ -37,13 +37,6 @@ ios-release:
     paths:
       - release/ios
 
-test:
-  stage: test
-  tags:
-    - macos
-  script:
-    - echo "Future test job"
-
 deploy-local:
   stage: deploy
   tags:
@@ -60,4 +53,19 @@ deploy-ios:
   script:
     - export VERSION=$(node -pe "require('./package.json').version")
     - appcenter distribute release -f ./release/ios/SoSa.ipa --app $APPCENTER_IOS_APP --group $APPCENTER_DISTRIBUTION
-    - echo "Future deploy job"
+
+deploy-android:
+  stage: deploy
+  tags:
+    - macos
+  script:
+    - export VERSION=$(node -pe "require('./package.json').version")
+    - appcenter distribute release -f ./release/android/app-release.apk --app $APPCENTER_ANDROID_APP --group $APPCENTER_DISTRIBUTION
+
+
+test:
+  stage: test
+  tags:
+    - macos
+  script:
+    - echo "Future test job"
