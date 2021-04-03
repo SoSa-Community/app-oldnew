@@ -1,5 +1,8 @@
 #https://sosa.net app!
 
+[![pipeline status](https://gitlab.com/media-cake/sosa-app/badges/master/pipeline.svg)](https://gitlab.com/media-cake/sosa-app/-/commits/master)
+[![coverage report](https://gitlab.com/media-cake/sosa-app/badges/master/coverage.svg)](https://gitlab.com/media-cake/sosa-app/-/commits/master)
+
 I'm a work in progress, ignore me or don't. I'm just a readme not your boss!
 
 ```

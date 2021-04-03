@@ -1,33 +1,91 @@
+stages:
+  - prebuild
+  - build
+  - deploy
+
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
       when: never  # Prevent pipeline run for push event
     - when: always # Run pipeline for all other cases
 
+# Cache modules in between jobs
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .npm/
+    - node_modules/
+
+prebuild:
+  stage: prebuild
+  tags:
+    - macos
+  script:
+    - npm ci --cache .npm --prefer-offline
+
 android-release:
   stage: build
   tags:
     - macos
+  needs: ["prebuild"]
   script:
-    - npm install
+    - export VERSION=$(node -pe "require('./package.json').version")
+    - mkdir -p release/android
     - cd ./android
     - ./gradlew assembleRelease
-    - apksigner sign --ks-pass env:KEYSTORE_PASS --ks ~/SocialSavanna.jks --out ./app/build/outputs/apk/release/app-release.apk ./app/build/outputs/apk/release/app-release-unsigned.apk
+    - apksigner sign --ks-pass env:KEYSTORE_PASS --ks ~/keystore.jks --out ./app/build/outputs/apk/release/app-release.apk ./app/build/outputs/apk/release/app-release-unsigned.apk
     - apksigner verify ./app/build/outputs/apk/release/app-release.apk
+    - cp -R ./app/build/outputs/apk/release/* ../release/android/
   artifacts:
     paths:
-      - android/app/build/outputs/apk/release
+      - release/android
 
-test:
-  stage: test
+ios-release:
+  stage: build
   tags:
     - macos
+  needs: ["prebuild"]
   script:
-    - echo "Future test job"
+    - export VERSION=$(node -pe "require('./package.json').version")
+    - mkdir -p release/ios
+    - cd ./ios
+    - pod install
+    - xcodebuild -workspace SoSa.xcworkspace -scheme SoSa clean archive -configuration release -sdk iphoneos -archivePath SoSa.xcarchive -allowProvisioningUpdates
+    - xcodebuild -archivePath SoSa.xcarchive -exportPath ../release/ios -exportOptionsPlist ~/ExportOptions.plist -exportArchive -allowProvisioningUpdates
+  artifacts:
+    paths:
+      - release/ios
 
-deploy:
+deploy-local:
   stage: deploy
+  needs: ["android-release", "ios-release"]
   tags:
     - macos
+  variables:
+    GIT_STRATEGY: none
   script:
-    - echo "Future deploy job"
+    - export VERSION=$(node -pe "require('./package.json').version")
+    - mkdir -p ~/release/$VERSION
+    - cp -R ./release ~/release/$VERSION
+
+deploy-ios:
+  stage: deploy
+  needs: ["ios-release"]
+  tags:
+    - macos
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - export VERSION=$(node -pe "require('./package.json').version")
+    - appcenter distribute release -f ./release/ios/SoSa.ipa --app $APPCENTER_IOS_APP --group $APPCENTER_DISTRIBUTION
+
+deploy-android:
+  stage: deploy
+  needs: ["android-release"]
+  tags:
+    - macos
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - export VERSION=$(node -pe "require('./package.json').version")
+    - appcenter distribute release -f ./release/android/app-release.apk --app $APPCENTER_ANDROID_APP --group $APPCENTER_DISTRIBUTION
