@@ -89,9 +89,11 @@ const ProfileModal = ({profileId, onDismiss}) => {
     const { services: { profiles: profileService } } = useAPI();
     const [ isLoading, setIsLoading ] = useState(true);
     const [ profile, setProfile ] = useState(null);
+    const [ isVisible, setIsVisible ] = useState(false)
     const [ error, setError ] = useState(null);
     
     const handleDismiss = () => {
+        setIsVisible(false);
         setProfile(null);
         setIsLoading(false);
         onDismiss && onDismiss();
@@ -184,11 +186,14 @@ const ProfileModal = ({profileId, onDismiss}) => {
     
     useEffect(() => {
         if(profileId) {
+            setIsVisible(true);
             setIsLoading(true);
             setProfile(null);
     
             profileService.get(profileId)
-                .then((profile) => setProfile(profile))
+                .then((profile) => {
+                    setProfile(profile)
+                })
                 .catch((error) => {
                     handleDismiss();
     
@@ -203,23 +208,32 @@ const ProfileModal = ({profileId, onDismiss}) => {
                     }
                     
                 })
-                .finally(() => setIsLoading(false));
+                .finally(() => {
+                    setTimeout(() => setIsLoading(false), 100);
+                    
+                });
         }
     }, [profileId]);
+    
+    useEffect(() => {
+        console.debug('Visible', isVisible);
+    }, [isVisible]);
     
     return (
         <Modal style={{justifyContent: 'flex-end', margin:0}}
                animationType="slide"
                swipeDirection="down"
-               visible={!!(profileId)}
                transparent={true}
                hardwareAccelerated={true}
+               onBackButtonPress={handleDismiss}
                onBackdropPress={handleDismiss}
                onSwipeComplete={handleDismiss}
                hideModalContentWhileAnimating={true}
+               useNativeDriverForBackdrop={true}
                onModalHide={() => {
                    console.debug('hello', error);
                }}
+               {...{isVisible} }
         >
             <View style={Styles.body}>
                 { isLoading && <ActivityIndicator color="#fff" size="large" style={{alignSelf:'center', marginVertical: 24}}/> }

@@ -78,7 +78,6 @@ const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, set
     const [ selectedProfileId, setSelectedProfileId ] = useState(null);
     
     const showMemberProfile = (id) => {
-        console.debug(id);
         setSelectedProfileId(id);
     }
     
