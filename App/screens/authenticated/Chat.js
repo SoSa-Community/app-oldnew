@@ -492,7 +492,7 @@ const ChatScreen = ({navigation, showMemberProfile}) => {
     
             addStatus(`Joined room ${currentRoom?.name}`)
                 .finally(() => {
-                    addHeaderIcon('whos_online',['fal', 'users'], displayUserList);
+                    addHeaderIcon({id: 'whos_online', icon: ['fal', 'users'], onPress: displayUserList});
                 });
         }
     }, [currentRoom])

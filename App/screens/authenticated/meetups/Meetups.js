@@ -24,8 +24,10 @@ const MeetupsScreen = ({navigation}) => {
             let isActive = true;
             
             if(isActive){
-                addHeaderIcon('create_meetup', ['fal', 'plus'], () => {
-                    navigate('CreateMeetup')
+                addHeaderIcon({
+                    id: 'create_meetup',
+                    icon: ['fal', 'plus'],
+                    onPress: () => navigate('CreateMeetup')
                 });
                 
                 meetupService.search('sosa')

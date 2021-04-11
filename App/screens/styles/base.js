@@ -17,12 +17,10 @@ const BaseStyles = StyleSheet.create({
     },
 
     headerTitle: {
-        alignSelf: 'center',
-        textAlign: 'center',
         color: headerTextColour,
-        fontSize: 24,
-        padding: 10,
-        flex: 1
+        fontSize: 18,
+        flex: 1,
+        marginLeft: 8
     },
 
     container: {

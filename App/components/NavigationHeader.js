@@ -1,5 +1,5 @@
-import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
-import { Keyboard, Text, View, StyleSheet, BackHandler } from "react-native";
+import React, { useEffect, useState, forwardRef, useImperativeHandle, useReducer } from 'react';
+import {Keyboard, Text, View, StyleSheet, BackHandler, TouchableHighlight} from 'react-native';
 
 import PropTypes from "prop-types";
 
@@ -15,7 +15,9 @@ const Styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent:'center',
         alignItems:'center',
-        paddingTop: Platform.OS === 'ios' ? 32 : 0
+        alignContent:'center',
+        paddingTop: Platform.OS === 'ios' ? 32 : 6,
+        paddingBottom: 6,
     },
     menuTopLeft: {paddingLeft: 7, paddingRight: 5},
     menuTopRight: {paddingRight: 10, flex:0, flexDirection: 'row', alignItems: 'center', justifyContent:'flex-end'}
@@ -26,23 +28,51 @@ const NavigationHeader = forwardRef((
     ref
 ) =>
 {
-    let leftMenu = null;
-    let rightMenu = null;
-    
     const menuDefaults = {
         title: 'SoSa',
         leftMode: 'menu',
         showLeft: true,
         showRight: true
     };
-    menuStack = [menuDefaults];
+    menuStack = [ menuDefaults ];
     
     const { toggleSwipe, openLeftDrawer, getStackNavigator } = useAuthenticatedNavigation();
     
-    const [ headerIcons, setHeaderIcons ] = useState([]);
+    const [ headerIcons, dispatch ] = useReducer((state, data) => {
+        const { action } = data;
+        let icons = [...state];
+        
+        if(action === 'remove') {
+            if(Array.isArray(headerIcons)) {
+                return headerIcons.filter(item => (item.id !== id))
+            }
+        }
+        else {
+            const { id, icon, text, onPress } = data;
+    
+            
+            let found = false;
+    
+            icons.forEach((item, index) => {
+                if(item.id === id){
+                    found = true;
+                    item.icon = icon;
+                    item.text = text;
+                    item.onPress = onPress;
+                }
+            });
+    
+            if(!found) icons.unshift(data);
+        }
+        return icons;
+        
+    }, []);
+    
     const [ preferences, setPreferences ] = useState({});
     const [ showTopBar, setShowTopBar ] = useState(true);
     const [ menu, setMenu ] = useState(menuDefaults);
+    const [ leftMenu, setLeftMenu ] = useState(null);
+    const [ rightMenu, setRightMenu ] = useState(null);
     
     const popMenuStack = () => {
         let newState = menuDefaults;
@@ -63,33 +93,11 @@ const NavigationHeader = forwardRef((
     
     useImperativeHandle(ref, () => ({
         
-        addHeaderIcon(id, icon, onPress){
-            let icons = [...headerIcons];
-            let found = false;
-        
-            icons.forEach((item, index) => {
-                if(item.id === id){
-                    found = true;
-                    item.icon = icon;
-                    item.onPress = onPress;
-                }
-            });
-        
-            if(!found){
-                icons.unshift({
-                    id: id,
-                    icon: icon,
-                    onPress: onPress
-                });
-            }
-        
-            setHeaderIcons(icons);
+        addHeaderIcon(props = {id: undefined, icon: undefined, text: undefined, onPress: undefined}){
+            dispatch({ action:'add', ...props });
         },
+        removeHeaderIcon(id) { dispatch({ action:'remove' }); },
         
-        removeHeaderIcon(id) {
-            setHeaderIcons(headerIcons.filter(item => (item.id !== id)));
-        },
-    
         setMenuOptions(options, justUpdate, resetOnBack) {
             
             let currentState = {...menu};
@@ -116,46 +124,83 @@ const NavigationHeader = forwardRef((
     if(!showTopBar) return <></>;
     
     const {title, leftMode, showLeft, showRight, onBack, backIgnoreStack, leftIcon} = menu;
-    if(showLeft){
-        let menuIcon = null;
-        if(leftMode === 'back'){
-            menuIcon = <IconButton icon={leftIcon || ['fal', 'chevron-left']} style={{color: '#CCC'}} size={22} onPress={() => {
-                const goBack = () => {
-                    if(!backIgnoreStack){
-                        popMenuStack();
-                        getStackNavigator()?.current?.goBack();
-                    }
-                };
-                console.debug(typeof(onBack));
-                if(typeof(onBack) === 'function') {
-                    onBack()
-                        .catch(e => console.debug('Go Back Went Wrong', e))
-                        .finally(() =>  goBack());
-                }
-                else { goBack(); }
-            }}/>
-        }else{
-            menuIcon = <IconButton icon={['fal', 'bars']} style={{color: '#CCC'}} size={22} onPress={() => {
+    
+    useEffect(() => {
+        if(!showLeft) setLeftMenu(null);
+        else {
+            let icon = ['fal', 'bars'];
+            let onPress = () => {
                 Keyboard.dismiss();
                 openLeftDrawer();
-            }}/>;
+            };
+    
+            const goBack = () => {
+                if(!backIgnoreStack){
+                    popMenuStack();
+                    getStackNavigator()?.current?.goBack();
+                }
+            };
+            
+            if(leftMode === 'back'){
+                onPress = () => {
+                    if(typeof(onBack) !== 'function') goBack();
+                    else {
+                        onBack()
+                            .catch(e => console.debug('Go Back Went Wrong', e))
+                            .finally(() =>  goBack());
+                    }
+                }
+                icon = leftIcon || ['fal', 'chevron-left'];
+            }
+            
+            setLeftMenu(
+                <View style={Styles.menuTopLeft}>
+                    <IconButton
+                        style={{color: '#CCC'}}
+                        size={18}
+                        {...{icon, onPress}}
+                    />
+                </View>
+            );
         }
-        leftMenu = <View style={Styles.menuTopLeft}>{menuIcon}</View>;
-    }
-
-    if(showRight) {
-        let icons = headerIcons.map((item, i) => {
-            return (<View style={{verticalAlign:'center', marginLeft: 10}} key={item.id}>
-                <IconButton icon={item.icon} style={{color: '#CCC'}} activeStyle={{color: '#444442'}} size={30} onPress={item.onPress}/>
-            </View>);
-        });
-        rightMenu = <View style={Styles.menuTopRight}>{icons}</View>;
-    }
+    }, [showLeft, leftMode, onBack]);
+    
+    useEffect(() => {
+        if(!showRight) setRightMenu(null);
+        else {
+            let icons = headerIcons.map(({icon, id, text, onPress}) => {
+            
+                const Button = () => {
+                    if(icon) {
+                        return <IconButton
+                            style={{color: '#CCC'}}
+                            activeStyle={{color: '#444442'}}
+                            size={22}
+                            {...{ icon, onPress }}
+                        />
+                    }
+                
+                    return (
+                        <TouchableHighlight onPress={onPress}>
+                            <Text style={{color: '#ccc'}}>{text}</Text>
+                        </TouchableHighlight>
+                    );
+                }
+            
+                return (
+                    <View style={{ verticalAlign:'center', paddingLeft: 14 }} key={id}>
+                        <Button />
+                    </View>
+                );
+            });
+            setRightMenu(<View style={Styles.menuTopRight}>{icons}</View>);
+        }
+    }, [showRight, headerIcons])
     
     return  <View style={Styles.menuTop}>
-                {leftMenu}
-                <Text style={BaseStyles.headerTitle}>{title}</Text>
-                {rightMenu}
+                { leftMenu }
+                <Text style={[ BaseStyles.headerTitle ]}>{title}</Text>
+                { rightMenu }
             </View>
  
 });
