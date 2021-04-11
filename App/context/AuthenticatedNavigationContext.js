@@ -13,7 +13,8 @@ import {createDrawerNavigator } from '@react-navigation/drawer';
 
 import DrawerMenu from '../components/DrawerMenu';
 import NavigationHeader from '../components/NavigationHeader';
-import ProfileModal from '../components/ProfileModal';
+
+import { ProfileProvider } from './ProfileContext';
 
 const AuthenticatedNavigationContext = createContext();
 const DrawerL = createDrawerNavigator();
@@ -148,8 +149,10 @@ const AuthenticatedNavigationProvider = ({navigator: Navigator, ...props}) => {
                                     <DrawerR.Screen name="Navigator">
                                         { (props) => {
                                             return <>
-                                                <NavigationHeader ref={topBar} />
-                                                <Navigator {...props} {...{setStackNavigation, setDrawerNavigation}} />
+                                                <ProfileProvider>
+                                                    <NavigationHeader ref={topBar} />
+                                                    <Navigator {...props} {...{setStackNavigation, setDrawerNavigation}} />
+                                                </ProfileProvider>
                                             </>
                                         } }
                                     </DrawerR.Screen>

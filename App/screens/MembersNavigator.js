@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, memo } from 'react';
-import {StyleSheet, Text, View, TouchableHighlight} from 'react-native';
+import {StyleSheet, Text, View, TouchableHighlight, TouchableOpacity} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -7,7 +7,7 @@ import BaseStyles from "./styles/base";
 
 import { useAuth } from '../context/AuthContext';
 import { useAuthenticatedNavigation } from '../context/AuthenticatedNavigationContext';
-import { useAPI } from '../context/APIContext';
+import { useProfile } from '../context/ProfileContext';
 
 import Icon from "../components/Icon";
 import MeetupsScreen from "./authenticated/meetups/Meetups";
@@ -20,6 +20,9 @@ import MyProfileScreen from './authenticated/MyProfile';
 import WelcomeScreen from './authenticated/Welcome';
 
 import ProfileModal from '../components/ProfileModal';
+
+import FastImage from 'react-native-fast-image';
+
 const Stack = createStackNavigator();
 
 const Styles = StyleSheet.create({
@@ -56,8 +59,20 @@ const Styles = StyleSheet.create({
     },
     
     menuFooterButton: {
-        paddingHorizontal:14
-    }
+        paddingHorizontal:8
+    },
+    
+    pictureButton: {
+        backgroundColor: '#444442',
+        paddingHorizontal:14,
+        borderRadius: 100/2
+    },
+    
+    picture: {
+        width: 28,
+        height: 28,
+        borderRadius: 48/2
+    },
     
 });
 
@@ -70,12 +85,14 @@ const FooterButton = ({icon, onPress}) => {
 const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, setDrawerNavigation}) => {
     const { add: addDrawerItem, update: updateDrawerItem, closeLeftDrawer, closeRightDrawer } = useAuthenticatedNavigation();
     const { logout } = useAuth();
+    const { profile } = useProfile();
     
     const stackNavigation = useRef();
     
     const [ isLoading, setIsLoading ] = useState(false);
     const [ firstRun, setFirstRun ] = useState(true);
     const [ selectedProfileId, setSelectedProfileId ] = useState(null);
+    
     
     const showMemberProfile = (id) => {
         setSelectedProfileId(id);
@@ -86,7 +103,7 @@ const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, set
         stackNavigation?.current?.navigate('Settings');
     };
     
-    const showProfile = () => {
+    const showMyProfile = () => {
         drawerNavigation.dangerouslyGetParent().closeDrawer();
         stackNavigation?.current?.navigate('MyProfile');
         closeLeftDrawer();
@@ -117,36 +134,43 @@ const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, set
                     </TouchableHighlight>
                 </View>
             ));
-    
-            updateDrawerItem('options', (
-                <View style={Styles.menuFooterButtons} key={'options'}>
-                    <FooterButton onPress={showSettings} icon={['fal', 'cogs']} />
-                    <FooterButton onPress={() => logout()} icon={['fal', 'sign-out-alt']} />
-                </View>
-            ),false, true);
         }
         //
     }, [firstRun]);
     
+    useEffect(() => {
+        if(profile) {
+            updateDrawerItem('options', (
+                <View style={Styles.menuFooterButtons} key={'options'}>
+                    <TouchableOpacity onPress={ showMyProfile } style={[Styles.pictureButton, Styles.menuFooterButton]} >
+                        <FastImage source={{uri : profile?.picture}} style={Styles.picture} />
+                    </TouchableOpacity>
+                    <FooterButton onPress={ showSettings } icon={['fal', 'cogs']} />
+                    <FooterButton onPress={() => logout()} icon={['fal', 'sign-out-alt']} />
+                </View>
+            ),false, true);
+        }
+    }, [])
+    
     return (
-        <View style={BaseStyles.container} >
-            <NavigationContainer independent={true} ref={stackNavigation} onStateChange={(state) => {if (!state) return;}}>
-                <Stack.Navigator initialRouteName="Chat">
-                    <Stack.Screen name="Chat" options={{ headerShown: false }}>
-                        { (props) => <ChatScreen {...props} showMemberProfile={showMemberProfile}  /> }
-                    </Stack.Screen>
-                    <Stack.Screen name="Meetups" options={{ headerShown: false}} component={MeetupsScreen} />
-                    <Stack.Screen name="Meetup" options={{ headerShown: false }}>
-                        { (props) => <MeetupScreen {...props} showMemberProfile={showMemberProfile}  /> }
-                    </Stack.Screen>
-                    <Stack.Screen name="CreateMeetup" options={{ headerShown: false}} component={CreateMeetupScreen} />
-                    <Stack.Screen name="MyProfile" options={{ headerShown: false}} component={MyProfileScreen} />
-                    <Stack.Screen name="Settings" options={{ headerShown: false}} component={SettingsScreen} />
-                    <Stack.Screen name="Welcome" component={ WelcomeScreen } options={{title: 'Welcome To SoSa!'}} />
-                </Stack.Navigator>
-            </NavigationContainer>
-            <ProfileModal profileId={selectedProfileId} onDismiss={() => setSelectedProfileId(null)} />
-        </View>
+            <View style={BaseStyles.container} >
+                <NavigationContainer independent={true} ref={stackNavigation} onStateChange={(state) => {if (!state) return;}}>
+                    <Stack.Navigator initialRouteName="MyProfile">
+                        <Stack.Screen name="Chat" options={{ headerShown: false }}>
+                            { (props) => <ChatScreen {...props} showMemberProfile={ showMemberProfile }  /> }
+                        </Stack.Screen>
+                        <Stack.Screen name="Meetups" options={{ headerShown: false}} component={MeetupsScreen} />
+                        <Stack.Screen name="Meetup" options={{ headerShown: false }}>
+                            { (props) => <MeetupScreen {...props} showMemberProfile={ showMemberProfile }  /> }
+                        </Stack.Screen>
+                        <Stack.Screen name="CreateMeetup" options={{ headerShown: false}} component={ CreateMeetupScreen } />
+                        <Stack.Screen name="MyProfile" options={{ headerShown: false}} component={ MyProfileScreen } />
+                        <Stack.Screen name="Settings" options={{ headerShown: false}} component={ SettingsScreen } />
+                        <Stack.Screen name="Welcome" component={ WelcomeScreen } options={{title: 'Welcome To SoSa!'}} />
+                    </Stack.Navigator>
+                </NavigationContainer>
+                <ProfileModal profileId={selectedProfileId} onDismiss={() => setSelectedProfileId(null)} />
+            </View>
     );
 }
 
