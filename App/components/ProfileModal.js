@@ -191,10 +191,8 @@ const ProfileModal = ({profileId, onDismiss}) => {
             setProfile(null);
     
             profileService.get(profileId)
-                .then((profile) => {
-                    setProfile(profile)
-                })
-                .catch((error) => {
+                .then(profile => setProfile(profile))
+                .catch(() => {
                     handleDismiss();
     
                     const showModal = () => modals?.create('Profile unavailable', 'This user\'s profile is not available to you!');

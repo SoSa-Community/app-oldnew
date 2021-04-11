@@ -114,7 +114,7 @@ const MessageItem = ({message, onFacePress, onLongFacePress, onUsernamePress, my
     return  <View style={containerStyles}>
         <View style={Styles.inner}>
             <View style={Styles.pictureContainer}>
-                <TouchableOpacity onPress={onFacePress} onLongPress={onLongFacePress} style={Styles.pictureButton}>
+                <TouchableOpacity onPress={onFacePress} onLongPress={onLongFacePress} style={Styles.pictureButton} delayLongPress={100}>
                     <FastImage source={{uri : message?.user?.picture}} style={Styles.picture} />
                 </TouchableOpacity>
             </View>

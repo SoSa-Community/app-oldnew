@@ -60,7 +60,9 @@ const Styles = StyleSheet.create({
         height:42
     },
 
-    inputIcon:{color: '#ccc', marginHorizontal:4},
+    inputIcon:{
+        color: '#ccc', marginHorizontal:4
+    },
     
     multiline: {
         minHeight: 180,

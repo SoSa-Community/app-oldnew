@@ -8,6 +8,7 @@ const Styles = StyleSheet.create({
     small: {width: 32, height: 32, borderRadius: 32/2},
     med: {width: 48, height: 48, borderRadius: 48/2},
     large: {width: 64, height: 64, borderRadius: 64/2},
+    larger: {width: 80, height: 80, borderRadius: 80/2},
     verylarge: {width: 128, height: 128, borderRadius: 128/2},
 });
 
@@ -24,7 +25,7 @@ ProfilePicture.propTypes = {
         PropTypes.string,
         PropTypes.object
     ]).isRequired,
-    size: PropTypes.oneOf(['base', 'small', 'med', 'large', 'verylarge']),
+    size: PropTypes.oneOf(['base', 'small', 'med', 'large', 'larger', 'verylarge']),
     onPress: PropTypes.func
 };
 

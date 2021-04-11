@@ -7,8 +7,7 @@ import React, {
 import {Alert, Linking} from 'react-native';
 
 import { useAPI } from './APIContext';
-import Session from '../sosa/Session';
-import {useApp} from './AppContext';
+import { useApp } from './AppContext';
 
 let preauthID = null;
 

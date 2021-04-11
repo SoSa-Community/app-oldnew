@@ -7,12 +7,33 @@ import React, {
     useImperativeHandle,
     forwardRef
 } from 'react';
-import {AppState, Linking, Modal, StyleSheet, Text, TouchableHighlight, View} from 'react-native';
-
+import { AppState, Linking, Modal, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 import Session from '../sosa/Session';
 import Device from '../sosa/Device';
 import Helpers from '../sosa/Helpers';
 import SplashScreen from '../screens/Splash';
+
+/**
+ * Object.prototype.forEach() polyfill
+ * Refactored from https://gomakethings.com/looping-through-objects-with-es6/
+ * @author Chris Ferdinandi
+ * @author James Mahy
+ * @license MIT
+ */
+
+if (!Object.prototype.forEach) {
+    Object.defineProperty(Object.prototype, 'forEach', {
+        value: function (callback, thisArg) {
+            if (this == null) throw new TypeError('Not an object');
+            
+            for (let key in this) {
+                if (this.hasOwnProperty(key)) callback.call(thisArg, this[key], key, this);
+            }
+        },
+        writable: true
+    });
+    
+}
 
 const AppContext = createContext();
 const middleware = {};

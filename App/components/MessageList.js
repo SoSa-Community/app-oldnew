@@ -16,8 +16,6 @@ let messageBuffer = [];
 let bufferRenderTimer = null;
 let bufferRenderRunning = false;
 
-console.debug('INIT');
-
 const MessageList = forwardRef(({onFacePress, onLongFacePress, onMessageAdded, onScroll, addTag, uploadedImages, setUploadedImages, setPreviewEmbed, preferences}, ref) => {
     
     const { session } = useApp();
