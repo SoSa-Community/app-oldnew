@@ -38,41 +38,45 @@ const NavigationHeader = forwardRef((
     
     const { toggleSwipe, openLeftDrawer, getStackNavigator } = useAuthenticatedNavigation();
     
-    const [ headerIcons, dispatch ] = useReducer((state, data) => {
-        const { action } = data;
-        let icons = [...state];
-        
-        if(action === 'remove') {
-            if(Array.isArray(headerIcons)) {
-                return headerIcons.filter(item => (item.id !== id))
-            }
-        }
-        else {
-            const { id, icon, text, onPress } = data;
-    
-            
-            let found = false;
-    
-            icons.forEach((item, index) => {
-                if(item.id === id){
-                    found = true;
-                    item.icon = icon;
-                    item.text = text;
-                    item.onPress = onPress;
-                }
-            });
-    
-            if(!found) icons.unshift(data);
-        }
-        return icons;
-        
-    }, []);
-    
     const [ preferences, setPreferences ] = useState({});
     const [ showTopBar, setShowTopBar ] = useState(true);
     const [ menu, setMenu ] = useState(menuDefaults);
     const [ leftMenu, setLeftMenu ] = useState(null);
     const [ rightMenu, setRightMenu ] = useState(null);
+    
+    const [ headerIcons, dispatch ] = useReducer((state, data) => {
+        const { action } = data;
+        let icons = [];
+    
+        if(action === 'set') icons = data?.icons
+        else {
+            if(action === 'remove') {
+                if(Array.isArray(state)) {
+                    const { id } = data;
+                    return state.filter(item => (item.id !== id))
+                }
+            }
+            else {
+                icons = [...state];
+                
+                const { id, icon, text, onPress } = data;
+                let found = false;
+                
+                icons.forEach((item, index) => {
+                    if(item.id === id){
+                        found = true;
+                        item.icon = icon;
+                        item.text = text;
+                        item.onPress = onPress;
+                    }
+                });
+        
+                if(!found) icons.unshift(data);
+            }
+        }
+        return icons;
+        
+    }, []);
     
     const popMenuStack = () => {
         let newState = menuDefaults;
@@ -93,10 +97,12 @@ const NavigationHeader = forwardRef((
     
     useImperativeHandle(ref, () => ({
         
-        addHeaderIcon(props = {id: undefined, icon: undefined, text: undefined, onPress: undefined}){
+        addHeaderIcon(props = {id: undefined, icon: undefined, text: undefined, onPress: undefined}) {
             dispatch({ action:'add', ...props });
         },
-        removeHeaderIcon(id) { dispatch({ action:'remove' }); },
+        
+        removeHeaderIcon(id) { dispatch({ action:'remove', id }); },
+        setHeaderIcons(icons) { dispatch({ action:'set', icons }); },
         
         setMenuOptions(options, justUpdate, resetOnBack) {
             
@@ -175,7 +181,7 @@ const NavigationHeader = forwardRef((
                         return <IconButton
                             style={{color: '#CCC'}}
                             activeStyle={{color: '#444442'}}
-                            size={22}
+                            size={18}
                             {...{ icon, onPress }}
                         />
                     }

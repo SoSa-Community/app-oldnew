@@ -82,12 +82,15 @@ const AuthenticatedNavigationProvider = ({navigator: Navigator, ...props}) => {
         }
     }
     
-    const addHeaderIcon = (id, icon, onPress) => { topBar?.current.addHeaderIcon(id, icon, onPress); };
-    const removeHeaderIcon = (id) => { topBar?.current.removeHeaderIcon(id); }
+    const addHeaderIcon = (props) => topBar?.current?.addHeaderIcon(props);
+    const removeHeaderIcon = (id) => topBar?.current?.removeHeaderIcon(id);
+    const setHeaderIcons = (icons) => topBar?.current?.setHeaderIcons(icons);
+    
     const setMenuOptions = (options, justUpdate, resetOnBack) => {
         topBar?.current?.setMenuOptions(options, justUpdate, resetOnBack);
     };
-    const popMenuStack = () => { topBar?.current.popMenuStack(); }
+    
+    const popMenuStack = () => topBar?.current.popMenuStack();
     
     return (
         <AuthenticatedNavigationContext.Provider value={{
@@ -117,6 +120,7 @@ const AuthenticatedNavigationProvider = ({navigator: Navigator, ...props}) => {
             },
             addHeaderIcon,
             removeHeaderIcon,
+            setHeaderIcons,
             popMenuStack,
             setMenuOptions,
             getStackNavigator: () => stackNavigation,
