@@ -150,12 +150,12 @@ const MembersNavigator = ({navigation: drawerNavigation, setStackNavigation, set
                 </View>
             ),false, true);
         }
-    }, [])
+    }, [profile])
     
     return (
             <View style={BaseStyles.container} >
                 <NavigationContainer independent={true} ref={stackNavigation} onStateChange={(state) => {if (!state) return;}}>
-                    <Stack.Navigator initialRouteName="MyProfile">
+                    <Stack.Navigator initialRouteName="Chat">
                         <Stack.Screen name="Chat" options={{ headerShown: false }}>
                             { (props) => <ChatScreen {...props} showMemberProfile={ showMemberProfile }  /> }
                         </Stack.Screen>

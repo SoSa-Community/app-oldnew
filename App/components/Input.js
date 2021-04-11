@@ -16,7 +16,7 @@ const Input = (
         minLength, maxLength, selection, onSelectionChange, onBlur, onKeyPress, autoCorrect,
         lengthIndicatorShowPercentage, lengthWarningPercentage, lengthDangerPercentage, setIsValid,
         label, labelStyle, containerStyle, outerContainerStyle, innerContainerStyle, inputStyle,
-        showSaveButtons, onSave, onCancel, buttons,
+        showSaveButtons, onSave, onCancel, editable, textStyle, textValue
 }) => {
     
     if(enabled !== true && enabled !== false) enabled = true;
@@ -27,6 +27,9 @@ const Input = (
 	const [showPicker, setShowPicker] = useState(false);
 	const [tempPickerValue, setTempPickerValue] = useState((type === 'date' || type === 'time') ? new Date() : '');
 	const [lengthPercentage, setLengthPercentage] = useState(0);
+    
+    let outerContainerStyles = [];
+    let innerContainerStyles = [];
  
 
 	const displaySuccess = (errorString) => {
@@ -39,10 +42,7 @@ const Input = (
 		}
 	};
 
-	const showClear = () => {
-		return !!((inputValue && inputValue.length) || alwaysShowClear);
-	};
-
+	const showClear = () => !!((inputValue && inputValue.length) || alwaysShowClear);
 	const clearInput = () => {setInputValue('');};
 
 	const handleChange = (data) => {
@@ -174,11 +174,34 @@ const Input = (
 	    return (<Text style={{zIndex: 0, marginTop: -6, backgroundColor: '#444442', color:'#dc3545', paddingTop: 10, paddingBottom: 8, borderBottomRightRadius: 4, borderBottomLeftRadius: 4,  paddingHorizontal: 6, marginBottom: 4}}>{error}</Text>);
     }
     
-    let outerContainerStyles = [];
-    let innerContainerStyles = [];
+    if(type !== 'multiline') outerContainerStyles.push(Styles.inputParentContainer);
     
+    innerContainerStyles.push(Styles.inputContainer);
+    if(error) innerContainerStyles.push(Styles.inputContainerHasError);
     
-    const renderField = () => {
+    const validateLength = () => {
+        if(typeof(setIsValid) === 'function'){
+            if((!maxLength || inputValue.length <= maxLength) && inputValue.length >= minLength) setIsValid(true);
+            else  setIsValid(false);
+        }
+    }
+    
+    const Field = () => {
+        if(!editable) {
+            const styles = [];
+            let text = inputValue;
+            
+            if(textValue) text = textValue
+            else if(type === 'picker' && Array.isArray(pickerOptions)) {
+                const found = pickerOptions.filter(({value}) => value === inputValue).pop();
+                if(found) text = found?.label;
+            }
+            
+            styles.push({ color: '#121111' });
+            
+            return <Text style={[styles, textStyle]}>{ text }</Text>
+        }
+        
         if(type === 'picker') return renderPicker();
         if(type === 'date' || type === 'time') return renderDateTimePicker();
 
@@ -201,51 +224,36 @@ const Input = (
                 lengthIndicatorStyles.push(Styles.lengthIndicatorNeutral);
                 return (<Text style={[lengthIndicatorStyles]}>{!inputValue.length ? 'at-least ' : ''}{`${minLength - inputValue.length}`}{!inputValue.length ? ' thingies ' : ''}</Text>);
             }
-            
         };
         
         return (
             <>
-                    <TextInput
-                            selection={selection}
-                            onSelectionChange={onSelectionChange}
-                            multiline={(type === 'multiline')}
-                            placeholder={placeholder}
-                            placeholderTextColor="#ccc"
-                            value={inputValue}
-                            style={styles}
-                            onChangeText={handleChange}
-                            editable={enabled}
-                            onBlur={onBlur}
-                            onKeyPress={onKeyPress}
-                            autoCorrect={autoCorrect}
-                            maxLength={maxLength ? maxLength : null}
+                <TextInput
+                    selection={selection}
+                    onSelectionChange={onSelectionChange}
+                    multiline={(type === 'multiline')}
+                    placeholder={placeholder}
+                    placeholderTextColor="#ccc"
+                    value={inputValue}
+                    style={styles}
+                    onChangeText={handleChange}
+                    editable={enabled}
+                    onBlur={onBlur}
+                    onKeyPress={onKeyPress}
+                    autoCorrect={autoCorrect}
+                    maxLength={maxLength ? maxLength : null}
                 />
                 { renderLengthWarning() }
-            </>);
+            </>
+        );
     };
     
-    if(type !== 'multiline') outerContainerStyles.push(Styles.inputParentContainer);
-    
-    innerContainerStyles.push(Styles.inputContainer);
-    if(error) innerContainerStyles.push(Styles.inputContainerHasError);
-    
-    const renderIcon = () => {
-        return icon && <Icon icon={icon}  style={Styles.inputIcon} size={18}/>
-    };
-    
-    const validateLength = () => {
-        if(typeof(setIsValid) === 'function'){
-            if((!maxLength || inputValue.length <= maxLength) && inputValue.length >= minLength) setIsValid(true);
-            else  setIsValid(false);
-        }
-    }
-    
-    const renderButtons = () => {
+    const FieldIcon = () => editable && icon && <Icon icon={icon}  style={Styles.inputIcon} size={18} />;
+    const Buttons = () => {
+        if(!editable) return <></>;
+        
         const buttonsToRender = [];
-    
         if(showSaveButtons) {
-            
             buttonsToRender.push(
                 <TouchableOpacity onPress={onSave} key="save_button">
                     <Icon icon={['fas', 'check']}  style={Styles.inputIcon} size={18} color='#28a745' />
@@ -267,6 +275,12 @@ const Input = (
             );
         }
         return buttonsToRender;
+    }
+    
+    const Label = () => {
+        return label && label.length ?
+            <Text style={[{color: '#fff', marginTop: 8, marginBottom: 4, fontSize:16}, labelStyle]}>{label}</Text> :
+            null
     }
     
     
@@ -301,21 +315,24 @@ const Input = (
         setDateInputValue(dateValue);
     }, [value]);
     
+    
+    if(!editable) {
+        outerContainerStyles = [];
+        innerContainerStyles = [];
+    }
+    
     return (
         <View style={[containerStyle]}>
-            {   label && label.length ?
-                <Text style={[{color: '#fff', marginTop: 8, marginBottom: 4, fontSize:16}, labelStyle]}>{label}</Text> :
-                null
-            }
+            <Label />
             <View style={[outerContainerStyles, outerContainerStyle]}>
                 <View style={[innerContainerStyles, innerContainerStyle]}>
-                    { renderIcon() }
-                    { renderField() }
-                    { validateInput && displaySuccess(validateInput()) }
-                    { renderButtons() }
+                    <FieldIcon />
+                    <Field />
+                    { editable && validateInput && displaySuccess(validateInput()) }
+                    <Buttons />
                 </View>
             </View>
-            { renderError() }
+            { editable && renderError() }
         </View>
 	);
 }
@@ -353,6 +370,7 @@ Input.propTypes = {
     lengthIndicatorShowPercentage: PropTypes.number,
     lengthWarningPercentage: PropTypes.number,
     lengthDangerPercentage: PropTypes.number,
+    editable: PropTypes.bool
 };
 
 Input.defaultProps = {
@@ -385,6 +403,7 @@ Input.defaultProps = {
     lengthIndicatorShowPercentage: 80,
     lengthWarningPercentage: 90,
     lengthDangerPercentage: 95,
+    editable: true
 };
 
 export default Input;

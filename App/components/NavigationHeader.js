@@ -181,7 +181,7 @@ const NavigationHeader = forwardRef((
                         return <IconButton
                             style={{color: '#CCC'}}
                             activeStyle={{color: '#444442'}}
-                            size={18}
+                            size={20}
                             {...{ icon, onPress }}
                         />
                     }
