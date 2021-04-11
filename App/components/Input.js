@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextInput, View, TouchableOpacity, Text, Keyboard, Platform, Modal, Button } from "react-native";
+import { TextInput, View, TouchableOpacity, TouchableHighlight, Text, Keyboard, Platform, Modal, Button } from "react-native";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-community/picker';
 import PropTypes from 'prop-types';
@@ -15,7 +15,8 @@ const Input = (
         errorBorderOnly, enabled, allowClear, alwaysShowClear, type, pickerOptions=[],
         minLength, maxLength, selection, onSelectionChange, onBlur, onKeyPress, autoCorrect,
         lengthIndicatorShowPercentage, lengthWarningPercentage, lengthDangerPercentage, setIsValid,
-        label, labelStyle, containerStyle, outerContainerStyle, innerContainerStyle, inputStyle
+        label, labelStyle, containerStyle, outerContainerStyle, innerContainerStyle, inputStyle,
+        showSaveButtons, onSave, onCancel, buttons,
 }) => {
     
     if(enabled !== true && enabled !== false) enabled = true;
@@ -240,6 +241,34 @@ const Input = (
         }
     }
     
+    const renderButtons = () => {
+        const buttonsToRender = [];
+    
+        if(showSaveButtons) {
+            
+            buttonsToRender.push(
+                <TouchableOpacity onPress={onSave} key="save_button">
+                    <Icon icon={['fas', 'check']}  style={Styles.inputIcon} size={18} color='#28a745' />
+                </TouchableOpacity>
+            );
+    
+            buttonsToRender.push(
+                <TouchableHighlight onPress={onCancel} key="cancel_button">
+                    <Text style={Styles.inputIcon} >Cancel</Text>
+                </TouchableHighlight>
+            );
+        }
+        
+        if(allowClear && showClear()){
+            buttonsToRender.push(
+                <TouchableOpacity onPress={clearInput} key="clear_button">
+                    <Icon icon={['fas', 'times-circle']}  style={Styles.inputIcon} size={18} color='#bababa' />
+                </TouchableOpacity>
+            );
+        }
+        return buttonsToRender;
+    }
+    
     
     useEffect( () => {
         if(maxLength || minLength) {
@@ -283,10 +312,7 @@ const Input = (
                     { renderIcon() }
                     { renderField() }
                     { validateInput && displaySuccess(validateInput()) }
-                    { allowClear && showClear() &&
-                    <TouchableOpacity onPress={clearInput}>
-                        <Icon icon={['fas', 'times-circle']}  style={Styles.inputIcon} size={16} color='#bababa' />
-                    </TouchableOpacity> }
+                    { renderButtons() }
                 </View>
             </View>
             { renderError() }
