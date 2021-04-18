@@ -65,7 +65,6 @@ const CredentialInput = ({forLogin, error, setError, processing, setProcessing})
     if(credentials){
         if(forLogin){
             return <View>
-                
                 <Input
                     containerStyle={{marginBottom: 4}}
                     icon={['fal', 'user']}

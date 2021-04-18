@@ -32,7 +32,7 @@ const SecureTextInput = ({icon, placeholder, onChangeText, value, enabled, valid
         <View style={Styles.inputParentContainer}>
             <View style={Styles.inputContainer}>
                 { icon && <Icon icon={icon}  style={Styles.inputIcon} size={18}/> }
-                <TextInput placeholder={placeholder} placeholderTextColor="#ccc" style={Styles.input} secureTextEntry={hideInput} onChangeText={onChangeText} value={value} editable={enabled}/>
+                <TextInput placeholder={placeholder} placeholderTextColor="#ccc" style={Styles.input} secureTextEntry={hideInput} onChangeText={onChangeText} value={value} editable={enabled} />
                 { validateInput && displaySuccess(validateInput())}
                 { displayViewInput() }
             </View>

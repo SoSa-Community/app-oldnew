@@ -1,36 +1,58 @@
 import React, { useState, useEffect } from 'react';
-import { TextInput, View, TouchableOpacity, TouchableHighlight, Text, Keyboard, Platform, Modal, Button } from "react-native";
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { Picker } from '@react-native-community/picker';
+import { TextInput, View, TouchableOpacity, TouchableHighlight, Text } from "react-native";
 import PropTypes from 'prop-types';
 
-import Helpers from "../sosa/Helpers";
 import Icon from './Icon';
+import DateTimePicker from './DateTimePicker/DateTimePicker';
+import Picker from './Picker/Picker';
 
 import Styles from "../screens/styles/onboarding";
 
-const Input = (
-    {
-        icon, placeholder, value, onChangeText, validateInput, error,
-        errorBorderOnly, enabled, allowClear, alwaysShowClear, type, pickerOptions=[],
-        minLength, maxLength, selection, onSelectionChange, onBlur, onKeyPress, autoCorrect,
-        lengthIndicatorShowPercentage, lengthWarningPercentage, lengthDangerPercentage, setIsValid,
-        label, labelStyle, containerStyle, outerContainerStyle, innerContainerStyle, inputStyle,
-        showSaveButtons, onSave, onCancel, editable, textStyle, textValue
+const Input = ({
+    icon,
+    placeholder,
+    value,
+    onChangeText,
+    validateInput,
+    error,
+    errorBorderOnly,
+    enabled,
+    allowClear,
+    alwaysShowClear,
+    type,
+    pickerOptions=[],
+    minLength,
+    maxLength,
+    selection,
+    onSelectionChange,
+    onBlur,
+    onKeyPress,
+    autoCorrect,
+    lengthIndicatorShowPercentage,
+    lengthWarningPercentage,
+    lengthDangerPercentage,
+    setIsValid,
+    label,
+    labelStyle,
+    containerStyle,
+    outerContainerStyle,
+    innerContainerStyle,
+    inputStyle,
+    showSaveButtons,
+    onSave,
+    onCancel,
+    editable,
+    textStyle,
+    textValue,
+    form,
+    name
 }) => {
-    
-    if(enabled !== true && enabled !== false) enabled = true;
-    let dateValue = value;
  
-	const [inputValue, setInputValue] = useState('');
-	const [dateInputValue, setDateInputValue] = useState(new Date());
-	const [showPicker, setShowPicker] = useState(false);
-	const [tempPickerValue, setTempPickerValue] = useState((type === 'date' || type === 'time') ? new Date() : '');
-	const [lengthPercentage, setLengthPercentage] = useState(0);
+	const [ inputValue, setInputValue ] = useState('');
+	const [ lengthPercentage, setLengthPercentage ] = useState(0);
     
     let outerContainerStyles = [];
     let innerContainerStyles = [];
- 
 
 	const displaySuccess = (errorString) => {
 		if(errorString === null){
@@ -43,141 +65,21 @@ const Input = (
 	};
 
 	const showClear = () => !!((inputValue && inputValue.length) || alwaysShowClear);
-	const clearInput = () => {setInputValue('');};
+	const clearInput = () => setInputValue('');
 
 	const handleChange = (data) => {
 		let otherData = null;
 		
 	    if(data !== undefined){
-			if(type === 'date' || type === 'time'){
-				setDateInputValue(data);
-				otherData = new Date(data.getTime());
-				data = Helpers.dateToString(data, type);
-			}
-
 			setInputValue(data);
 			if(typeof(onChangeText) === 'function') onChangeText(data, otherData);
 		}
 	};
 
-	const renderDateTimePicker = () => {
-		const doChange = (selectedDate) => {
-			setShowPicker(false);
-			handleChange(selectedDate);
-		}
-
-		const FieldLabel = () => (<TouchableOpacity onPress={() => {Keyboard.dismiss(); setShowPicker(true)}} style={{marginHorizontal: 4, flex: 1, height: '100%', justifyContent:'center'}}>
-			{ inputValue.length > 0 && <Text style={{color: '#121111'}}>{inputValue}</Text>}
-			{ inputValue.length === 0 && <Text style={{color: '#ccc'}}>{placeholder}</Text>}
-		</TouchableOpacity>);
-
-		const Picker = () => showPicker && (
-				<DateTimePicker
-					testID="dateTimePicker"
-					value={Platform.OS === 'ios' && tempPickerValue ? tempPickerValue : dateInputValue}
-					mode={type}
-					display={Platform.OS === 'ios' ? "spinner" : "default"}
-					onChange={(event, selectedDate) => {
-						if(Platform.OS === 'ios'){
-							setTempPickerValue(selectedDate);
-						}else{
-							doChange(selectedDate);
-						}
-					}}
-				/>);
-
-
-		if(Platform.OS === 'ios'){
-			return (
-				<>
-				<FieldLabel />
-				<Modal visible={showPicker} transparent={true} onRequestClose={() => setShowPicker(false)}>
-					<View style={{flex:1, justifyContent:'center', backgroundColor:'rgba(0,0,0,0.75)'}}>
-						<View style={{backgroundColor:'#fff', height:300, borderRadius:12, marginHorizontal: 24, justifyContent:'center'}}>
-							<Picker />
-							<View style={{flex:1, flexDirection: 'row', justifyContent:'center', alignItems:'flex-end', marginBottom: 16}}>
-								<Button title="Cancel" style={{flex:1}} onPress={() => setShowPicker(false)}/>
-								<Button title="Confirm" style={{flex:1}} onPress={() => doChange(tempPickerValue)}/>
-							</View>
-						</View>
-					</View>
-				</Modal>
-				</>);
-		}else{
-			return (
-				<>
-					<FieldLabel />
-					<Picker />
-				</>
-			);
-		}
-	}
-
-	const renderPicker = () => {
-		const doChange = (selectedValue) => {
-			setShowPicker(false);
-			handleChange(selectedValue)
-		}
-
-		let labelIndex = {}
-
-		const picker = (
-			<Picker
-				selectedValue={Platform.OS === 'ios' && tempPickerValue ? tempPickerValue : inputValue}
-				placeholder={placeholder}
-				prompt={placeholder}
-				style={{flex: 1, color: '#121111'}}
-				textStyle={{fontSize: 12, color: '#121111'}}
-				size={12}
-				onValueChange={(itemValue, itemIndex) => {
-					if(Platform.OS === 'ios'){
-						setTempPickerValue(itemValue);
-					}else {
-						doChange(itemValue)
-					}
-				}}
-			>
-				{ pickerOptions.map(({label, value}) => {
-					labelIndex[value] = label;
-					return <Picker.Item label={label} value={value} key={value}/>
-				}) }
-			</Picker>
-		);
-
-		if(Platform.OS === 'ios'){
-
-			return (
-			<>
-				<TouchableOpacity onPress={() => {Keyboard.dismiss(); setShowPicker(true)}} style={{marginHorizontal: 4, flex: 1, height: '100%', justifyContent:'center'}}>
-					{ inputValue.length > 0 && <Text style={{color: '#121111'}}>{labelIndex.hasOwnProperty(inputValue) ? labelIndex[inputValue] : inputValue}</Text>}
-					{ inputValue.length === 0 && <Text style={{color: '#ccc'}}>{placeholder}</Text>}
-				</TouchableOpacity>
-				<Modal visible={showPicker} transparent={true} onRequestClose={() => setShowPicker(false)}>
-					<View style={{flex:1, justifyContent:'center', backgroundColor:'rgba(0,0,0,0.75)'}}>
-						<View style={{backgroundColor:'#fff', height:300, borderRadius:12, marginHorizontal: 24, justifyContent:'center'}}>
-							{picker}
-							<View style={{flex:1, flexDirection: 'row', justifyContent:'center', alignItems:'flex-end', marginBottom: 16}}>
-								<Button title="Cancel" style={{flex:1}} onPress={() => setShowPicker(false)}/>
-								<Button title="Confirm" style={{flex:1}} onPress={() => doChange(tempPickerValue)}/>
-							</View>
-						</View>
-					</View>
-				</Modal>
-			</>);
-		}else{
-			return picker;
-		}
-	}
-
 	const renderError = () => {
 	    if(!error || errorBorderOnly) return null;
 	    return (<Text style={{zIndex: 0, marginTop: -6, backgroundColor: '#444442', color:'#dc3545', paddingTop: 10, paddingBottom: 8, borderBottomRightRadius: 4, borderBottomLeftRadius: 4,  paddingHorizontal: 6, marginBottom: 4}}>{error}</Text>);
     }
-    
-    if(type !== 'multiline') outerContainerStyles.push(Styles.inputParentContainer);
-    
-    innerContainerStyles.push(Styles.inputContainer);
-    if(error) innerContainerStyles.push(Styles.inputContainerHasError);
     
     const validateLength = () => {
         if(typeof(setIsValid) === 'function'){
@@ -186,31 +88,13 @@ const Input = (
         }
     }
     
-    const Field = () => {
-        if(!editable) {
-            const styles = [];
-            let text = inputValue;
-            
-            if(textValue) text = textValue
-            else if(type === 'picker' && Array.isArray(pickerOptions)) {
-                const found = pickerOptions.filter(({value}) => value === inputValue).pop();
-                if(found) text = found?.label;
-            }
-            
-            styles.push({ color: '#121111' });
-            
-            return <Text style={[styles, textStyle]}>{ text }</Text>
-        }
-        
-        if(type === 'picker') return renderPicker();
-        if(type === 'date' || type === 'time') return renderDateTimePicker();
-
+    const renderTextField = () => {
         let styles = [Styles.input];
         if(type === 'multiline') styles.push(Styles.multiline);
         styles.push(inputStyle);
     
         const renderLengthWarning = () => {
-            
+        
             let lengthIndicatorStyles = [Styles.lengthIndicator];
             if(inputValue.length >= minLength){
                 if(lengthPercentage >= lengthDangerPercentage){
@@ -225,7 +109,7 @@ const Input = (
                 return (<Text style={[lengthIndicatorStyles]}>{!inputValue.length ? 'at-least ' : ''}{`${minLength - inputValue.length}`}{!inputValue.length ? ' thingies ' : ''}</Text>);
             }
         };
-        
+    
         return (
             <>
                 <TextInput
@@ -236,7 +120,15 @@ const Input = (
                     placeholderTextColor="#ccc"
                     value={inputValue}
                     style={styles}
-                    onChangeText={handleChange}
+                    onChangeText={
+                        (data) => {
+                            handleChange(data);
+                            if( form ) {
+                                const { register } = form;
+                                if(register && name) register(name).onChange(data);
+                            }
+                        }
+                    }
                     editable={enabled}
                     onBlur={onBlur}
                     onKeyPress={onKeyPress}
@@ -246,10 +138,10 @@ const Input = (
                 { renderLengthWarning() }
             </>
         );
-    };
+    }
     
-    const FieldIcon = () => editable && icon && <Icon icon={icon}  style={Styles.inputIcon} size={18} />;
-    const Buttons = () => {
+    const renderFieldIcon = () => editable && icon && <Icon icon={icon}  style={Styles.inputIcon} size={18} />;
+    const renderButtons = () => {
         if(!editable) return <></>;
         
         const buttonsToRender = [];
@@ -259,7 +151,7 @@ const Input = (
                     <Icon icon={['fas', 'check']}  style={Styles.inputIcon} size={18} color='#28a745' />
                 </TouchableOpacity>
             );
-    
+            
             buttonsToRender.push(
                 <TouchableHighlight onPress={onCancel} key="cancel_button">
                     <Text style={Styles.inputIcon} >Cancel</Text>
@@ -277,12 +169,30 @@ const Input = (
         return buttonsToRender;
     }
     
-    const Label = () => {
+    const renderLabel = () => {
         return label && label.length ?
             <Text style={[{color: '#fff', marginTop: 8, marginBottom: 4, fontSize:16}, labelStyle]}>{label}</Text> :
             null
     }
     
+    const renderField = () => {
+        if(!editable) {
+            const styles = [{ color: '#121111' }];
+            
+            let text = inputValue;
+            
+            if(textValue) text = textValue
+            else if(type === 'picker' && Array.isArray(pickerOptions)) {
+                const found = pickerOptions.filter(({value}) => value === inputValue).pop();
+                if(found) text = found?.label;
+            }
+            return <Text style={[styles, textStyle]}>{ text }</Text>
+        }
+        
+        if(type === 'picker') return <Picker onChange={ handleChange } {...{ placeholder, value, options: pickerOptions } } /> ;
+        if(type === 'date' || type === 'time') return <DateTimePicker onChange={ handleChange } {...{ placeholder, value, forTime: type === 'time' } } />;
+        return renderTextField();
+    };
     
     useEffect( () => {
         if(maxLength || minLength) {
@@ -294,42 +204,27 @@ const Input = (
     }, [inputValue] );
     
     
-    useEffect(() => {
-        if(type === 'date' || type === 'time'){
-            let date = (new Date(dateValue));
-            if(Object.prototype.toString.call(date) !== '[object Date]' || isNaN(date.getTime())) {
-                date = new Date();
-            }
-            if(type === 'time'){
-                const [hour, minutes] = dateValue.split(':');
-                
-                date.setHours(hour);
-                date.setMinutes(minutes);
-            }
-            
-            value = Helpers.dateToString(date, type);
-            
-            dateValue = date;
-        }
-        setInputValue(value);
-        setDateInputValue(dateValue);
-    }, [value]);
-    
+    useEffect(() => setInputValue(value), [value]);
     
     if(!editable) {
         outerContainerStyles = [];
         innerContainerStyles = [];
+    } else {
+        if(type !== 'multiline') outerContainerStyles.push(Styles.inputParentContainer);
+    
+        innerContainerStyles.push(Styles.inputContainer);
+        if(error) innerContainerStyles.push(Styles.inputContainerHasError);
     }
     
     return (
         <View style={[containerStyle]}>
-            <Label />
+            { renderLabel() }
             <View style={[outerContainerStyles, outerContainerStyle]}>
                 <View style={[innerContainerStyles, innerContainerStyle]}>
-                    <FieldIcon />
-                    <Field />
+                    { renderFieldIcon() }
+                    { renderField() }
                     { editable && validateInput && displaySuccess(validateInput()) }
-                    <Buttons />
+                    { renderButtons() }
                 </View>
             </View>
             { editable && renderError() }
