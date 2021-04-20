@@ -105,9 +105,9 @@ const MyProfileScreen = ({ navigation }) => {
             .mine(true)
             .then(({ profile, options, widgets }) => {
                 if(options) {
-                    const { gender } = options;
-                    if(Array.isArray(gender) && gender.length) {
-                        const newOptions = gender.map(({id, name}) => ({label: name, value: id}));
+                    const { genders } = options;
+                    if(Array.isArray(genders) && genders.length) {
+                        const newOptions = genders.map(({id, name}) => ({label: name, value: id}));
                         setGenders(newOptions);
                     }
                 }
@@ -115,6 +115,15 @@ const MyProfileScreen = ({ navigation }) => {
                 setProfile(profile);
             })
             .catch(error => console.debug(error))
+    }
+    
+    const saveProfile = () => {
+        profileService
+            .save({ nickname: 'James' })
+            .then(profile => {
+                setProfile(profile);
+                setEditingMode(false)
+            })
     }
     
     useFocusEffect(
@@ -160,11 +169,12 @@ const MyProfileScreen = ({ navigation }) => {
         }
         else {
             setHeaderIcons([
-                { id: 'save_edit_profile', text:'Save', onPress: () => setEditingMode(false) },
+                { id: 'save_edit_profile', text:'Save', onPress: () => saveProfile() },
                 { id: 'cancel_edit_profile', text:'Cancel', onPress: () => setEditingMode(false) }
             ])
         }
     }, [ editingMode ])
+    
     
     const Top = () => {
         const Content = () => (

@@ -6,13 +6,14 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 
 import Helpers from "../../sosa/Helpers";
+import PickerModal from '../Picker/PickerModal';
 
 const DateTimePicker = ({ onChange, placeholder, value, forTime }) => {
     
     const [ showPicker, setShowPicker ] = useState(false);
     const [ tempPickerValue, setTempPickerValue ] = useState(new Date());
     const [ selectedDate, setSelectedDate ] = useState(new Date());
-    
+    const formattedDate = selectedDate ? moment(selectedDate).format(forTime ? 'hh:mm' : 'DD/MM/YYYY') : '';
     
     const getType = () => forTime ? 'time' : 'date';
     
@@ -78,24 +79,21 @@ const DateTimePicker = ({ onChange, placeholder, value, forTime }) => {
             doChange(date);
         }
     }, [ value ])
-
-
+    
     if(Platform.OS === 'ios'){
         return (
-            <>
-            { renderFieldLabel() }
-            <Modal visible={showPicker} transparent={true} onRequestClose={() => setShowPicker(false)}>
-                <View style={{flex:1, justifyContent:'center', backgroundColor:'rgba(0,0,0,0.75)'}}>
-                    <View style={{backgroundColor:'#fff', height:300, borderRadius:12, marginHorizontal: 24, justifyContent:'center'}}>
-                        { renderPicker() }
-                        <View style={{flex:1, flexDirection: 'row', justifyContent:'center', alignItems:'flex-end', marginBottom: 16}}>
-                            <Button title="Cancel" style={{ flex:1 }} onPress={() => setShowPicker(false)}/>
-                            <Button title="Confirm" style={{ flex:1 }} onPress={() => doChange(tempPickerValue)}/>
-                        </View>
-                    </View>
-                </View>
-            </Modal>
-            </>);
+            <PickerModal
+                setVisible={setShowPicker}
+                visible={showPicker}
+                value={ formattedDate }
+                label={ formattedDate }
+                placeholder={ placeholder }
+                onCancel={() => setShowPicker(false)}
+                onConfirm={() => doChange(tempPickerValue)}
+            >
+                { renderPicker() }
+            </PickerModal>
+        )
     }else{
         return (
             <>
