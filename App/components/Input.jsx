@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, forwardRef, useImperativeHandle} from 'react';
 import { TextInput, View, TouchableOpacity, TouchableHighlight, Text } from "react-native";
 import PropTypes from 'prop-types';
 
@@ -7,11 +7,13 @@ import DateTimePicker from './DateTimePicker/DateTimePicker';
 import Picker from './Picker/Picker';
 
 import Styles from "../screens/styles/onboarding";
+import InputWrapper from './InputWrapper/InputWrapper';
 
-const Input = ({
+const Input = forwardRef(({
     icon,
     placeholder,
     value,
+    initialValue,
     onChangeText,
     validateInput,
     error,
@@ -46,26 +48,12 @@ const Input = ({
     textValue,
     form,
     name
-}) => {
+}, ref) => {
  
-	const [ inputValue, setInputValue ] = useState('');
+	const [ inputValue, setInputValue ] = useState(initialValue);
 	const [ lengthPercentage, setLengthPercentage ] = useState(0);
-    
-    let outerContainerStyles = [];
-    let innerContainerStyles = [];
-
-	const displaySuccess = (errorString) => {
-		if(errorString === null){
-			return null;
-		}else if(errorString.length === 0){
-			return <Icon icon={['fas', 'check']}  style={Styles.inputIcon} size={18} color='#28a745' />
-		}else{
-			return <Icon icon={['fas', 'info-circle']}  style={Styles.inputIcon} size={18} color='#dc3545' onPress={() => {console.log(errorString);}} />
-		}
-	};
-
-	const showClear = () => !!((inputValue && inputValue.length) || alwaysShowClear);
-	const clearInput = () => setInputValue('');
+ 
+	const clear = () => setInputValue('');
 
 	const handleChange = (data) => {
 		let otherData = null;
@@ -75,20 +63,16 @@ const Input = ({
 			if(typeof(onChangeText) === 'function') onChangeText(data, otherData);
 		}
 	};
-
-	const renderError = () => {
-	    if(!error || errorBorderOnly) return null;
-	    return (<Text style={{zIndex: 0, marginTop: -6, backgroundColor: '#444442', color:'#dc3545', paddingTop: 10, paddingBottom: 8, borderBottomRightRadius: 4, borderBottomLeftRadius: 4,  paddingHorizontal: 6, marginBottom: 4}}>{error}</Text>);
-    }
-    
-    const validateLength = () => {
-        if(typeof(setIsValid) === 'function'){
-            if((!maxLength || inputValue.length <= maxLength) && inputValue.length >= minLength) setIsValid(true);
-            else  setIsValid(false);
+	
+	const reset = () => {
+	    if(initialValue !== null) {
+	        handleChange(initialValue);
         }
-    }
+	    else handleChange(value);
+    };
     
-    const renderTextField = () => {
+    
+	const renderTextField = () => {
         let styles = [Styles.input];
         if(type === 'multiline') styles.push(Styles.multiline);
         styles.push(inputStyle);
@@ -140,41 +124,6 @@ const Input = ({
         );
     }
     
-    const renderFieldIcon = () => editable && icon && <Icon icon={icon}  style={Styles.inputIcon} size={18} />;
-    const renderButtons = () => {
-        if(!editable) return <></>;
-        
-        const buttonsToRender = [];
-        if(showSaveButtons) {
-            buttonsToRender.push(
-                <TouchableOpacity onPress={onSave} key="save_button">
-                    <Icon icon={['fas', 'check']}  style={Styles.inputIcon} size={18} color='#28a745' />
-                </TouchableOpacity>
-            );
-            
-            buttonsToRender.push(
-                <TouchableHighlight onPress={onCancel} key="cancel_button">
-                    <Text style={Styles.inputIcon} >Cancel</Text>
-                </TouchableHighlight>
-            );
-        }
-        
-        if(allowClear && showClear()){
-            buttonsToRender.push(
-                <TouchableOpacity onPress={clearInput} key="clear_button">
-                    <Icon icon={['fas', 'times-circle']}  style={Styles.inputIcon} size={18} color='#bababa' />
-                </TouchableOpacity>
-            );
-        }
-        return buttonsToRender;
-    }
-    
-    const renderLabel = () => {
-        return label && label.length ?
-            <Text style={[{color: '#fff', marginTop: 8, marginBottom: 4, fontSize:16}, labelStyle]}>{label}</Text> :
-            null
-    }
-    
     const renderField = () => {
         if(!editable) {
             const styles = [{ color: '#121111' }];
@@ -189,7 +138,7 @@ const Input = ({
             return <Text style={[styles, textStyle]}>{ text }</Text>
         }
         
-        if(type === 'picker') return <Picker onChange={ handleChange } {...{ placeholder, value, options: pickerOptions } } /> ;
+        if(type === 'picker') return <Picker onChange={ handleChange } {...{ placeholder, value, options: pickerOptions, initialValue, ref } } /> ;
         if(type === 'date' || type === 'time') return <DateTimePicker onChange={ handleChange } {...{ placeholder, value, forTime: type === 'time' } } />;
         return renderTextField();
     };
@@ -197,45 +146,56 @@ const Input = ({
     useEffect( () => {
         if(maxLength || minLength) {
             if (maxLength > 0) {
-                setLengthPercentage(Math.floor((inputValue.length / maxLength) * 100));
+                if(typeof(inputValue) === 'string'){
+                    setLengthPercentage(Math.floor((inputValue.length / maxLength) * 100));
+                } else {
+                    setLengthPercentage(0);
+                }
             }
-            validateLength();
         }
     }, [inputValue] );
     
     
     useEffect(() => setInputValue(value), [value]);
     
-    if(!editable) {
-        outerContainerStyles = [];
-        innerContainerStyles = [];
-    } else {
-        if(type !== 'multiline') outerContainerStyles.push(Styles.inputParentContainer);
-    
-        innerContainerStyles.push(Styles.inputContainer);
-        if(error) innerContainerStyles.push(Styles.inputContainerHasError);
-    }
+    useImperativeHandle(ref, () => ({ value: inputValue, clear, reset, set: handleChange }));
     
     return (
-        <View style={[containerStyle]}>
-            { renderLabel() }
-            <View style={[outerContainerStyles, outerContainerStyle]}>
-                <View style={[innerContainerStyles, innerContainerStyle]}>
-                    { renderFieldIcon() }
-                    { renderField() }
-                    { editable && validateInput && displaySuccess(validateInput()) }
-                    { renderButtons() }
-                </View>
-            </View>
-            { editable && renderError() }
-        </View>
-	);
-}
+        <InputWrapper {...{
+            icon,
+            value: inputValue,
+            validateInput,
+            error,
+            errorBorderOnly,
+            allowClear,
+            alwaysShowClear,
+            minLength,
+            maxLength,
+            setIsValid,
+            label,
+            labelStyle,
+            containerStyle,
+            outerContainerStyle,
+            innerContainerStyle,
+            onSave,
+            onCancel,
+            onClear: clear,
+            editable
+        } }
+        >
+            { renderField() }
+        </InputWrapper>
+    )
+});
 
 Input.propTypes = {
     icon: PropTypes.array,
     placeholder: PropTypes.string,
     value: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number
+    ]),
+    initialValue: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.number
     ]),
@@ -272,6 +232,7 @@ Input.defaultProps = {
     icon: null,
     placeholder: '',
     value: '',
+    initialValue: null,
     onChangeText: null,
     validateInput: false,
     error: null,
