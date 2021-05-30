@@ -2,7 +2,6 @@ import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'rea
 import { TouchableOpacity, Text, Keyboard, Platform } from "react-native";
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
-
 import PropTypes from 'prop-types';
 
 import Helpers from "../../sosa/Helpers";

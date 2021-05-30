@@ -1,8 +1,7 @@
-import React, {useState, useEffect, forwardRef, useImperativeHandle} from 'react';
-import { TextInput, View, TouchableOpacity, TouchableHighlight, Text } from "react-native";
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { TextInput, Text } from "react-native";
 import PropTypes from 'prop-types';
 
-import Icon from './Icon';
 import DateTimePicker from './DateTimePicker/DateTimePicker';
 import Picker from './Picker/Picker';
 
@@ -87,8 +86,10 @@ const Input = forwardRef(({
                 else if(lengthPercentage >= lengthWarningPercentage){
                     lengthIndicatorStyles.push(Styles.lengthIndicatorWarning);
                 }
-                if(lengthPercentage >= lengthIndicatorShowPercentage) return (<Text style={[lengthIndicatorStyles]}>{`${inputValue.length}/${maxLength}`}</Text>);
-            }else{
+                if(lengthPercentage >= lengthIndicatorShowPercentage) {
+                	return (<Text style={[lengthIndicatorStyles]}>{`${inputValue.length}/${maxLength}`}</Text>);
+				}
+            } else {
                 lengthIndicatorStyles.push(Styles.lengthIndicatorNeutral);
                 return (<Text style={[lengthIndicatorStyles]}>{!inputValue.length ? 'at-least ' : ''}{`${minLength - inputValue.length}`}{!inputValue.length ? ' thingies ' : ''}</Text>);
             }

@@ -5,8 +5,7 @@ import PropTypes from 'prop-types';
 
 const PickerModal = ({ value, setVisible, visible, onConfirm, onCancel, placeholder, label, children }) => {
     
-    return (
-        <>
+    return (<>
             <TouchableOpacity onPress={() => { Keyboard.dismiss(); setVisible(true) }} style={{marginHorizontal: 4, flex: 1, height: '100%', justifyContent:'center'}}>
                 { value.length > 0 && <Text style={{color: '#121111'}}>{ label }</Text> }
                 { value.length === 0 && <Text style={{color: '#ccc'}}>{ placeholder }</Text> }

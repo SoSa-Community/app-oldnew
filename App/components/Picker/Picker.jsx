@@ -1,7 +1,8 @@
-import React, {useState, useEffect, forwardRef, useImperativeHandle} from 'react';
-import {Platform, Text} from 'react-native';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { Platform, Text } from 'react-native';
 import { Picker as RNPicker } from '@react-native-community/picker';
 import PropTypes from 'prop-types';
+
 import PickerModal from './PickerModal';
 import InputWrapper from '../InputWrapper/InputWrapper';
 

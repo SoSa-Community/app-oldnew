@@ -1,143 +1,147 @@
-import {getDeviceName, getSystemName, getBrand, getModel} from 'react-native-device-info';
-import AsyncStorage from "@react-native-community/async-storage";
+import {
+	getDeviceName,
+	getSystemName,
+	getBrand,
+	getModel,
+} from 'react-native-device-info';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default class Device {
+	initialized = false;
+	id = '';
+	secret = '';
+	name = '';
+	platform = 'other';
+	pushService = 'other';
 
-    initialized = false;
-    id = '';
-    secret = '';
-    name = '';
-    platform = 'other';
-    pushService = 'other';
+	static init() {
+		return new Promise((resolve, reject) => {
+			let device = new Device();
 
-    static init(){
-        return new Promise((resolve, reject) => {
-            let device = new Device();
-            
-            Device.retrieve((obj) => {
-                console.info('App::Device::init', obj);
-    
-                if(obj !== null && obj?.secret) {
-                    obj.forEach((value, key) => device[key] = value);
-                    device.initialized = true;
-                    resolve(device);
-                }
-                else{
-                    let platform = 'other';
-                    let pushService = 'other';
+			Device.retrieve((obj) => {
+				console.info('App::Device::init', obj);
 
-                    switch(getSystemName()){
-                        case 'Android':
-                            pushService = platform = 'android';
-                            break;
-                        case 'iOS':
-                        case 'iPhone IS':
-                            pushService = platform = 'ios';
-        
-                            break;
-                    }
+				if (obj !== null && obj?.secret) {
+					obj.forEach((value, key) => (device[key] = value));
+					device.initialized = true;
+					resolve(device);
+				} else {
+					let platform = 'other';
+					let pushService = 'other';
 
-                    device.setPlatform(platform);
-                    device.setPushService(pushService);
-                    device.setSecret(device.generateSecret());
+					switch (getSystemName()) {
+						case 'Android':
+							pushService = platform = 'android';
+							break;
+						case 'iOS':
+						case 'iPhone IS':
+							pushService = platform = 'ios';
 
-                    getDeviceName()
-                        .then(deviceName => {
-                            let name = [];
-                            let brand = getBrand();
-                            let model = getModel();
-        
-                            if(brand) name.push(brand);
-                            if(model) name.push(model);
-        
-                            let fullName = `${name.join(' ')}`;
-        
-                            if(deviceName)  fullName = `${deviceName} (${fullName})`;
-        
-                            device.setName(fullName);
-                            device.save();
-                            device.initialized = true;
-                        })
-                        .finally(() => resolve(device));
-                }
-            });
-        });
-    }
+							break;
+					}
 
-    getId = () => {
-        return this.id;
-    }
+					device.setPlatform(platform);
+					device.setPushService(pushService);
+					device.setSecret(device.generateSecret());
 
-    setId = (id) => {
-        this.id = id;
-    }
+					getDeviceName()
+						.then((deviceName) => {
+							let name = [];
+							let brand = getBrand();
+							let model = getModel();
 
-    getSecret(){
-        return this.secret;
-    }
+							if (brand) name.push(brand);
+							if (model) name.push(model);
 
-    setSecret(secret){
-        this.secret = secret;
-    }
+							let fullName = `${name.join(' ')}`;
 
-    generateSecret(){
-        return 'sausage';
-        return [...Array(64)].map(i=>(~~(Math.random()*36)).toString(36)).join('');
-    }
+							if (deviceName)
+								fullName = `${deviceName} (${fullName})`;
 
-    getName(){
-        return this.name;
-    }
+							device.setName(fullName);
+							device.save();
+							device.initialized = true;
+						})
+						.finally(() => resolve(device));
+				}
+			});
+		});
+	}
 
-    setName = (name) => {
-        this.name = name;
-    }
+	getId = () => {
+		return this.id;
+	};
 
-    getPlatform(){
-        return this.platform;
-    }
+	setId = (id) => {
+		this.id = id;
+	};
 
-    setPlatform(platform){
-        this.platform = platform;
-    }
+	getSecret() {
+		return this.secret;
+	}
 
-    getPushService(){
-        return this.pushService;
-    }
+	setSecret(secret) {
+		this.secret = secret;
+	}
 
-    setPushService(pushService){
-        this.pushService = pushService;
-    }
+	generateSecret() {
+		return 'sausage';
+		return [...Array(64)]
+			.map((i) => (~~(Math.random() * 36)).toString(36))
+			.join('');
+	}
 
-    static retrieve(callback){
-        try {
-            AsyncStorage.getItem('current_device').then(value => {
-                let obj = null;
-                if(typeof(value) === "string")  obj = JSON.parse(value);
-                callback(obj);
-    
-                console.info('App::Device::retrieve', obj);
-            });
-        } catch(e) {
-            console.error('App::Device::retrieve', e);
-        }
-    }
+	getName() {
+		return this.name;
+	}
 
-    save(){
-        try {
-            console.info('App::Device::save', this);
-            AsyncStorage.setItem('current_device', JSON.stringify(this));
-        } catch (e) {
-            console.error('App::Device::save', e);
-        }
-    }
-    
-    parseJSON(jsonData){
-        jsonData.forEach((value, key) => {
-            if(this.hasOwnProperty(key)) this[key] = value;
-        });
-        this.save();
-    }
+	setName = (name) => {
+		this.name = name;
+	};
 
+	getPlatform() {
+		return this.platform;
+	}
 
+	setPlatform(platform) {
+		this.platform = platform;
+	}
+
+	getPushService() {
+		return this.pushService;
+	}
+
+	setPushService(pushService) {
+		this.pushService = pushService;
+	}
+
+	static retrieve(callback) {
+		try {
+			AsyncStorage.getItem('current_device').then((value) => {
+				let obj = null;
+				if (typeof value === 'string') obj = JSON.parse(value);
+				callback(obj);
+
+				console.info('App::Device::retrieve', obj);
+			});
+		} catch (e) {
+			console.error('App::Device::retrieve', e);
+		}
+	}
+
+	save() {
+		try {
+			console.info('App::Device::save', this);
+			AsyncStorage.setItem('current_device', JSON.stringify(this));
+		} catch (e) {
+			console.error('App::Device::save', e);
+		}
+	}
+
+	parseJSON(jsonData) {
+		jsonData.forEach((value, key) => {
+			if (this.hasOwnProperty(key)) this[key] = value;
+		});
+		this.save();
+	}
 }

@@ -5,8 +5,8 @@ import AuthenticatedNavigator from './screens/AuthenticatedNavigator';
 import UnauthenticatedNavigator from './screens/UnauthenticatedNavigator';
 
 const SoSa = () => {
-    const { authenticated } = useAuth();
-    if(authenticated) return <AuthenticatedNavigator />
-    return <UnauthenticatedNavigator />
-}
+	const { authenticated } = useAuth();
+	if (authenticated) return <AuthenticatedNavigator />;
+	return <UnauthenticatedNavigator />;
+};
 export default SoSa;
