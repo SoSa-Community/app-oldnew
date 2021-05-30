@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, StyleSheet, TouchableHighlight, ImageBackground } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import moment from 'moment';
+
 import { useAPI } from '../../context/APIContext';
 import { useAuthenticatedNavigation } from '../../context/AuthenticatedNavigationContext';
 
 import ProfilePicture from '../../components/ProfilePicture';
 import Input from '../../components/Input';
+import Picker from '../../components/Picker/Picker';
+import DateTimePicker from '../../components/DateTimePicker/DateTimePicker';
 
 const Styles = StyleSheet.create({
     topContainer: {
@@ -84,19 +88,21 @@ const Styles = StyleSheet.create({
 
 const MyProfileScreen = ({ navigation }) => {
     
-    const { setHeaderIcons, removeHeaderIcon, setMenuOptions } = useAuthenticatedNavigation();
+    const nicknameRef = useRef();
+    const taglineRef = useRef();
+    const genderPickerRef = useRef();
     
+    const { setHeaderIcons, removeHeaderIcon, setMenuOptions } = useAuthenticatedNavigation();
     
     const { services: { profiles: profileService } } = useAPI();
     
     const [ genders, setGenders ] = useState([]);
     const [ profile, setProfile ] = useState(null);
     
-    const [ selectedGenderId, setSelectedGenderId ] = useState('');
+    
     const [ dateOfBirth, setDateOfBirth ] = useState('');
     
     const [ editingMode, setEditingMode ] = useState(false);
-    
     
     const refreshProfile = () => {
         setGenders([]);
@@ -117,13 +123,48 @@ const MyProfileScreen = ({ navigation }) => {
             .catch(error => console.debug(error))
     }
     
-    const saveProfile = () => {
-        profileService
-            .save({ nickname: 'James' })
-            .then(profile => {
-                setProfile(profile);
-                setEditingMode(false)
-            })
+    function saveProfile(){
+        const params = {};
+        const nickname = nicknameRef?.current?.value;
+        const tagline = taglineRef?.current?.value;
+        const selectedGenderId = genderPickerRef?.current?.value;
+        
+        if(nickname !== profile?.nickname) params.nickname = nickname;
+        if(tagline !== profile?.tagline) params.tagline = tagline;
+        
+        
+        if(dateOfBirth !== profile?.date_of_birth) params.date_of_birth = dateOfBirth;
+        if(selectedGenderId !== profile?.gender_id) params.gender_id = selectedGenderId;
+        
+        console.debug(params);
+        if(Object.keys(params).length){
+            profileService
+                .save(params)
+                .then(updatedProfile => {
+                    setProfile(updatedProfile);
+                })
+        }
+    }
+    
+    const reset = () => {
+        console.debug('reset');
+        if(profile) {
+            const { nickname, tagline, gender, date_of_birth } = profile;
+            
+            genderPickerRef?.current?.reset();
+            nicknameRef?.current?.reset();
+            taglineRef?.current?.reset();
+            
+        
+            const date = new Date(Date.parse(date_of_birth));
+            if(
+                Object.prototype.toString.call(date) === "[object Date]" &&
+                !isNaN(date.getTime()))
+            {
+                setDateOfBirth(`${moment(date).format('YYYY-MM-DD')}`);
+            }
+        }
+        setEditingMode(false);
     }
     
     useFocusEffect(
@@ -145,20 +186,7 @@ const MyProfileScreen = ({ navigation }) => {
         }, [])
     );
     
-    useEffect(() => {
-        if(profile) {
-            const { gender, date_of_birth } = profile;
-            setSelectedGenderId(gender?.id);
-            
-            const date = new Date(Date.parse(date_of_birth));
-            if(
-                Object.prototype.toString.call(date) === "[object Date]" &&
-                !isNaN(date.getTime()))
-            {
-                setDateOfBirth(`${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getDate()}`);
-            }
-        }
-    }, [profile]);
+    useEffect(() => reset(), [profile]);
     
     useEffect(() => {
         if(!editingMode) {
@@ -169,15 +197,14 @@ const MyProfileScreen = ({ navigation }) => {
         }
         else {
             setHeaderIcons([
-                { id: 'save_edit_profile', text:'Save', onPress: () => saveProfile() },
-                { id: 'cancel_edit_profile', text:'Cancel', onPress: () => setEditingMode(false) }
+                { id: 'save_edit_profile', text:'Save', onPress: function() { saveProfile() }},
+                { id: 'cancel_edit_profile', text:'Cancel', onPress: () => reset() }
             ])
         }
     }, [ editingMode ])
     
-    
-    const Top = () => {
-        const Content = () => (
+    const top = () => {
+        const content = () => (
                 <View style={{ zIndex:100 }}>
                     { editingMode &&
                         <TouchableHighlight style={Styles.changeCoverButton}>
@@ -192,84 +219,83 @@ const MyProfileScreen = ({ navigation }) => {
                     
                     <View style={Styles.nicknameContainer}>
                         <Input
+                            ref={nicknameRef}
                             placeholder="Nickname"
+                            initialValue={ profile?.nickname }
                             value={ profile?.nickname }
-                            onChangeText={() => {}}
-                            editable={editingMode}
+                            editable={ editingMode }
                             textStyle={Styles.nickname}
                         />
                     </View>
                     
                     <View style={Styles.tagContainer}>
                         <Input
+                            ref={taglineRef}
                             placeholder="Tagline"
+                            initialValue={ profile?.tagline }
                             value={ profile?.tagline }
-                            onChangeText={() => {}}
                             editable={editingMode}
                             textStyle={Styles.tag}
                         />
                     </View>
-                    
                 </View>
         );
         
         if (profile?.cover_picture) {
             return  <ImageBackground source={{uri: profile?.cover_picture}} style={{overflow:'hidden', resizeMode:'contain', paddingVertical: 24}}>
-                        <Content />
+                        { content() }
                         <View style={Styles.overlay} />
                     </ImageBackground>
         } else {
             return <View style={{alignItems: 'center', marginVertical: 24}}>
-                <Content/>
+                { content() }
             </View>;
         }
     }
     
-    const Gender = () => {
+    const gender = () => {
         return <View style={{marginBottom: 8}}>
-                    <Input
+                    <Picker
+                        ref={ genderPickerRef }
                         label="How do you identify?"
                         labelStyle={Styles.label}
                         icon={['fal', 'genderless']}
                         placeholder="Gender Identity"
-                        onChangeText={data => setSelectedGenderId(data)}
-                        enabled={ true }
-                        pickerOptions={ genders }
-                        value={ selectedGenderId }
+                        enabled
+                        options={ genders }
+                        initialValue={ profile?.gender?.id }
+                        value={ profile?.gender?.id }
                         type="picker"
-                        editable={editingMode}
+                        editable={ editingMode }
                         textStyle={{color:'#fff', fontSize: 16}}
                     />
                 </View>;
     }
     
-    const Age = () => {
+    const age = () => {
         
         return <View style={{}}>
-            <Input
+            <DateTimePicker
                 label="How old are you?"
                 labelStyle={Styles.label}
                 icon={['fal', 'calendar-star']}
                 placeholder="Date Of Birth"
-                onChangeText={data => setDateOfBirth(data)}
-                value={dateOfBirth}
+                initialValue={ dateOfBirth }
+                value={ dateOfBirth }
                 enabled
-                type="date"
-                allowClear={false}
                 editable={editingMode}
                 textStyle={{color:'#fff', fontSize: 16}}
-                textValue={profile?.age}
+                textValue={ profile?.age }
             />
         </View>;
     }
     
     return (
         <View style={{flex: 1, backgroundColor: '#444442'}}>
-            <Top />
+            { top() }
             <View style={{padding: 16, flex:1}}>
-                <Gender />
-                <Age />
-                
+                { gender() }
+                { age() }
             </View>
         </View>
     );

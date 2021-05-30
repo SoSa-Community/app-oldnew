@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, Text, Keyboard, Platform, Modal, Button } from "react-native";
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { TouchableOpacity, Text, Keyboard, Platform } from "react-native";
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 
@@ -7,8 +7,29 @@ import PropTypes from 'prop-types';
 
 import Helpers from "../../sosa/Helpers";
 import PickerModal from '../Picker/PickerModal';
+import InputWrapper from '../InputWrapper/InputWrapper';
 
-const DateTimePicker = ({ onChange, placeholder, value, forTime }) => {
+const DateTimePicker = forwardRef(({
+    icon,
+    error,
+    errorBorderOnly,
+    setIsValid,
+    label,
+    labelStyle,
+    containerStyle,
+    outerContainerStyle,
+    innerContainerStyle,
+    textStyle,
+    onSave,
+    onCancel,
+    editable,
+    onChange,
+    placeholder,
+    initialValue,
+    value,
+    forTime,
+    textValue
+}, ref) => {
     
     const [ showPicker, setShowPicker ] = useState(false);
     const [ tempPickerValue, setTempPickerValue ] = useState(new Date());
@@ -23,10 +44,21 @@ const DateTimePicker = ({ onChange, placeholder, value, forTime }) => {
         if(data) {
             setSelectedDate(data);
             const otherData = new Date(data.getTime());
-            onChange(Helpers.dateToString(data, getType()), otherData);
+            
+            if(typeof(onChange) === 'function') {
+                onChange(Helpers.dateToString(data, getType()), otherData);
+            }
+            
         }
     }
-
+    
+    const reset = () => {
+        if(initialValue !== null) {
+            doChange(initialValue);
+        }
+        else doChange(value);
+    };
+    
     const renderFieldLabel = () => {
         const textValue = moment(selectedDate).format(forTime ? 'hh:mm' : 'DD/MM/YYYY');
         
@@ -80,7 +112,32 @@ const DateTimePicker = ({ onChange, placeholder, value, forTime }) => {
         }
     }, [ value ])
     
-    if(Platform.OS === 'ios'){
+    useImperativeHandle(ref, () => ({ value: selectedDate, reset, set: doChange }));
+    
+    if(Platform.OS !== 'ios') {
+        return (
+            <InputWrapper {...{
+                icon,
+                value: selectedDate,
+                error,
+                errorBorderOnly,
+                setIsValid,
+                label,
+                labelStyle,
+                containerStyle,
+                outerContainerStyle,
+                innerContainerStyle,
+                onSave,
+                onCancel,
+                editable
+            } }
+            >
+                { renderFieldLabel() }
+                { renderPicker() }
+            </InputWrapper>
+        );
+    }
+    else {
         return (
             <PickerModal
                 setVisible={setShowPicker}
@@ -94,15 +151,8 @@ const DateTimePicker = ({ onChange, placeholder, value, forTime }) => {
                 { renderPicker() }
             </PickerModal>
         )
-    }else{
-        return (
-            <>
-                { renderFieldLabel() }
-                { renderPicker() }
-            </>
-        );
     }
-}
+});
 
 DateTimePicker.propTypes = {
     placeholder: PropTypes.string,
