@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, TouchableHighlight } from 'react-native';
 import PropTypes from 'prop-types';
 
-import Styles from '../screens/styles/onboarding';
+import Styles from '../../screens/styles/onboarding';
 
 const SocialButton = ({ onPress, icon, enabled }) => {
 	return (

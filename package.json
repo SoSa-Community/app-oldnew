@@ -11,7 +11,10 @@
     "android:dev:production": "set APP_ENV=production&& npx react-native bundle --platform android --dev true --reset-cache --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && npx react-native run-android",
     "ios:dev:production": "set APP_ENV=production&& npx react-native bundle --platform ios --dev true --reset-cache --entry-file index.js --bundle-output ios/main.jsbundle && npx react-native run-ios",
     "android:dev:development": "set APP_ENV=development&& npx react-native bundle --platform android --dev true --reset-cache --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && npx react-native run-android",
-    "ios:dev:development": "set APP_ENV=development&& npx react-native bundle --platform ios --dev true --reset-cache --entry-file index.js --bundle-output ios/main.jsbundle && npx react-native run-ios"
+    "ios:dev:development": "set APP_ENV=development&& npx react-native bundle --platform ios --dev true --reset-cache --entry-file index.js --bundle-output ios/main.jsbundle && npx react-native run-ios",
+    "storybook": "start-storybook -p 7007",
+    "build-storybook": "build-storybook",
+    "prestorybook": "rnstl"
   },
   "dependencies": {
     "@fortawesome/fontawesome-pro": "^5.15.3",
@@ -62,14 +65,33 @@
     "@babel/core": "^7.14.3",
     "@babel/runtime": "^7.14.0",
     "@react-native-community/eslint-config": "^2.0.0",
+    "@storybook/addon-actions": "^5.3.21",
+    "@storybook/addon-knobs": "^5.3.21",
+    "@storybook/addon-links": "^5.3.21",
+    "@storybook/addon-ondevice-actions": "^5.3.23",
+    "@storybook/addon-ondevice-knobs": "^5.3.25",
+    "@storybook/react-native": "^5.3.25",
+    "@storybook/react-native-server": "^5.3.23",
     "babel-jest": "^26.6.3",
+    "babel-loader": "^8.2.2",
     "eslint": "7.14.0",
     "jest": "^26.6.3",
+    "metro": "^0.65.2",
     "metro-react-native-babel-preset": "^0.64.0",
-    "react-test-renderer": "17.0.1",
-    "metro": "^0.65.2"
+    "react-dom": "^17.0.1",
+    "react-native-storybook-loader": "^2.0.4",
+    "react-test-renderer": "17.0.1"
   },
   "jest": {
     "preset": "react-native"
+  },
+  "config": {
+    "react-native-storybook-loader": {
+      "searchDir": [
+        "./App/components"
+      ],
+      "pattern": "**/*.stories.js",
+      "outputFile": "./storybook/storyLoader.js"
+    }
   }
 }

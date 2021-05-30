@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { Alert, View } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 
-import SocialButton from '../SocialButton';
+import SocialButton from '../SocialButton/SocialButton';
 import FormError from '../FormError';
 import { useApp } from '../../context/AppContext';
 
