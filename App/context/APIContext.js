@@ -4,7 +4,7 @@ import React, {
     useEffect,
     useState
 } from 'react';
-import { Client } from 'sosa-chat-client';
+import { Client } from '../services/API/Client';
 import AppConfig from '../config';
 import io from 'socket.io-client';
 import { parseString as parseXMLString} from 'react-native-xml2js';

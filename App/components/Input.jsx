@@ -50,7 +50,7 @@ const Input = forwardRef(({
     name
 }, ref) => {
  
-	const [ inputValue, setInputValue ] = useState(initialValue);
+	const [ inputValue, setInputValue ] = useState(initialValue || '');
 	const [ lengthPercentage, setLengthPercentage ] = useState(0);
  
 	const clear = () => setInputValue('');
@@ -156,7 +156,9 @@ const Input = forwardRef(({
     }, [inputValue] );
     
     
-    useEffect(() => setInputValue(value), [value]);
+    useEffect(() => {
+        if(value !== null) setInputValue(value)
+    }, [value]);
     
     useImperativeHandle(ref, () => ({ value: inputValue, clear, reset, set: handleChange }));
     

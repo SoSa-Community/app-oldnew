@@ -144,7 +144,7 @@ export default class Helpers {
                         fileName = uriSplit[uriSplit.length - 1];
                     }
                 
-                    const file = {uri, type, name: fileName};
+                    const file = { uri, type, name: fileName };
                     doUpload(file);
                 }
             });

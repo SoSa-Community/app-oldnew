@@ -41,8 +41,8 @@ const NavigationHeader = forwardRef((
     const [ preferences, setPreferences ] = useState({});
     const [ showTopBar, setShowTopBar ] = useState(true);
     const [ menu, setMenu ] = useState(menuDefaults);
-    const [ leftMenu, setLeftMenu ] = useState(null);
-    const [ rightMenu, setRightMenu ] = useState(null);
+    const [ leftMenu, setLeftMenu ] = useState(<></>);
+    const [ rightMenu, setRightMenu ] = useState(<></>);
     
     const [ headerIcons, dispatch ] = useReducer((state, data) => {
         const { action } = data;
@@ -172,11 +172,13 @@ const NavigationHeader = forwardRef((
     }, [showLeft, leftMode, onBack]);
     
     useEffect(() => {
-        if(!showRight) setRightMenu(null);
+        if(!showRight) setRightMenu(<></>);
         else {
-            let icons = headerIcons.map(({icon, id, text, onPress}) => {
+            let icons = headerIcons.map(item => {
+                const headerIcon = typeof(item) === 'function' ? item() : item;
+                const {icon, id, text, onPress} = headerIcon;
             
-                const Button = () => {
+                const button = () => {
                     if(icon) {
                         return <IconButton
                             style={{color: '#CCC'}}
@@ -195,7 +197,7 @@ const NavigationHeader = forwardRef((
             
                 return (
                     <View style={{ verticalAlign:'center', paddingLeft: 14 }} key={id}>
-                        <Button />
+                        { button() }
                     </View>
                 );
             });
