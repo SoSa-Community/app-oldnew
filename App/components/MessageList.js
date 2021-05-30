@@ -4,7 +4,7 @@ import {
     Text,
 } from 'react-native';
 
-import { Message } from 'sosa-chat-client';
+import { Message } from '../services/API/entities/Message';
 import MessageItem from './chat/MessageItem';
 
 import Styles from '../screens/styles/chat';
