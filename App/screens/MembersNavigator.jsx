@@ -15,13 +15,13 @@ import { useAuthenticatedNavigation } from '../context/AuthenticatedNavigationCo
 import { useProfile } from '../context/ProfileContext';
 
 import Icon from '../components/Icon';
-import MeetupsScreen from './authenticated/meetups/Meetups';
-import MeetupScreen from './authenticated/meetups/Meetup';
+import MeetupsScreen from './authenticated/Meetups/Meetups';
+import MeetupScreen from './authenticated/Meetups/Meetup';
 
-import ChatScreen from './authenticated/Chat';
-import CreateMeetupScreen from './authenticated/meetups/CreateMeetup';
-import MyProfileScreen from './authenticated/MyProfile';
-import WelcomeScreen from './authenticated/Welcome';
+import ChatScreen from './authenticated/Chat/Chat';
+import CreateMeetupScreen from './authenticated/Meetups/CreateMeetup';
+import MyProfileScreen from './authenticated/Profile/MyProfile';
+import WelcomeScreen from './authenticated/Welcome/Welcome';
 import SettingsScreen from './Settings';
 
 import ProfileModal from '../components/ProfileModal';

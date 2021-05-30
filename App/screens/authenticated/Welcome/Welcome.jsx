@@ -8,15 +8,15 @@ import {
 	Platform,
 } from 'react-native';
 
-import Input from '../../components/Input';
-import ActivityButton from '../../components/ActivityButton';
+import Input from '../../../components/Input';
+import ActivityButton from '../../../components/ActivityButton';
 
-import InfoBox from '../../components/InfoBox';
-import FormError from '../../components/FormError';
+import InfoBox from '../../../components/InfoBox';
+import FormError from '../../../components/FormError';
 
-import { useAPI } from '../../context/APIContext';
-import { useAuth } from '../../context/AuthContext';
-import { useAuthenticatedNavigation } from '../../context/AuthenticatedNavigationContext';
+import { useAPI } from '../../../context/APIContext';
+import { useAuth } from '../../../context/AuthContext';
+import { useAuthenticatedNavigation } from '../../../context/AuthenticatedNavigationContext';
 
 const Styles = StyleSheet.create({
 	container: {

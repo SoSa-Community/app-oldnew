@@ -9,13 +9,13 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import moment from 'moment';
 
-import { useAPI } from '../../context/APIContext';
-import { useAuthenticatedNavigation } from '../../context/AuthenticatedNavigationContext';
+import { useAPI } from '../../../context/APIContext';
+import { useAuthenticatedNavigation } from '../../../context/AuthenticatedNavigationContext';
 
-import ProfilePicture from '../../components/ProfilePicture';
-import Input from '../../components/Input';
-import Picker from '../../components/Picker/Picker';
-import DateTimePicker from '../../components/DateTimePicker/DateTimePicker';
+import ProfilePicture from '../../../components/ProfilePicture';
+import Input from '../../../components/Input';
+import Picker from '../../../components/Picker/Picker';
+import DateTimePicker from '../../../components/DateTimePicker/DateTimePicker';
 
 const Styles = StyleSheet.create({
 	topContainer: {

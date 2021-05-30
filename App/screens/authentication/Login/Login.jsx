@@ -7,12 +7,12 @@ import {
 	Platform,
 } from 'react-native';
 
-import BaseStyles from '../styles/base';
-import AppConfig from '../../config';
+import BaseStyles from '../../styles/base';
+import AppConfig from '../../../config';
 
-import Styles from '../styles/onboarding';
-import CredentialInput from '../../components/auth/CredentialInput';
-import SocialButtons from '../../components/auth/SocialButtons';
+import Styles from '../../styles/onboarding';
+import CredentialInput from '../../../components/auth/CredentialInput';
+import SocialButtons from '../../../components/auth/SocialButtons';
 
 const LoginScreen = ({ navigation }) => {
 	const [error, setError] = useState('');

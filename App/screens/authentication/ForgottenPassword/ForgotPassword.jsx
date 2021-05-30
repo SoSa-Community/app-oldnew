@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import Styles from '../styles/onboarding';
+import Styles from '../../styles/onboarding';
 import { Text, View } from 'react-native';
 
-import BaseStyles from '../styles/base';
-import Helpers from '../../sosa/Helpers';
-import Input from '../../components/Input';
-import ActivityButton from '../../components/ActivityButton';
-import FormError from '../../components/FormError';
+import BaseStyles from '../../styles/base';
+import Helpers from '../../../sosa/Helpers';
+import Input from '../../../components/Input';
+import ActivityButton from '../../../components/ActivityButton';
+import FormError from '../../../components/FormError';
 
 export default class ForgotPassword extends Component {
 	navigation = null;

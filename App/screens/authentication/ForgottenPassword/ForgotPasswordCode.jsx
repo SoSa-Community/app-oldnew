@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 
-import BaseStyles from '../styles/base';
-import Styles from '../styles/onboarding';
+import BaseStyles from '../../styles/base';
+import Styles from '../../styles/onboarding';
 import { TouchableWithoutFeedback, Text, View } from 'react-native';
 
-import Helpers from '../../sosa/Helpers';
-import FormError from '../../components/FormError';
-import Input from '../../components/Input';
-import SecureTextInput from '../../components/SecureTextInput';
-import ActivityButton from '../../components/ActivityButton';
+import Helpers from '../../../sosa/Helpers';
+import FormError from '../../../components/FormError';
+import Input from '../../../components/Input';
+import SecureTextInput from '../../../components/SecureTextInput';
+import ActivityButton from '../../../components/ActivityButton';
 
 export default class ForgotPasswordCode extends Component {
 	navigation = null;

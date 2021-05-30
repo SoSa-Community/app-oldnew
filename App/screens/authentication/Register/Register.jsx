@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 
-import BaseStyles from '../styles/base';
-import Styles from '../styles/onboarding';
+import BaseStyles from '../../styles/base';
+import Styles from '../../styles/onboarding';
 
 import { View } from 'react-native';
 
-import CredentialInput from '../../components/auth/CredentialInput';
-import SocialButtons from '../../components/auth/SocialButtons';
+import CredentialInput from '../../../components/auth/CredentialInput';
+import SocialButtons from '../../../components/auth/SocialButtons';
 
 const RegistrationScreen = () => {
 	const [error, setError] = useState('');

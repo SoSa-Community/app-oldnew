@@ -12,20 +12,20 @@ import {
 	TouchableOpacity,
 } from 'react-native';
 
-import { useApp } from '../../context/AppContext';
-import { useAuthenticatedNavigation } from '../../context/AuthenticatedNavigationContext';
-import { useAPI } from '../../context/APIContext';
+import { useApp } from '../../../context/AppContext';
+import { useAuthenticatedNavigation } from '../../../context/AuthenticatedNavigationContext';
+import { useAPI } from '../../../context/APIContext';
 
-import Helpers from '../../sosa/Helpers';
+import Helpers from '../../../sosa/Helpers';
 
-import MessageInput from '../../components/MessageInput';
-import { UserList } from '../../components/chat/UserList';
-import RoomItem from '../../components/chat/RoomItem';
-import ProfileModal from '../../components/ProfileModal';
-import UploadPreview from '../../components/UploadPreview';
-import MessageList from '../../components/MessageList';
+import MessageInput from '../../../components/MessageInput';
+import { UserList } from '../../../components/chat/UserList';
+import RoomItem from '../../../components/chat/RoomItem';
+import ProfileModal from '../../../components/ProfileModal';
+import UploadPreview from '../../../components/UploadPreview';
+import MessageList from '../../../components/MessageList';
 
-import Styles from '../styles/chat';
+import Styles from '../../styles/chat';
 
 let settingUp = false;
 let coolDown = false;

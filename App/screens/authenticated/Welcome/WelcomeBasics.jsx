@@ -7,8 +7,8 @@ import {
 	KeyboardAvoidingView,
 } from 'react-native';
 
-import Input from '../../components/Input';
-import ActivityButton from '../../components/ActivityButton';
+import Input from '../../../components/Input';
+import ActivityButton from '../../../components/ActivityButton';
 
 class WelcomeBasicsScreen extends Component {
 	navigation = null;

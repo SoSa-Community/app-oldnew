@@ -6,10 +6,10 @@ import { StatusBar, View } from 'react-native';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 
-import LoginScreen from './authentication/login';
-import RegistrationScreen from './authentication/register';
-import ForgotPassword from './authentication/forgot_password';
-import ForgotPasswordCode from './authentication/forgot_password_code';
+import LoginScreen from './authentication/Login/Login';
+import RegistrationScreen from './authentication/Register/Register';
+import ForgotPassword from './authentication/ForgottenPassword/ForgotPassword';
+import ForgotPasswordCode from './authentication/ForgottenPassword/ForgotPasswordCode';
 
 import BaseStyles from '../screens/styles/base';
 import SplashScreen from './Splash';
