@@ -12,7 +12,7 @@ import moment from 'moment';
 import { useAPI } from '../../../context/APIContext';
 import { useAuthenticatedNavigation } from '../../../context/AuthenticatedNavigationContext';
 
-import ProfilePicture from '../../../components/ProfilePicture';
+import ProfilePicture from '../../../components/ProfilePicture/ProfilePicture';
 import Input from '../../../components/Input';
 import Picker from '../../../components/Picker/Picker';
 import DateTimePicker from '../../../components/DateTimePicker/DateTimePicker';
