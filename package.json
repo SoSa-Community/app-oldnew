@@ -63,6 +63,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.14.3",
+    "@babel/eslint-parser": "^7.14.4",
     "@babel/runtime": "^7.14.0",
     "@react-native-community/eslint-config": "^2.0.0",
     "@storybook/addon-actions": "^5.3.21",
@@ -72,6 +73,7 @@
     "@storybook/addon-ondevice-knobs": "^5.3.25",
     "@storybook/react-native": "^5.3.25",
     "@storybook/react-native-server": "^5.3.23",
+    "babel-eslint": "^10.1.0",
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.2.2",
     "eslint": "7.14.0",
@@ -88,7 +90,7 @@
   "config": {
     "react-native-storybook-loader": {
       "searchDir": [
-        "./App/components"
+        "./App"
       ],
       "pattern": "**/*.stories.js",
       "outputFile": "./storybook/storyLoader.js"
