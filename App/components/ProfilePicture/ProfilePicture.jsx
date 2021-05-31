@@ -2,26 +2,20 @@ import React from 'react';
 import { TouchableHighlight, StyleSheet, View, Image } from 'react-native';
 import PropTypes from 'prop-types';
 import FastImage from 'react-native-fast-image';
-import IconButton from '../IconButton';
+
+import FloatingIconButton from '../FloatingCameraButton/FloatingIconButton';
+
+const createImageStyle = (size) => {
+	return { width: size, height: size, borderRadius: size / 2 };
+};
 
 const Styles = StyleSheet.create({
-	base: { width: 16, height: 16, borderRadius: 16 / 2 },
-	small: { width: 32, height: 32, borderRadius: 32 / 2 },
-	med: { width: 48, height: 48, borderRadius: 48 / 2 },
-	large: { width: 64, height: 64, borderRadius: 64 / 2 },
-	larger: { width: 80, height: 80, borderRadius: 80 / 2 },
-	verylarge: { width: 128, height: 128, borderRadius: 128 / 2 },
-	button: {
-		position: 'absolute',
-		bottom: '-2%',
-		right: '-1%',
-		backgroundColor: '#444442',
-		borderRadius: 14,
-		width: 28,
-		height: 28,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
+	base: createImageStyle(32),
+	small: createImageStyle(48),
+	med: createImageStyle(64),
+	large: createImageStyle(96),
+	larger: createImageStyle(124),
+	verylarge: createImageStyle(144),
 });
 
 const ProfilePicture = ({ picture, onPress, size, style, button }) => {
@@ -56,21 +50,19 @@ const ProfilePicture = ({ picture, onPress, size, style, button }) => {
 			);
 		}
 
-		return <>{image()}</>;
+		return image();
 	};
 
 	return (
 		<View style={{ position: 'relative' }}>
 			{imageComponent()}
-			{button && button?.icon ? (
-				<View style={Styles.button}>
-					<IconButton
-						icon={button?.icon}
-						style={button?.style || { color: '#fff' }}
-						size={button?.size || 18}
-						onPress={button?.onPress}
-					/>
-				</View>
+			{button ? (
+				<FloatingIconButton
+					size={button?.size}
+					onPress={button?.onPress}
+					style={[{ color: '#fff' }, button?.style]}
+					icon={button?.icon}
+				/>
 			) : (
 				<></>
 			)}
@@ -83,7 +75,7 @@ ProfilePicture.propTypes = {
 		PropTypes.string,
 		PropTypes.object,
 		PropTypes.bool,
-	]).isRequired,
+	]),
 	size: PropTypes.oneOf([
 		'base',
 		'small',
@@ -106,6 +98,7 @@ ProfilePicture.propTypes = {
 ProfilePicture.defaultProps = {
 	size: 'base',
 	onPress: null,
+	picture: require(`../../assets/profiles/default.jpg`),
 };
 
 export default ProfilePicture;

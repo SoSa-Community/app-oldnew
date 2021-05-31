@@ -35,6 +35,7 @@ import {
 	faSyncAlt as falSyncAlt,
 	faPencilAlt as falPencilAlt,
 	faPencil as falPencil,
+	faCamera as falCamera,
 } from '@fortawesome/pro-light-svg-icons';
 
 import { faWifi as farWifi } from '@fortawesome/pro-regular-svg-icons';
@@ -73,6 +74,7 @@ library.add(
 	falPencilAlt,
 	fasPencil,
 	falPencil,
+	falCamera
 );
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
