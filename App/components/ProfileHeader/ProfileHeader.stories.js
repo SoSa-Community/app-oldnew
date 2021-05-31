@@ -6,7 +6,7 @@ import { View } from 'react-native';
 
 import ProfileHeader from './ProfileHeader';
 
-storiesOf('ProfileHeader', module)
+storiesOf('Components/ProfileHeader', module)
 	.addDecorator((getStory) => {
 		return (<View style={{backgroundColor:'#2D2F30'}}>{getStory()}</View>);
 	})

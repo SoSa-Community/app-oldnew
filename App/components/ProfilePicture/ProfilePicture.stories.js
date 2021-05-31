@@ -8,7 +8,7 @@ import ProfilePicture from './ProfilePicture';
 
 const defaultPicture = require(`../../assets/profiles/default.jpg`);
 
-storiesOf('ProfilePicture', module)
+storiesOf('Components/ProfilePicture', module)
 	.addDecorator((getStory) => <CenterView>{getStory()}</CenterView>)
 	.add('Base', () => {
 		return <ProfilePicture picture={defaultPicture} size="base" />;

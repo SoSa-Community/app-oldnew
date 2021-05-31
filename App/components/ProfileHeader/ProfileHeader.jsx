@@ -51,6 +51,7 @@ const Styles = StyleSheet.create({
 	},
 	saveButton: { color: '#F96854' },
 	editButton: { color: '#F96854' },
+	profilePictureContainer: { flex: 1, alignItems: 'center' },
 });
 
 const ProfileHeader = ({
@@ -141,7 +142,7 @@ const ProfileHeader = ({
 			</View>
 			<View style={Styles.pictureContainer}>
 				{cancelButton()}
-				<View style={Styles.column}>
+				<View style={Styles.profilePictureContainer}>
 					<ProfilePicture
 						picture={profilePicture}
 						style={Styles.profilePicture}

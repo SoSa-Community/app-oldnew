@@ -5,7 +5,7 @@ import React from 'react';
 import CenterView from '../../../storybook/stories/CenterView/index';
 import FloatingIconButton from './FloatingIconButton';
 
-storiesOf('FloatingIconButton', module)
+storiesOf('Components/FloatingIconButton', module)
 	.addDecorator((getStory) => <CenterView>{getStory()}</CenterView>)
 	.add('Default', () => {
 		return <FloatingIconButton containerStyle={{ position: 'relative' }} />;

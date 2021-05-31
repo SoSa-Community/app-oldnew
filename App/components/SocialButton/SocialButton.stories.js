@@ -6,7 +6,7 @@ import React from 'react';
 import CenterView from '../../../storybook/stories/CenterView/index';
 import SocialButton from './SocialButton';
 
-storiesOf('SocialButton', module)
+storiesOf('Components/SocialButton', module)
 	.addDecorator((getStory) => <CenterView>{getStory()}</CenterView>)
 	.add('imgur', () => (
 		<SocialButton
