@@ -4,14 +4,29 @@ import React, {
 	forwardRef,
 	useImperativeHandle,
 } from 'react';
-import { TouchableOpacity, Text, Keyboard, Platform } from 'react-native';
+import {
+	TouchableOpacity,
+	Text,
+	Keyboard,
+	Platform,
+	View,
+	StyleSheet,
+} from 'react-native';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 
 import Helpers from '../../sosa/Helpers';
 import PickerModal from '../Picker/PickerModal';
-import InputWrapper from '../InputWrapper/InputWrapper';
+
+const Styles = StyleSheet.create({
+	placeholderButton: {
+		marginHorizontal: 4,
+		flex: 1,
+		height: '100%',
+		justifyContent: 'center',
+	},
+});
 
 const DateTimePicker = forwardRef(
 	(
@@ -36,14 +51,14 @@ const DateTimePicker = forwardRef(
 			forTime,
 			textValue,
 		},
-		ref
+		ref,
 	) => {
 		const [showPicker, setShowPicker] = useState(false);
 		const [tempPickerValue, setTempPickerValue] = useState(new Date());
 		const [selectedDate, setSelectedDate] = useState(new Date());
-		const formattedDate = selectedDate
-			? moment(selectedDate).format(forTime ? 'hh:mm' : 'DD/MM/YYYY')
-			: '';
+		const formattedDate = !selectedDate
+			? ''
+			: moment(selectedDate).format(forTime ? 'hh:mm' : 'DD/MM/YYYY');
 
 		const getType = () => (forTime ? 'time' : 'date');
 
@@ -61,9 +76,8 @@ const DateTimePicker = forwardRef(
 		};
 
 		const reset = () => {
-			if (initialValue !== null) {
-				doChange(initialValue);
-			} else doChange(value);
+			if (initialValue !== null) doChange(initialValue);
+			else doChange(value);
 		};
 
 		const renderFieldLabel = () => {
@@ -77,17 +91,12 @@ const DateTimePicker = forwardRef(
 						Keyboard.dismiss();
 						setShowPicker(true);
 					}}
-					style={{
-						marginHorizontal: 4,
-						flex: 1,
-						height: '100%',
-						justifyContent: 'center',
-					}}>
+					style={Styles.placeholderButton}>
 					{textValue.length > 0 && (
-						<Text style={{ color: '#121111' }}>{textValue}</Text>
+						<Text style={textStyle}>{textValue}</Text>
 					)}
 					{textValue.length === 0 && (
-						<Text style={{ color: '#ccc' }}>{placeholder}</Text>
+						<Text style={textStyle}>{placeholder}</Text>
 					)}
 				</TouchableOpacity>
 			);
@@ -143,25 +152,10 @@ const DateTimePicker = forwardRef(
 
 		if (Platform.OS !== 'ios') {
 			return (
-				<InputWrapper
-					{...{
-						icon,
-						value: selectedDate,
-						error,
-						errorBorderOnly,
-						setIsValid,
-						label,
-						labelStyle,
-						containerStyle,
-						outerContainerStyle,
-						innerContainerStyle,
-						onSave,
-						onCancel,
-						editable,
-					}}>
+				<View style={{ flex: 1 }}>
 					{renderFieldLabel()}
 					{renderPicker()}
-				</InputWrapper>
+				</View>
 			);
 		} else {
 			return (
@@ -172,7 +166,8 @@ const DateTimePicker = forwardRef(
 					label={formattedDate}
 					placeholder={placeholder}
 					onCancel={() => setShowPicker(false)}
-					onConfirm={() => doChange(tempPickerValue)}>
+					onConfirm={() => doChange(tempPickerValue)}
+					textStyle={textStyle}>
 					{renderPicker()}
 				</PickerModal>
 			);
@@ -185,6 +180,7 @@ DateTimePicker.propTypes = {
 	value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 	onChange: PropTypes.func,
 	forTime: PropTypes.bool,
+	textStyle: PropTypes.object,
 };
 
 DateTimePicker.defaultProps = {
@@ -192,6 +188,7 @@ DateTimePicker.defaultProps = {
 	value: '',
 	onChange: null,
 	forTime: false,
+	textStyle: null,
 };
 
 export default DateTimePicker;

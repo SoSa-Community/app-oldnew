@@ -19,6 +19,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-pro": "^5.15.3",
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
+    "@fortawesome/pro-duotone-svg-icons": "^5.15.3",
     "@fortawesome/pro-light-svg-icons": "^5.15.3",
     "@fortawesome/pro-regular-svg-icons": "^5.15.3",
     "@fortawesome/pro-solid-svg-icons": "^5.15.3",
@@ -26,8 +27,8 @@
     "@react-native-community/async-storage": "^1.12.1",
     "@react-native-community/datetimepicker": "^3.5.0",
     "@react-native-community/masked-view": "^0.1.11",
-    "@react-native-community/picker": "^1.8.1",
     "@react-native-community/progress-bar-android": "^1.0.4",
+    "@react-native-picker/picker": "^1.16.1",
     "@react-navigation/drawer": "^5.12.5",
     "@react-navigation/native": "^5.9.4",
     "@react-navigation/stack": "^5.14.5",
