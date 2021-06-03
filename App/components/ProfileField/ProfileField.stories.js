@@ -66,8 +66,20 @@ storiesOf('Components/ProfileField', module)
 				value=""
 				editingMode
 				type="text"
-				labelForEditing="When were you born?"
-				valueForEditing="1986-01-30"
+				labelForEditing="Where were you born?"
+				valueForEditing=""
+			/>
+		);
+	})
+	.add('Text Styled', () => {
+		return (
+			<ProfileField
+				value="Froggity Froggirl"
+				editingMode
+				type="text"
+				labelForEditing=""
+				valueForEditing="Froggity Froggirl"
+				options={{ inputStyle: { fontSize: 26, textAlign: 'center' } }}
 			/>
 		);
 	});

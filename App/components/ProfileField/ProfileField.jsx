@@ -69,7 +69,7 @@ const ProfileField = ({
 	editingMode,
 	options,
 }) => {
-	const [error, setError] = useState('hello this is error');
+	const [error, setError] = useState('');
 
 	if (editingMode) {
 		const editingComponent = () => {
@@ -100,14 +100,14 @@ const ProfileField = ({
 						{...options}
 					/>
 				);
-			}
-			else if (type === 'text') {
+			} else if (type === 'text') {
 				return (
 					<Input
 						placeholder={labelForEditing}
 						value={valueForEditing}
 						onChangeText={(data) => {}}
 						enabled
+						{...options}
 					/>
 				);
 			}
@@ -127,7 +127,11 @@ const ProfileField = ({
 			<View style={{ width: '100%' }}>
 				<Text style={labelStyles}>{labelForEditing}</Text>
 				<View style={containerStyles}>
-					<Icon icon={icon} size={26} style={iconStyles} />
+					{icon ? (
+						<Icon icon={icon} size={26} style={iconStyles} />
+					) : (
+						<></>
+					)}
 					<View style={{ flex: 1, alignContent: 'flex-start' }}>
 						{editingComponent()}
 					</View>
@@ -140,9 +144,7 @@ const ProfileField = ({
 						/>
 					</View>
 				</View>
-				{error && error.length && (
-					<Text style={Styles.errorText}>{error}</Text>
-				)}
+				{error && error.length ? ( <Text style={Styles.errorText}>{error}</Text> ) : (<></>)}
 			</View>
 		);
 	}

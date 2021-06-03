@@ -54,41 +54,6 @@ const Styles = StyleSheet.create({
 		borderWidth: 2,
 	},
 
-	input: {
-		flex: 1,
-		color: '#121111',
-		height: 42,
-	},
-
-	inputIcon: {
-		color: '#ccc',
-		marginHorizontal: 4,
-	},
-
-	multiline: {
-		minHeight: 180,
-		width: '100%',
-		textAlignVertical: 'top',
-		borderRadius: 8,
-	},
-
-	lengthIndicator: {
-		alignSelf: 'center',
-		paddingRight: 12,
-	},
-
-	lengthIndicatorWarning: {
-		color: '#f0ad4e',
-	},
-
-	lengthIndicatorDanger: {
-		color: '#dc3545',
-	},
-
-	lengthIndicatorNeutral: {
-		color: '#ccc',
-	},
-
 	viewPasswordIcon: {},
 
 	forgotButton: { color: '#7ac256', padding: 8, textAlign: 'center' },
