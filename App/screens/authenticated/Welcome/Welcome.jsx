@@ -8,7 +8,7 @@ import {
 	Platform,
 } from 'react-native';
 
-import Input from '../../../components/Input';
+import TextField from '../../../components/TextField';
 import ActivityButton from '../../../components/ActivityButton';
 
 import InfoBox from '../../../components/InfoBox';
@@ -182,7 +182,7 @@ const WelcomeScreen = ({ navigation, route: { params } }) => {
 					<View style={Styles.inputs}>
 						<View>
 							<Text style={Styles.label}>Your username</Text>
-							<Input
+							<TextField
 								icon={['fal', 'user']}
 								placeholder="Username"
 								value={username}
@@ -194,7 +194,7 @@ const WelcomeScreen = ({ navigation, route: { params } }) => {
 						{!haveEmail && (
 							<View style={Styles.emailContainer}>
 								<Text style={Styles.label}>Your e-mail</Text>
-								<Input
+								<TextField
 									icon={['fal', 'envelope']}
 									placeholder="E-mail"
 									value={email}

@@ -6,7 +6,7 @@ import { TouchableWithoutFeedback, Text, View } from 'react-native';
 
 import Helpers from '../../../sosa/Helpers';
 import FormError from '../../../components/FormError';
-import Input from '../../../components/Input';
+import TextField from '../../../components/TextField';
 import SecureTextInput from '../../../components/SecureTextInput';
 import ActivityButton from '../../../components/ActivityButton';
 
@@ -178,7 +178,7 @@ export default class ForgotPasswordCode extends Component {
 					<View style={Styles.content_container}>
 						<FormError errors={this.state.checkError} />
 						{this.state.emailProvided ? null : (
-							<Input
+							<TextField
 								icon={['fal', 'user']}
 								placeholder="Your E-mail"
 								value={this.state.emailInput}
@@ -195,7 +195,7 @@ export default class ForgotPasswordCode extends Component {
 							/>
 						)}
 
-						<Input
+						<TextField
 							icon={['fal', 'user']}
 							placeholder={`Your ${this.codeLength}-Character Code`}
 							value={this.state.codeInput}

@@ -8,7 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 
 import ActivityButton from '../ActivityButton';
 import FormError from '../FormError';
-import Input from '../Input';
+import TextField from '../TextField';
 import SecureTextInput from '../SecureTextInput';
 
 import Helpers from '../../sosa/Helpers';
@@ -90,18 +90,18 @@ const CredentialInput = ({
 		if (forLogin) {
 			return (
 				<View>
-					<Input
+					<TextField
 						containerStyle={{ marginBottom: 4 }}
 						icon={['fal', 'user']}
 						placeholder="Username or e-mail address"
 						value={username}
-						onChangeText={(data) => setUsername(data)}
+						onChange={(data) => setUsername(data)}
 						enabled={!processing}
 					/>
 					<SecureTextInput
 						icon={['fal', 'key']}
 						placeholder="Password"
-						onChangeText={(data) => setPassword(data)}
+						onChange={(data) => setPassword(data)}
 						value={password}
 						enabled={!processing}
 					/>
@@ -114,27 +114,27 @@ const CredentialInput = ({
 		} else {
 			return (
 				<View>
-					<Input
+					<TextField
 						containerStyle={{ marginBottom: 4 }}
 						icon={['fal', 'user']}
 						placeholder="Username"
 						value={username}
-						onChangeText={(data) => setUsername(data)}
+						onChange={(data) => setUsername(data)}
 						enabled={!processing}
 					/>
 					<SecureTextInput
 						icon={['fal', 'key']}
 						placeholder="Password"
-						onChangeText={(data) => setPassword(data)}
+						onChange={(data) => setPassword(data)}
 						validateInput={() => validatePassword()}
 						enabled={!processing}
 					/>
-					<Input
+					<TextField
 						containerStyle={{ marginTop: 4 }}
 						icon={['fal', 'envelope']}
 						placeholder="E-mail"
 						value={email}
-						onChangeText={(data) => setEmail(data)}
+						onChange={(data) => setEmail(data)}
 						enabled={!processing}
 					/>
 					<FormError errors={error} />

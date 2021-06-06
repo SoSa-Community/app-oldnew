@@ -4,7 +4,7 @@ import { Text, View } from 'react-native';
 
 import BaseStyles from '../../styles/base';
 import Helpers from '../../../sosa/Helpers';
-import Input from '../../../components/Input';
+import TextField from '../../../components/TextField';
 import ActivityButton from '../../../components/ActivityButton';
 import FormError from '../../../components/FormError';
 
@@ -69,7 +69,7 @@ export default class ForgotPassword extends Component {
 
 					<View style={Styles.content_container}>
 						<FormError errors={this.state.requestError} />
-						<Input
+						<TextField
 							icon={['fal', 'envelope']}
 							placeholder="Your e-mail address"
 							value={this.state.emailInput}

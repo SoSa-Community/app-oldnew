@@ -7,7 +7,7 @@ import {
 	KeyboardAvoidingView,
 } from 'react-native';
 
-import Input from '../../../components/Input';
+import TextField from '../../../components/TextField';
 import ActivityButton from '../../../components/ActivityButton';
 
 class WelcomeBasicsScreen extends Component {
@@ -55,7 +55,7 @@ class WelcomeBasicsScreen extends Component {
 								<Text style={{ marginBottom: 8 }}>
 									When were you born?
 								</Text>
-								<Input
+								<TextField
 									icon={['fal', 'calendar-star']}
 									placeholder="Date Of Birth"
 									value={dateOfBirthInput}
@@ -73,7 +73,7 @@ class WelcomeBasicsScreen extends Component {
 								<Text style={{ marginBottom: 8 }}>
 									Where do you live?
 								</Text>
-								<Input
+								<TextField
 									icon={['fal', 'map-marker-smile']}
 									placeholder="Location"
 									value={locationInput}
@@ -89,7 +89,7 @@ class WelcomeBasicsScreen extends Component {
 								<Text style={{ marginBottom: 8 }}>
 									How do you identify?
 								</Text>
-								<Input
+								<TextField
 									icon={['fal', 'genderless']}
 									placeholder="Gender Identity"
 									value={genderInput}

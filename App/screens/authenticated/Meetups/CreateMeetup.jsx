@@ -18,7 +18,7 @@ import { useApp } from '../../../context/AppContext';
 import { useAPI } from '../../../context/APIContext';
 
 import ActivityButton from '../../../components/ActivityButton';
-import Input from '../../../components/Input';
+import TextField from '../../../components/TextField';
 
 import Helpers from '../../../sosa/Helpers';
 
@@ -287,7 +287,7 @@ const CreateMeetupScreen = ({ navigation }) => {
 					</View>
 					<View
 						style={{ flex: 1, paddingHorizontal: 4, marginTop: 8 }}>
-						<Input
+						<TextField
 							error={errors?.title}
 							placeholder="What's it called?"
 							value={title}
@@ -300,7 +300,7 @@ const CreateMeetupScreen = ({ navigation }) => {
 							}
 						/>
 
-						<Input
+						<TextField
 							label="When is it?"
 							icon={['fal', 'calendar-week']}
 							error={errors?.date}
@@ -312,7 +312,7 @@ const CreateMeetupScreen = ({ navigation }) => {
 						<View
 							style={{ flexDirection: 'row', marginVertical: 4 }}>
 							<View style={{ flex: 1 }}>
-								<Input
+								<TextField
 									icon={['fal', 'clock']}
 									error={errors?.date}
 									errorBorderOnly
@@ -335,7 +335,7 @@ const CreateMeetupScreen = ({ navigation }) => {
 								-
 							</Text>
 							<View style={{ flex: 1 }}>
-								<Input
+								<TextField
 									icon={['fal', 'clock']}
 									error={errors?.date}
 									errorBorderOnly
@@ -347,7 +347,7 @@ const CreateMeetupScreen = ({ navigation }) => {
 							</View>
 						</View>
 
-						<Input
+						<TextField
 							label="What's the plan?"
 							icon={['fal', 'compass']}
 							error={errors.type}
@@ -364,7 +364,7 @@ const CreateMeetupScreen = ({ navigation }) => {
 							]}
 						/>
 
-						<Input
+						<TextField
 							type="multiline"
 							placeholder="Description"
 							value={description}
