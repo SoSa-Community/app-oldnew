@@ -28,6 +28,14 @@ storiesOf('Components/ProfilePicture', module)
 	.add('Very Large', () => {
 		return <ProfilePicture picture={defaultPicture} size="verylarge" />;
 	})
+	.add('Loading - Small', () => {
+		return <ProfilePicture picture={defaultPicture} size="small" loading />;
+	})
+	.add('Loading - Very Large', () => {
+		return (
+			<ProfilePicture picture={defaultPicture} size="verylarge" loading />
+		);
+	})
 	.add('With onPress', () => {
 		return (
 			<ProfilePicture
