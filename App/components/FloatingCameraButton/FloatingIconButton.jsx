@@ -33,7 +33,7 @@ const FloatingIconButton = ({ icon, onPress, size, style, containerStyle }) => {
 };
 
 FloatingIconButton.propTypes = {
-	icon: PropTypes.number,
+	icon: PropTypes.array,
 	size: PropTypes.number,
 	onPress: PropTypes.func,
 	style: PropTypes.object,
