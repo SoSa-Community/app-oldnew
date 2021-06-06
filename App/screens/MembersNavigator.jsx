@@ -20,7 +20,7 @@ import MeetupScreen from './authenticated/Meetups/Meetup';
 
 import ChatScreen from './authenticated/Chat/Chat';
 import CreateMeetupScreen from './authenticated/Meetups/CreateMeetup';
-import MyProfileScreen from './authenticated/Profile/MyProfile';
+import MyProfileScreen from './authenticated/Profile/MyProfile.old';
 import WelcomeScreen from './authenticated/Welcome/Welcome';
 import SettingsScreen from './Settings';
 

@@ -13,7 +13,7 @@ import { useAPI } from '../../../context/APIContext';
 import { useAuthenticatedNavigation } from '../../../context/AuthenticatedNavigationContext';
 
 import ProfilePicture from '../../../components/ProfilePicture/ProfilePicture';
-import Input from '../../../components/Input';
+import TextField from '../../../components/TextField';
 import Picker from '../../../components/Picker/Picker';
 import DateTimePicker from '../../../components/DateTimePicker/DateTimePicker';
 
@@ -258,7 +258,7 @@ const MyProfileScreen = ({ navigation }) => {
 				</View>
 
 				<View style={Styles.nicknameContainer}>
-					<Input
+					<TextField
 						ref={nicknameRef}
 						placeholder="Nickname"
 						initialValue={profile?.nickname}
@@ -269,7 +269,7 @@ const MyProfileScreen = ({ navigation }) => {
 				</View>
 
 				<View style={Styles.tagContainer}>
-					<Input
+					<TextField
 						ref={taglineRef}
 						placeholder="Tagline"
 						initialValue={profile?.tagline}
