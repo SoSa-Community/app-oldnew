@@ -4,17 +4,17 @@ import { storiesOf } from '@storybook/react-native';
 import React from 'react';
 
 import CenterView from '../../../storybook/stories/CenterView/index';
-import ProfileField from './ProfileField';
+import ProfileFieldWrapper from './ProfileFieldWrapper';
 
 storiesOf('Components/ProfileField', module)
 	.addDecorator((getStory) => <CenterView>{getStory()}</CenterView>)
 	.add('Default', () => {
-		return <ProfileField icon={['far', 'gift']} label="Age" value="35" />;
+		return <ProfileFieldWrapper icon={['fal', 'gift']} label="Age" value="35" />;
 	})
 	.add('DateOfBirth', () => {
 		return (
-			<ProfileField
-				icon={['far', 'gift']}
+			<ProfileFieldWrapper
+				icon={['fal', 'gift']}
 				label="Age"
 				value="35"
 				editingMode
@@ -46,8 +46,8 @@ storiesOf('Components/ProfileField', module)
 		];
 
 		return (
-			<ProfileField
-				icon={['far', 'genderless']}
+			<ProfileFieldWrapper
+				icon={['fal', 'genderless']}
 				label="Gender"
 				value="Attack Helicopter"
 				editingMode
@@ -60,8 +60,8 @@ storiesOf('Components/ProfileField', module)
 	})
 	.add('Text', () => {
 		return (
-			<ProfileField
-				icon={['far', 'compass']}
+			<ProfileFieldWrapper
+				icon={['fal', 'compass']}
 				label="From"
 				value=""
 				editingMode
@@ -73,7 +73,7 @@ storiesOf('Components/ProfileField', module)
 	})
 	.add('Text Styled', () => {
 		return (
-			<ProfileField
+			<ProfileFieldWrapper
 				value="Froggity Froggirl"
 				editingMode
 				type="text"
