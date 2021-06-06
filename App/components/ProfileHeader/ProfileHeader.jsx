@@ -32,6 +32,9 @@ const Styles = StyleSheet.create({
 		height: '200%',
 		width: '100%',
 	},
+	overlayLoading: {
+		backgroundColor: 'rgba(0, 0, 0, 0.75)',
+	},
 	coverContainer: { height: 170, position: 'relative' },
 	cover: {
 		flex: 1,
@@ -46,35 +49,44 @@ const Styles = StyleSheet.create({
 		alignItems: 'center',
 		flexDirection: 'row',
 	},
-	profilePicture: {
-		marginTop: -85,
-	},
 	saveButton: { color: '#F96854' },
 	editButton: { color: '#F96854' },
-	profilePictureContainer: { flex: 1, alignItems: 'center' },
+	profilePictureContainer: { flex: 1, alignItems: 'center', marginTop: -85 },
 });
 
 const ProfileHeader = ({
-	picture,
+	coverPicture,
 	profilePicture,
 	onCancel,
 	onSave,
 	isEditable,
+	onEdit,
+	editingMode,
+	loading
 }) => {
-	const [editingMode, setEditingMode] = useState(false);
-
+	
 	const handleCancel = () => {
-		setEditingMode(false);
 		if (typeof onCancel === 'function') onCancel();
 	};
 
-	const handleSave = () => {
-		setEditingMode(false);
-		if (typeof onSave === 'function') onSave();
+	const handleSave = async () => {
+		let success = true;
+
+		if (typeof onSave === 'function') {
+			try {
+				await onSave();
+			} catch (e) {
+				success = false;
+			}
+		}
+	};
+
+	const handleEdit = () => {
+		if (typeof onEdit === 'function') onEdit();
 	};
 
 	const cancelButton = () => {
-		if (isEditable) {
+		if (isEditable && !loading) {
 			if (editingMode) {
 				return (
 					<View style={[Styles.cancelColumn]}>
@@ -90,7 +102,7 @@ const ProfileHeader = ({
 	};
 
 	const saveButton = () => {
-		if (isEditable) {
+		if (isEditable && !loading) {
 			if (editingMode) {
 				return (
 					<View style={Styles.saveColumn}>
@@ -109,7 +121,7 @@ const ProfileHeader = ({
 							icon={['fal', 'pencil']}
 							style={Styles.editButton}
 							size={18}
-							onPress={() => setEditingMode(true)}
+							onPress={() => handleEdit()}
 						/>
 					</View>
 				);
@@ -123,14 +135,21 @@ const ProfileHeader = ({
 		<View style={Styles.container}>
 			<View style={Styles.coverContainer}>
 				<ImageBackground
-					source={picture === 'string' ? { uri: picture } : picture}
+					source={
+						typeof coverPicture === 'string'
+							? { uri: coverPicture }
+							: coverPicture
+					}
 					style={Styles.cover}>
-					<View style={Styles.overlay} />
+					{!loading && <View style={Styles.overlay} />}
+					{loading && (
+						<View style={[Styles.overlay, Styles.overlayLoading]} />
+					)}
 				</ImageBackground>
 				<View style={Styles.actionBarContainer}>
 					<View style={Styles.actionBar} />
 				</View>
-				{isEditable ? (
+				{isEditable && !loading ? (
 					<FloatingIconButton
 						size={18}
 						onPress={() => {}}
@@ -145,9 +164,9 @@ const ProfileHeader = ({
 				<View style={Styles.profilePictureContainer}>
 					<ProfilePicture
 						picture={profilePicture}
-						style={Styles.profilePicture}
 						size="verylarge"
 						button={isEditable ? { size: 20 } : null}
+						loading={loading}
 					/>
 				</View>
 				{saveButton()}
@@ -157,7 +176,7 @@ const ProfileHeader = ({
 };
 
 ProfileHeader.propTypes = {
-	picture: PropTypes.oneOfType([
+	coverPicture: PropTypes.oneOfType([
 		PropTypes.string,
 		PropTypes.object,
 		PropTypes.bool,
@@ -170,14 +189,16 @@ ProfileHeader.propTypes = {
 	onCancel: PropTypes.func,
 	onSave: PropTypes.func,
 	isEditable: PropTypes.bool,
+	editingMode: PropTypes.bool,
 };
 
 ProfileHeader.defaultProps = {
-	picture: require('../../assets/profiles/cover.jpg'),
+	coverPicture: require('../../assets/profiles/cover.jpg'),
 	profilePicture: undefined,
 	onCancel: () => {},
 	onSave: () => {},
 	isEditable: false,
+	editingMode: false,
 };
 
 export default ProfileHeader;
