@@ -4,11 +4,17 @@ import React, {
 	forwardRef,
 	useImperativeHandle,
 } from 'react';
-import { Platform, Text } from 'react-native';
+import {Platform, StyleSheet, Text} from 'react-native';
 import { Picker as RNPicker } from '@react-native-picker/picker';
 import PropTypes from 'prop-types';
 
 import PickerModal from './PickerModal';
+const Styles = StyleSheet.create({
+	label: {
+		color: '#fff',
+		fontSize: 16,
+	},
+});
 
 const Picker = forwardRef(
 	(
@@ -35,7 +41,7 @@ const Picker = forwardRef(
 		},
 		ref,
 	) => {
-		const [selectedValue, setSelectedValue] = useState('');
+		const [selectedValue, setSelectedValue] = useState(value);
 		const [showPicker, setShowPicker] = useState(false);
 		const [tempPickerValue, setTempPickerValue] = useState('');
 
@@ -72,7 +78,7 @@ const Picker = forwardRef(
 					}
 					placeholder={placeholder}
 					prompt={placeholder}
-					style={[textStyle, { flex: 1 }]}
+					style={[Styles.label, textStyle, { flex: 1 }]}
 					onValueChange={(itemValue, itemIndex) => {
 						if (Platform.OS === 'ios')
 							setTempPickerValue(itemValue);
@@ -101,7 +107,7 @@ const Picker = forwardRef(
 					.pop();
 				if (found) text = found?.label;
 			}
-			return <Text style={textStyle}>{text}</Text>;
+			return <Text style={[Styles.label, textStyle]}>{text}</Text>;
 		}
 
 		if (Platform.OS !== 'ios') return picker();

@@ -26,6 +26,14 @@ const Styles = StyleSheet.create({
 		height: '100%',
 		justifyContent: 'center',
 	},
+	placeholder: {
+		color: '#fff',
+		fontSize: 16,
+	},
+	label: {
+		color: '#fff',
+		fontSize: 16,
+	},
 });
 
 const DateTimePicker = forwardRef(
@@ -41,6 +49,7 @@ const DateTimePicker = forwardRef(
 			outerContainerStyle,
 			innerContainerStyle,
 			textStyle,
+			placeholderStyle,
 			onSave,
 			onCancel,
 			editable,
@@ -93,10 +102,14 @@ const DateTimePicker = forwardRef(
 					}}
 					style={Styles.placeholderButton}>
 					{textValue.length > 0 && (
-						<Text style={textStyle}>{textValue}</Text>
+						<Text style={[Styles.label, textStyle]}>
+							{textValue}
+						</Text>
 					)}
 					{textValue.length === 0 && (
-						<Text style={textStyle}>{placeholder}</Text>
+						<Text style={[Styles.placeholder, placeholderStyle]}>
+							{placeholder}
+						</Text>
 					)}
 				</TouchableOpacity>
 			);
@@ -167,7 +180,7 @@ const DateTimePicker = forwardRef(
 					placeholder={placeholder}
 					onCancel={() => setShowPicker(false)}
 					onConfirm={() => doChange(tempPickerValue)}
-					textStyle={textStyle}>
+					textStyle={[Styles.label, textStyle]}>
 					{renderPicker()}
 				</PickerModal>
 			);
