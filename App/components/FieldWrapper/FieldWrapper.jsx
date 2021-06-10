@@ -57,7 +57,7 @@ const Styles = StyleSheet.create({
 	privacyButtonIcon: { color: '#FFF' },
 });
 
-const ProfileFieldWrapper = ({
+const FieldWrapper = ({
 	icon,
 	label,
 	value,
@@ -122,7 +122,7 @@ const ProfileFieldWrapper = ({
 	);
 };
 
-ProfileFieldWrapper.propTypes = {
+FieldWrapper.propTypes = {
 	icon: PropTypes.array,
 	label: PropTypes.string,
 	value: PropTypes.any,
@@ -139,7 +139,7 @@ ProfileFieldWrapper.propTypes = {
 	placeholder: PropTypes.string,
 };
 
-ProfileFieldWrapper.defaultProps = {
+FieldWrapper.defaultProps = {
 	icon: null,
 	label: '',
 	value: '',
@@ -156,4 +156,4 @@ ProfileFieldWrapper.defaultProps = {
 	placeholder: '',
 };
 
-export default ProfileFieldWrapper;
+export default FieldWrapper;

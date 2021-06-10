@@ -46,12 +46,7 @@ const TextField = forwardRef((props, ref) => {
 		value,
 		initialValue,
 		onChange,
-		validateInput,
-		error,
-		errorBorderOnly,
 		enabled,
-		allowClear,
-		alwaysShowClear,
 		multiline,
 		minLength,
 		maxLength,
@@ -63,20 +58,10 @@ const TextField = forwardRef((props, ref) => {
 		lengthIndicatorShowPercentage,
 		lengthWarningPercentage,
 		lengthDangerPercentage,
-		setIsValid,
-		containerStyle,
-		outerContainerStyle,
-		innerContainerStyle,
 		style,
-		showSaveButtons,
-		editable,
-		textStyle,
 		placeholderColour,
-		textValue,
-		form,
-		name,
 	} = props;
-	
+
 	const [inputValue, setInputValue] = useState(value || '');
 	const [lengthPercentage, setLengthPercentage] = useState(0);
 

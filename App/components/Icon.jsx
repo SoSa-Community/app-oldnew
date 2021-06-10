@@ -10,7 +10,6 @@ import {
 	faPencil as fasPencil,
 } from '@fortawesome/pro-solid-svg-icons';
 
-import { faGift as farGift, faGenderless as farGenderless, faCompass as farCompass, faMapMarkerAlt as farMapMarkerAlt } from '@fortawesome/pro-regular-svg-icons';
 import { faGlobeEurope as fadGlobeEurope } from '@fortawesome/pro-duotone-svg-icons';
 
 import {
@@ -39,6 +38,9 @@ import {
 	faPencilAlt as falPencilAlt,
 	faPencil as falPencil,
 	faCamera as falCamera,
+	faGift as falGift,
+	faMapMarkerAlt as falMapMarkerAlt,
+	faUserCheck as falUserCheck
 } from '@fortawesome/pro-light-svg-icons';
 
 import { faWifi as farWifi } from '@fortawesome/pro-regular-svg-icons';
@@ -78,11 +80,10 @@ library.add(
 	fasPencil,
 	falPencil,
 	falCamera,
-	farGift,
 	fadGlobeEurope,
-	farGenderless,
-	farCompass,
-	farMapMarkerAlt
+	falGift,
+	falMapMarkerAlt,
+	falUserCheck,
 );
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';

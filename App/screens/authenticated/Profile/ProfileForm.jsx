@@ -4,7 +4,7 @@ import { View, StyleSheet, ScrollView } from 'react-native';
 import { useForm } from 'react-hook-form';
 
 import ProfileHeader from '../../../components/ProfileHeader/ProfileHeader';
-import ProfileFieldWrapper from '../../../components/ProfileFieldWrapper/ProfileFieldWrapper';
+import FieldWrapper from '../../../components/FieldWrapper/FieldWrapper';
 import FormDateTimePicker from '../../../components/Forms/DateTimePicker/FormDateTimePicker';
 import FormPicker from '../../../components/Forms/Picker/FormPicker';
 import FormTextField from '../../../components/Forms/TextField/FormTextField';
@@ -114,7 +114,7 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 			/>
 
 			<View style={{ paddingHorizontal: 14, marginTop: 12 }}>
-				<ProfileFieldWrapper
+				<FieldWrapper
 					value={formValues?.nickname}
 					editingMode={editingMode}
 					containerStyle={Styles.nicknameTaglineContainer}
@@ -145,8 +145,8 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 						enabled
 						style={Styles.nickname}
 					/>
-				</ProfileFieldWrapper>
-				<ProfileFieldWrapper
+				</FieldWrapper>
+				<FieldWrapper
 					editingMode={editingMode}
 					containerStyle={Styles.nicknameTaglineContainer}
 					value={formValues?.tagline || '-'}
@@ -160,8 +160,8 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 						enabled
 						style={Styles.tagline}
 					/>
-				</ProfileFieldWrapper>
-				<ProfileFieldWrapper
+				</FieldWrapper>
+				<FieldWrapper
 					icon={['fal', 'gift']}
 					label={editingMode ? 'When were you born?' : 'Age'}
 					value={formValues?.age}
@@ -177,8 +177,8 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 						editable
 						textValue={profile?.age}
 					/>
-				</ProfileFieldWrapper>
-				<ProfileFieldWrapper
+				</FieldWrapper>
+				<FieldWrapper
 					icon={['fal', 'genderless']}
 					label={editingMode ? 'How do you identify?' : 'Gender'}
 					value={getGenderName()}
@@ -193,8 +193,8 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 						editable
 						options={genders}
 					/>
-				</ProfileFieldWrapper>
-				<ProfileFieldWrapper
+				</FieldWrapper>
+				<FieldWrapper
 					icon={['fal', 'compass']}
 					label={editingMode ? 'Where were you born?' : 'From'}
 					value={formValues?.from_location || '-'}
@@ -207,8 +207,8 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 						placeholder="Where did you come from?"
 						enabled
 					/>
-				</ProfileFieldWrapper>
-				<ProfileFieldWrapper
+				</FieldWrapper>
+				<FieldWrapper
 					icon={['fal', 'map-marker-alt']}
 					label={editingMode ? 'Where do you exist?' : 'Based in'}
 					value={formValues?.current_location || '-'}
@@ -221,8 +221,8 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 						defaultValue={profile?.current_location}
 						enabled
 					/>
-				</ProfileFieldWrapper>
-				<ProfileFieldWrapper
+				</FieldWrapper>
+				<FieldWrapper
 					icon={['fal', 'user-check']}
 					label={editingMode ? 'What should we call you?' : 'Call me'}
 					value={formValues?.name || '-'}
@@ -235,7 +235,7 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 						defaultValue={profile?.name}
 						enabled
 					/>
-				</ProfileFieldWrapper>
+				</FieldWrapper>
 			</View>
 		</ScrollView>
 	);
