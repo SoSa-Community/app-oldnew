@@ -37,7 +37,7 @@ const SoSa = () => {
 							headerStyle: BaseStyles.header,
 							headerTitleStyle: BaseStyles.headerTitle,
 							headerTintColor: 'white',
-							headerTitleContainerStyle: { left: 10 },
+							headerTitleContainerStyle: { alignItems: 'center' },
 						}}>
 						<Stack.Screen
 							name="Login"
