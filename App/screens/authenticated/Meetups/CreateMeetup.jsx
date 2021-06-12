@@ -17,8 +17,8 @@ import { useAuthenticatedNavigation } from '../../../context/AuthenticatedNaviga
 import { useApp } from '../../../context/AppContext';
 import { useAPI } from '../../../context/APIContext';
 
-import ActivityButton from '../../../components/ActivityButton';
-import TextField from '../../../components/TextField';
+import ActivityButton from '../../../components/ActivityButton/ActivityButton';
+import TextField from '../../../components/TextField/TextField';
 
 import Helpers from '../../../sosa/Helpers';
 

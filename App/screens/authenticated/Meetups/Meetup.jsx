@@ -14,7 +14,7 @@ import {
 import { useAuthenticatedNavigation } from '../../../context/AuthenticatedNavigationContext';
 import { useAPI } from '../../../context/APIContext';
 
-import ActivityButton from '../../../components/ActivityButton';
+import ActivityButton from '../../../components/ActivityButton/ActivityButton';
 import Icon from '../../../components/Icon';
 import CommentItem from '../../../components/comments/CommentItem';
 import Helpers from '../../../sosa/Helpers';

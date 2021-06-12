@@ -9,7 +9,7 @@ import {
 import FastImage from 'react-native-fast-image';
 import PropTypes from 'prop-types';
 
-import ActivityButton from '../ActivityButton';
+import ActivityButton from '../ActivityButton/ActivityButton';
 import Icon from '../Icon';
 
 import Helpers from '../../sosa/Helpers';

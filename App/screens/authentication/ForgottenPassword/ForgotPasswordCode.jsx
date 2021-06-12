@@ -6,9 +6,9 @@ import { TouchableWithoutFeedback, Text, View } from 'react-native';
 
 import Helpers from '../../../sosa/Helpers';
 import FormError from '../../../components/FormError';
-import TextField from '../../../components/TextField';
-import SecureTextInput from '../../../components/SecureTextInput';
-import ActivityButton from '../../../components/ActivityButton';
+import TextField from '../../../components/TextField/TextField';
+import SecureTextField from '../../../components/SecureTextField';
+import ActivityButton from '../../../components/ActivityButton/ActivityButton';
 
 export default class ForgotPasswordCode extends Component {
 	navigation = null;
@@ -212,7 +212,7 @@ export default class ForgotPasswordCode extends Component {
 						/>
 
 						<FormError errors={this.state.passwordError} />
-						<SecureTextInput
+						<SecureTextField
 							placeholder="New password"
 							onChangeText={(data) =>
 								this.setState({ passwordInput: data })

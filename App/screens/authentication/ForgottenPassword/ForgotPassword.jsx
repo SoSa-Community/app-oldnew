@@ -4,8 +4,8 @@ import { Text, View } from 'react-native';
 
 import BaseStyles from '../../styles/base';
 import Helpers from '../../../sosa/Helpers';
-import TextField from '../../../components/TextField';
-import ActivityButton from '../../../components/ActivityButton';
+import TextField from '../../../components/TextField/TextField';
+import ActivityButton from '../../../components/ActivityButton/ActivityButton';
 import FormError from '../../../components/FormError';
 
 export default class ForgotPassword extends Component {

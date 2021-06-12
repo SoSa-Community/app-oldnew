@@ -6,13 +6,17 @@ import { useNavigation } from '@react-navigation/native';
 
 import { useAuth } from '../../context/AuthContext';
 
-import ActivityButton from '../ActivityButton';
+import ActivityButton from '../ActivityButton/ActivityButton';
 import FormError from '../FormError';
-import TextField from '../TextField';
-import SecureTextInput from '../SecureTextInput';
+import TextField from '../TextField/TextField';
+import SecureTextField from '../SecureTextField';
 
 import Helpers from '../../sosa/Helpers';
 import Styles from '../../screens/styles/onboarding';
+import FieldWrapper from '../FieldWrapper/FieldWrapper';
+import FormTextField from '../Forms/TextField/FormTextField';
+import { useForm } from 'react-hook-form';
+import FormSecureTextField from '../Forms/SecureTextField/FormSecureTextField';
 
 const CredentialInput = ({
 	forLogin,
@@ -29,9 +33,14 @@ const CredentialInput = ({
 	const [password, setPassword] = useState('');
 	const [email, setEmail] = useState('');
 
-	const { forgotPassword, credentials } = AppConfig.features[
-		forLogin ? 'login' : 'register'
-	];
+	const errors = {};
+
+	const { handleSubmit, control, formState, watch, reset } = useForm({
+		mode: 'onSubmit',
+	});
+
+	const { forgotPassword, credentials } =
+		AppConfig.features[forLogin ? 'login' : 'register'];
 
 	const validatePassword = () => {
 		try {
@@ -44,17 +53,32 @@ const CredentialInput = ({
 		return '';
 	};
 
-	const Buttons = () => {
-		const handleAuth = () => {
-			setProcessing(true);
-			const promise = forLogin
-				? login(username, password)
-				: register(username, password, email);
-			promise
-				.catch((error) => setError(error))
-				.finally(() => setProcessing(false));
-		};
+	const handleAuth = () => {
+		setProcessing(true);
+		return new Promise((resolve, reject) => {
+			const isValid = async (data) => {
+				const { username, password } = data;
+				try {
+					const result = (await forLogin)
+						? login(username, password)
+						: register(username, password, email);
+					setProcessing(false);
+					resolve(result);
+				} catch (error) {
+					setError(error);
+					reject(error);
+				}
+			};
 
+			const isErrored = (data) => {
+				reject();
+			};
+
+			handleSubmit(isValid, isErrored)();
+		});
+	};
+
+	const Buttons = () => {
 		const letmeinButton = (
 			<ActivityButton
 				showActivity={processing}
@@ -66,8 +90,7 @@ const CredentialInput = ({
 			<View>
 				<Text
 					style={Styles.forgotButton}
-					onPress={() => navigation.navigate('ForgotPassword')}
-				>
+					onPress={() => navigation.navigate('ForgotPassword')}>
 					Forgotten Password
 				</Text>
 			</View>
@@ -90,21 +113,28 @@ const CredentialInput = ({
 		if (forLogin) {
 			return (
 				<View>
-					<TextField
-						containerStyle={{ marginBottom: 4 }}
-						icon={['fal', 'user']}
-						placeholder="Username or e-mail address"
-						value={username}
-						onChange={(data) => setUsername(data)}
-						enabled={!processing}
-					/>
-					<SecureTextInput
+					<FieldWrapper
+						error={errors?.username?.message}
+						editingMode
+						icon={['fal', 'user']}>
+						<FormTextField
+							control={control}
+							name="username"
+							placeholder="Username or e-mail address"
+							enabled={!processing}
+						/>
+					</FieldWrapper>
+					<FieldWrapper
 						icon={['fal', 'key']}
-						placeholder="Password"
-						onChange={(data) => setPassword(data)}
-						value={password}
-						enabled={!processing}
-					/>
+						error={errors?.password?.message}
+						editingMode>
+						<FormSecureTextField
+							control={control}
+							name="password"
+							placeholder="Password"
+							enabled={!processing}
+						/>
+					</FieldWrapper>
 					<View style={{ marginTop: 2 }}>
 						<FormError errors={error} />
 					</View>
@@ -122,7 +152,7 @@ const CredentialInput = ({
 						onChange={(data) => setUsername(data)}
 						enabled={!processing}
 					/>
-					<SecureTextInput
+					<SecureTextField
 						icon={['fal', 'key']}
 						placeholder="Password"
 						onChange={(data) => setPassword(data)}
