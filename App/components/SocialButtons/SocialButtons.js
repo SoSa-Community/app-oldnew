@@ -5,7 +5,7 @@ import { Alert, View } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 
 import SocialButton from '../SocialButton/SocialButton';
-import FormError from '../FormError';
+import FormError from '../FormError/FormError';
 import { useApp } from '../../context/AppContext';
 
 const onboardingPath = '../../assets/onboarding/';
