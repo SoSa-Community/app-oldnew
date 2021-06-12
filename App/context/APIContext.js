@@ -87,19 +87,18 @@ const APIProvider = (props) => {
 		),
 	);
 
-	const validateSession = () => {
+	const validateSession = async () => {
 		const {
 			services: { auth },
 		} = client;
 
-		return auth.validateSession().catch((error) => {
+		try {
+			return await auth.validateSession();
+		} catch (error) {
 			console.debug('error', error);
-			if (session.id.length > 0) {
-				return auth.deviceLogin(device.id);
-			} else {
-				throw error;
-			}
-		});
+			if (!session?.id?.length) throw error;
+			else return auth.deviceLogin(device.id);
+		}
 	};
 
 	useEffect(() => {
