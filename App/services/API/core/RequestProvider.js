@@ -18,72 +18,76 @@ export class RequestProvider {
 			},
 		} = this;
 
-		return new Promise((resolve, reject) => {
-			if (!requireAuth) {
-				resolve({});
-			} else {
-				let _device,
-					_session,
-					_jwt = null;
+		return new Promise(async (resolve, reject) => {
+			if (!requireAuth) resolve({});
+			else {
+				let device,
+					session,
+					jwt = null;
 
-				getDevice()
-					.then((device) => (_device = device))
-					.then(() => getSession())
-					.then((session) => (_session = session))
-					.catch((error) => console.debug(error))
-					.then(() => {
-						let payload = {};
-						const { id, isBot, botId } = _device;
+				try {
+					device = await getDevice();
+					session = await getSession();
+				} catch (e) {
+					console.debug(e);
+				}
 
-						if (isBot) {
-							payload = { id: botId };
-						} else if (forSocket) {
-							payload = {
-								id: _session.id,
-								refresh_token: _session.refresh_token,
-							};
-						} else {
-							payload = { device_id: id };
-						}
-						return generateJWT(payload);
-					})
-					.then((jwt) => (_jwt = jwt))
-					.catch((error) => console.debug(error))
-					.finally(() => {
-						resolve({
-							device: _device,
-							session: _session,
-							jwt: _jwt,
-						});
-					});
+				let payload = {};
+				const { id, isBot, botId } = device;
+
+				if (isBot) payload = { id: botId };
+				else if (forSocket) {
+					payload = {
+						id: session.id,
+						refresh_token: session.refresh_token,
+					};
+				} else {
+					payload = { device_id: id };
+				}
+
+				try {
+					jwt = await generateJWT(payload);
+				} catch (e) {
+					console.debug(e);
+				}
+
+				resolve({
+					device,
+					session,
+					jwt,
+				});
 			}
 		});
 	};
 
 	request = (request) => {
-		const { namespace, call, payload, method, requireAuth } = request;
+		return new Promise(async (resolve, reject) => {
+			const { namespace, call, payload, method, requireAuth } = request;
 
-		return this.getAuthEntities(requireAuth).then(
-			({ device, session, jwt }) => {
+			try {
+				const { device, session, jwt } = await this.getAuthEntities(
+					requireAuth,
+				);
+
 				let uriParts = [];
+
 				if (namespace) uriParts.push(namespace);
 				if (call) uriParts.push(call);
 				let uri = uriParts.join('/');
 
-				let request = {
-					method,
-					headers: {
-						Accept: 'application/json',
-						'Content-Type': 'application/json',
-					},
+				let body;
+				const headers = {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
 				};
 
-				if (jwt && jwt.length) request.headers.token = jwt;
+				if (jwt && jwt.length) headers.token = jwt;
 				if (session) {
 					let { id: sessionID, expiry, refresh_token } = session;
 					console.log(session);
+
 					if (typeof sessionID === 'string' && sessionID.length) {
-						request.headers['session-id'] = sessionID;
+						headers['session-id'] = sessionID;
 
 						let parsedExpiry = new Date(
 							Date.parse(expiry.replace(/-/g, '/')),
@@ -97,14 +101,13 @@ export class RequestProvider {
 							parsedExpiry.getTime() <
 								new Date().getUTCMilliseconds()
 						)
-							request.headers['refresh-token'] = refresh_token;
+							headers['refresh-token'] = refresh_token;
 					}
 				}
 
 				if (payload) {
-					if (method === 'POST') {
-						request.body = JSON.stringify(payload);
-					} else {
+					if (method === 'POST') body = JSON.stringify(payload);
+					else {
 						let keyValues = [];
 
 						payload.forEach((value, key) =>
@@ -117,43 +120,42 @@ export class RequestProvider {
 				const endpoint = `${this.config.host}/${uri}`;
 				const timeout = 10000;
 
-				console.info('Client::RequestProvider::Request', uri, request);
-				return new Promise((resolve, reject) => {
-					let timeoutTimer = setTimeout(
-						() => reject('Network Timed Out'),
-						timeout,
-					);
-
-					fetch(endpoint, request).then((response) => {
-						clearTimeout(timeoutTimer);
-						response
-							.json()
-							.then((json) => {
-								console.info(
-									'Client::RequestProvider::Request::Response',
-									json,
-								);
-								if (json && json.session) {
-									const {
-										client: { sessionHandler },
-									} = this;
-									session.parseJSON(json.session);
-
-									sessionHandler
-										.updateSession(session)
-										.then(() => {
-											resolve(json);
-										});
-								} else {
-									resolve(json);
-								}
-							})
-							.catch((error) => {
-								reject(error);
-							});
-					});
+				console.info('Client::RequestProvider::Request', uri, {
+					method,
+					body,
+					headers,
 				});
-			},
-		);
+
+				let timeoutTimer = setTimeout(
+					() => reject(new Error('network_timeout')),
+					timeout,
+				);
+
+				const response = await fetch(endpoint, {
+					method,
+					body,
+					headers,
+				});
+
+				clearTimeout(timeoutTimer);
+				const json = await response.json();
+
+				console.info(
+					'Client::RequestProvider::Request::Response',
+					json,
+				);
+
+				if (json?.session) {
+					const {
+						client: { sessionHandler },
+					} = this;
+					session.parseJSON(json.session);
+					await sessionHandler.updateSession(session);
+				}
+				resolve(json);
+			} catch (e) {
+				reject(e);
+			}
+		});
 	};
 }

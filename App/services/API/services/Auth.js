@@ -12,39 +12,37 @@ export class AuthService {
 		this.provider = client.getProvider('auth');
 	}
 
-	handleAuthRequest = (namespace, call, data) => {
+	handleAuthRequest = async (namespace, call, data) => {
 		const {
 			client: {
 				sessionHandler: { getDevice, updateDevice },
 			},
 		} = this;
 
-		return new Request(
+		const request = new Request(
 			this.provider,
 			namespace,
 			call,
 			data,
 			call === 'validate' ? 'GET' : 'POST',
 			true,
-		)
-			.run()
-			.then((json) => {
-				const {
-					response: { device_id },
-				} = json;
-				if (typeof device_id === 'string') {
-					return getDevice()
-						.then((deviceInstance) => {
-							deviceInstance.id = device_id;
-							return updateDevice(deviceInstance).then(
-								() => json,
-							);
-						})
-						.then(({ response }) => response);
-				} else {
-					return json.response;
-				}
-			});
+		);
+
+		const json = await request.run();
+
+		const { response } = json;
+		const { device_id } = response;
+
+		if (typeof device_id === 'string') {
+			try {
+				const device = await getDevice();
+				device.id = device_id;
+				await updateDevice(device);
+			} catch (error) {
+				console.debug(error);
+			}
+		}
+		return response;
 	};
 
 	login = (username, password) => {
