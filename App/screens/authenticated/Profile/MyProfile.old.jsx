@@ -13,7 +13,7 @@ import { useAPI } from '../../../context/APIContext';
 import { useAuthenticatedNavigation } from '../../../context/AuthenticatedNavigationContext';
 
 import ProfilePicture from '../../../components/ProfilePicture/ProfilePicture';
-import TextField from '../../../components/TextField';
+import TextField from '../../../components/TextField/TextField';
 import Picker from '../../../components/Picker/Picker';
 import DateTimePicker from '../../../components/DateTimePicker/DateTimePicker';
 

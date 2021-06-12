@@ -6,7 +6,7 @@ import Styles from '../../styles/onboarding';
 import { View } from 'react-native';
 
 import CredentialInput from '../../../components/auth/CredentialInput';
-import SocialButtons from '../../../components/auth/SocialButtons';
+import SocialButtons from '../../../components/SocialButtons/SocialButtons';
 
 const RegistrationScreen = () => {
 	const [error, setError] = useState('');
