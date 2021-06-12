@@ -43,11 +43,12 @@ const ActivityButton = ({
 }) => {
 	const styles = [Styles.button];
 	if (showActivity) styles.push(Styles.pressed);
-	if (disabled) styles.push(Styles.disabled)
+	if (disabled) styles.push(Styles.disabled);
 	styles.push(style);
 
 	return (
-		<TouchableWithoutFeedback onPress={onPress}>
+		<TouchableWithoutFeedback
+			onPress={!showActivity && !disabled ? onPress : null}>
 			<View style={styles}>
 				<Text style={[Styles.text, textStyle]}>{text}</Text>
 				{showActivity && !disabled && (

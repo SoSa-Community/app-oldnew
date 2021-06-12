@@ -14,7 +14,7 @@ storiesOf('Components/ActivityButton', module)
 			<ActivityButton
 				text="Button"
 				showActivity={false}
-				onPress={() => {}}
+				onPress={() => action('Button pressed')}
 			/>
 		);
 	})
