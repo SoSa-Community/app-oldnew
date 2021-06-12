@@ -56,8 +56,6 @@ const Styles = StyleSheet.create({
 
 	viewPasswordIcon: {},
 
-	forgotButton: { color: '#7ac256', padding: 8, textAlign: 'center' },
-
 	secondary_button: {
 		borderRadius: 4,
 		flex: 0,
@@ -119,22 +117,6 @@ const Styles = StyleSheet.create({
 		width: 64,
 		height: 64,
 	},
-
-	buttonBottom: {
-		flex: 1,
-		justifyContent: 'flex-end',
-		marginBottom: Platform.OS === 'ios' ? 68 : 36,
-	},
-
-	newToSoSaButton: {
-		alignItems: 'center',
-		borderRadius: 16,
-		borderColor: '#f0ad4e',
-		borderWidth: 1,
-		paddingVertical: 10,
-	},
-
-	newToSoSaButtonText: { color: '#fff' },
 });
 
 export default Styles;
