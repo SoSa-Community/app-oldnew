@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Controller } from 'react-hook-form';
-import TextField from '../../TextField';
+import TextField from '../../TextField/TextField';
 
 const FormTextField = ({ name, control, defaultValue, rules, ...props }) => {
 	return (
