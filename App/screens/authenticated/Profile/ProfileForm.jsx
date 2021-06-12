@@ -10,11 +10,25 @@ import FormPicker from '../../../components/Forms/Picker/FormPicker';
 import FormTextField from '../../../components/Forms/TextField/FormTextField';
 
 import PropTypes from 'prop-types';
+import IconButton from '../../../components/IconButton';
 
 const Styles = StyleSheet.create({
-	nicknameTaglineContainer: { justifyContent: 'center' },
+	nicknameTaglineContainer: { justifyContent: 'center', marginBottom: 12 },
 	nickname: { fontSize: 22, textAlign: 'center' },
 	tagline: { fontSize: 18, textAlign: 'center' },
+	fieldContainerStyle: { marginBottom: 12 },
+	privacyButton: {
+		borderWidth: 2,
+		borderColor: '#F96854',
+		backgroundColor: 'rgba(249, 104, 84, 0.21)',
+		width: 30,
+		height: 30,
+		borderRadius: 15,
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingVertical: 0,
+	},
+	privacyButtonIcon: { color: '#FFF' },
 });
 
 const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
@@ -36,8 +50,7 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 		mode: 'onSubmit',
 	});
 
-	const { dirtyFields, isValid, isDirty, errors } = formState;
-	const watchValues = watch();
+	const { errors } = formState;
 
 	const updateFromEntity = (entity) => {
 		const keys = Object.keys(formValues);
@@ -94,6 +107,18 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 			if (found) name = found?.label;
 		}
 		return name;
+	};
+
+	const fieldButtons = () => {
+		return [
+			<IconButton
+				icon={['fad', 'globe-europe']}
+				size={16}
+				style={Styles.privacyButtonIcon}
+				containerStyle={Styles.privacyButton}
+				onPress={() => {}}
+			/>,
+		];
 	};
 
 	useEffect(() => {
@@ -165,7 +190,9 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 					icon={['fal', 'gift']}
 					label={editingMode ? 'When were you born?' : 'Age'}
 					value={formValues?.age}
-					editingMode={editingMode}>
+					containerStyle={Styles.fieldContainerStyle}
+					editingMode={editingMode}
+					buttons={fieldButtons('age')}>
 					<FormDateTimePicker
 						name="date_of_birth"
 						control={control}
@@ -182,7 +209,9 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 					icon={['fal', 'genderless']}
 					label={editingMode ? 'How do you identify?' : 'Gender'}
 					value={getGenderName()}
-					editingMode={editingMode}>
+					containerStyle={Styles.fieldContainerStyle}
+					editingMode={editingMode}
+					buttons={fieldButtons('gender')}>
 					<FormPicker
 						name="gender_id"
 						control={control}
@@ -198,7 +227,9 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 					icon={['fal', 'compass']}
 					label={editingMode ? 'Where were you born?' : 'From'}
 					value={formValues?.from_location || '-'}
-					editingMode={editingMode}>
+					containerStyle={Styles.fieldContainerStyle}
+					editingMode={editingMode}
+					buttons={fieldButtons('from_location')}>
 					<FormTextField
 						name="from_location"
 						control={control}
@@ -212,7 +243,9 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 					icon={['fal', 'map-marker-alt']}
 					label={editingMode ? 'Where do you exist?' : 'Based in'}
 					value={formValues?.current_location || '-'}
-					editingMode={editingMode}>
+					containerStyle={Styles.fieldContainerStyle}
+					editingMode={editingMode}
+					buttons={fieldButtons('current_location')}>
 					<FormTextField
 						placeholder="Where did you go?"
 						name="current_location"
@@ -226,7 +259,9 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 					icon={['fal', 'user-check']}
 					label={editingMode ? 'What should we call you?' : 'Call me'}
 					value={formValues?.name || '-'}
-					editingMode={editingMode}>
+					containerStyle={Styles.fieldContainerStyle}
+					editingMode={editingMode}
+					buttons={fieldButtons('name')}>
 					<FormTextField
 						placeholder="Cotton eyed joe?"
 						name="name"
