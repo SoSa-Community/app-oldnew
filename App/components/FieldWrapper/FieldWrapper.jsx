@@ -1,13 +1,11 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-
-import Icon from '../Icon';
-import IconButton from '../IconButton';
-
 import PropTypes from 'prop-types';
 
+import Icon from '../Icon';
+
 const Styles = StyleSheet.create({
-	container: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+	container: { flexDirection: 'row', alignItems: 'center' },
 	icon: { color: '#FFF', marginRight: 12 },
 	label: {
 		color: '#BCBCBC',
@@ -43,18 +41,6 @@ const Styles = StyleSheet.create({
 		color: '#fff',
 		fontSize: 16,
 	},
-	privacyButton: {
-		borderWidth: 2,
-		borderColor: '#F96854',
-		backgroundColor: 'rgba(249, 104, 84, 0.21)',
-		width: 30,
-		height: 30,
-		borderRadius: 15,
-		justifyContent: 'center',
-		alignItems: 'center',
-		paddingVertical: 0,
-	},
-	privacyButtonIcon: { color: '#FFF' },
 });
 
 const FieldWrapper = ({
@@ -67,10 +53,15 @@ const FieldWrapper = ({
 	valueStyle,
 	editingMode,
 	children,
+	buttons,
 	error,
 }) => {
 	if (editingMode) {
-		const containerStyles = [Styles.container, Styles.editingContainer];
+		const containerStyles = [
+			Styles.container,
+			Styles.editingContainer,
+			containerStyle,
+		];
 		const iconStyles = [Styles.icon];
 		const labelStyles = [Styles.editingLabel];
 
@@ -79,6 +70,11 @@ const FieldWrapper = ({
 			containerStyles.push(Styles.editingContainerWithError);
 			iconStyles.push(Styles.errorTextColor);
 		}
+
+		const renderButtons = () => {
+			if (!buttons) return <></>;
+			return <View style={{ alignItems: 'flex-end' }}>{buttons}</View>;
+		};
 
 		return (
 			<View style={{ width: '100%', marginVertical: 8 }}>
@@ -92,15 +88,7 @@ const FieldWrapper = ({
 					<View style={{ flex: 1, alignContent: 'flex-start' }}>
 						{children}
 					</View>
-					<View style={{ alignItems: 'flex-end' }}>
-						<IconButton
-							icon={['fad', 'globe-europe']}
-							size={16}
-							style={Styles.privacyButtonIcon}
-							containerStyle={Styles.privacyButton}
-							onPress={() => {}}
-						/>
-					</View>
+					{renderButtons()}
 				</View>
 				{error && error.length ? (
 					<Text style={Styles.errorText}>{error}</Text>
@@ -116,8 +104,16 @@ const FieldWrapper = ({
 			{Array.isArray(icon) && (
 				<Icon icon={icon} size={26} style={Styles.icon} />
 			)}
-			{label && <Text style={[Styles.label, labelStyle]}>{label}</Text>}
-			<Text style={[Styles.value, valueStyle]}>{value}</Text>
+			{label ? (
+				<Text style={[Styles.label, labelStyle]}>{label}</Text>
+			) : (
+				<></>
+			)}
+			{value ? (
+				<Text style={[Styles.value, valueStyle]}>{value}</Text>
+			) : (
+				<></>
+			)}
 		</View>
 	);
 };
