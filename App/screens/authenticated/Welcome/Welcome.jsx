@@ -12,7 +12,7 @@ import TextField from '../../../components/TextField/TextField';
 import ActivityButton from '../../../components/ActivityButton/ActivityButton';
 
 import InfoBox from '../../../components/InfoBox';
-import FormError from '../../../components/FormError';
+import FormError from '../../../components/FormError/FormError';
 
 import { useAPI } from '../../../context/APIContext';
 import { useAuth } from '../../../context/AuthContext';

@@ -6,7 +6,7 @@ import BaseStyles from '../../styles/base';
 import Helpers from '../../../sosa/Helpers';
 import TextField from '../../../components/TextField/TextField';
 import ActivityButton from '../../../components/ActivityButton/ActivityButton';
-import FormError from '../../../components/FormError';
+import FormError from '../../../components/FormError/FormError';
 
 export default class ForgotPassword extends Component {
 	navigation = null;

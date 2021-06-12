@@ -5,7 +5,7 @@ import Styles from '../../styles/onboarding';
 import { TouchableWithoutFeedback, Text, View } from 'react-native';
 
 import Helpers from '../../../sosa/Helpers';
-import FormError from '../../../components/FormError';
+import FormError from '../../../components/FormError/FormError';
 import TextField from '../../../components/TextField/TextField';
 import SecureTextField from '../../../components/SecureTextField';
 import ActivityButton from '../../../components/ActivityButton/ActivityButton';
