@@ -1,90 +1,98 @@
-import React, { Component } from 'react';
-import Styles from '../../styles/onboarding';
-import { Text, View } from 'react-native';
+import React, { useState } from 'react';
+
+import { StyleSheet, Text, View } from 'react-native';
 
 import BaseStyles from '../../styles/base';
 import Helpers from '../../../sosa/Helpers';
-import TextField from '../../../components/TextField/TextField';
+
 import ActivityButton from '../../../components/ActivityButton/ActivityButton';
-import FormError from '../../../components/FormError/FormError';
 
-export default class ForgotPassword extends Component {
-	navigation = null;
+import FieldWrapper from '../../../components/FieldWrapper/FieldWrapper';
+import FormTextField from '../../../components/Forms/TextField/FormTextField';
+import { useForm } from 'react-hook-form';
 
-	state = {
-		emailInput: '',
-		requesting: false,
-		requestError: '',
-	};
-
-	constructor(props) {
-		super();
-		this.navigation = props.navigation;
+const Styles = StyleSheet.create({
+	keyboardView: { flex: 1 },
+	container: {
+		backgroundColor: '#121211',
+		flex: 1,
+	},
+	inner: { paddingHorizontal: 30, justifyContent: 'center' },
+	formContainer: {
+		marginTop: 15,
+	},
+	header: {
+		fontSize: 24,
+		color: '#fff',
+		textAlign: 'center',
+		marginBottom: 5,
 	}
+});
 
-	componentDidMount() {}
+const ForgotPassword = ({ navigation }) => {
+	const [processing, setProcessing] = useState(false);
 
-	setLoading = (isLoading) => {
-		this.setState({ requesting: isLoading });
+	const { handleSubmit, control, formState, setError } = useForm({
+		mode: 'onSubmit',
+	});
+
+	const { errors } = formState;
+
+	const handleForget = () => {
+		setProcessing(true);
+		console.debug('hello3', errors);
+
+		const isValid = async (data) => {
+			const { email } = data;
+			try {
+				const response = await Helpers.request('forgot', { email });
+				const { error } = response;
+
+				if (error) throw error;
+				navigation.navigate('ForgotPasswordCode', { email });
+			} catch (error) {
+				console.debug(error);
+				setError('email', error);
+			}
+			setProcessing(false);
+		};
+
+		const isErrored = (data) => {
+			console.debug('dadas', errors);
+			setProcessing(false);
+		};
+		handleSubmit(isValid, isErrored)();
 	};
 
-	setError = (error) => {
-		this.setState({ requestError: error });
-	};
+	return (
+		<View style={Styles.container}>
+			<View style={Styles.inner}>
+				<Text style={Styles.header}>What's your e-mail?</Text>
 
-	resetPassword = () => {
-		this.setLoading(true);
-		try {
-			Helpers.request('forgot', {
-				email: this.state.emailInput,
-			})
-				.then((json) => {
-					let error = '';
-					if (json.error) {
-						error = json.error.message;
-						this.setError(error);
-					} else {
-						this.navigation.navigate('ForgotPasswordCode', {
-							email: this.state.emailInput,
-						});
-					}
-				})
-				.catch((e) => {
-					this.setError(e);
-				})
-				.finally(() => {
-					this.setLoading(false);
-				});
-		} catch (e) {
-			this.setError(e.message);
-			this.setLoading(false);
-		}
-	};
-
-	render() {
-		return (
-			<View style={BaseStyles.container}>
 				<View style={Styles.formContainer}>
-					<Text style={Styles.header}>What's your e-mail?</Text>
-
-					<View style={Styles.content_container}>
-						<FormError errors={this.state.requestError} />
-						<TextField
-							icon={['fal', 'envelope']}
-							placeholder="Your e-mail address"
-							value={this.state.emailInput}
-							onChangeText={(data) =>
-								this.setState({ emailInput: data })
-							}
+					<FieldWrapper
+						error={errors?.email?.message}
+						editingMode
+						icon={['fal', 'envelope']}>
+						<FormTextField
+							name="email"
+							placeholder="E-mail"
+							control={control}
+							enabled={!processing}
 						/>
-						<ActivityButton
-							showActivity={this.state.requesting}
-							onPress={this.resetPassword}
-							text="Reset My Password!"
-						/>
-					</View>
+					</FieldWrapper>
+					<ActivityButton
+						showActivity={processing}
+						onPress={() => {
+							console.debug('hello2');
+							handleForget()
+						}}
+						text="Reset My Password!"
+					/>
 				</View>
 			</View>
-		);
-	}
-}
+		</View>
+	);
+};
+
+export default ForgotPassword;
