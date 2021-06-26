@@ -2,7 +2,7 @@ import React from 'react';
 import {
 	ActivityIndicator,
 	Text,
-	TouchableWithoutFeedback,
+	TouchableHighlight,
 	View,
 	StyleSheet,
 } from 'react-native';
@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 
 const Styles = StyleSheet.create({
 	button: {
-		borderRadius: 4,
+		borderRadius: 8,
 		flex: 0,
 		flexDirection: 'row',
 		backgroundColor: '#5cb85c',
@@ -47,7 +47,7 @@ const ActivityButton = ({
 	styles.push(style);
 
 	return (
-		<TouchableWithoutFeedback
+		<TouchableHighlight
 			onPress={!showActivity && !disabled ? onPress : null}>
 			<View style={styles}>
 				<Text style={[Styles.text, textStyle]}>{text}</Text>
@@ -59,7 +59,7 @@ const ActivityButton = ({
 					/>
 				)}
 			</View>
-		</TouchableWithoutFeedback>
+		</TouchableHighlight>
 	);
 };
 
