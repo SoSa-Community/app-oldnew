@@ -21,14 +21,13 @@ const buttonStyle = (size) => {
 
 const FloatingIconButton = ({ icon, onPress, size, style, containerStyle }) => {
 	return (
-		<View style={[buttonStyle(size), containerStyle]}>
-			<IconButton
-				icon={icon}
-				style={[{ color: '#fff' }, style]}
-				size={size}
-				onPress={onPress}
-			/>
-		</View>
+		<IconButton
+			icon={icon}
+			style={[{ color: '#fff' }, style]}
+			size={size}
+			containerStyle={[buttonStyle(size), containerStyle]}
+			onPress={onPress}
+		/>
 	);
 };
 
