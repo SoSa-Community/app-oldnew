@@ -35,10 +35,17 @@ const Styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	
 });
 
-const ProfilePicture = ({ picture, onPress, size, style, containerStyle, button, loading }) => {
+const ProfilePicture = ({
+	picture,
+	onPress,
+	size,
+	style,
+	containerStyle,
+	button,
+	loading,
+}) => {
 	const imageComponent = () => {
 		const image = () => {
 			if (typeof picture === 'string' || typeof picture === 'object') {

@@ -62,9 +62,10 @@ const ProfileHeader = ({
 	isEditable,
 	onEdit,
 	editingMode,
-	loading
+	loading,
+	changeProfilePicture,
+	changeCoverPicture,
 }) => {
-	
 	const handleCancel = () => {
 		if (typeof onCancel === 'function') onCancel();
 	};
@@ -152,7 +153,7 @@ const ProfileHeader = ({
 				{isEditable && !loading ? (
 					<FloatingIconButton
 						size={18}
-						onPress={() => {}}
+						onPress={() => changeCoverPicture()}
 						containerStyle={Styles.coverCameraButton}
 					/>
 				) : (
@@ -165,7 +166,14 @@ const ProfileHeader = ({
 					<ProfilePicture
 						picture={profilePicture}
 						size="verylarge"
-						button={isEditable ? { size: 20 } : null}
+						button={
+							isEditable
+								? {
+										size: 20,
+										onPress: () => changeProfilePicture(),
+								  }
+								: null
+						}
 						loading={loading}
 					/>
 				</View>
