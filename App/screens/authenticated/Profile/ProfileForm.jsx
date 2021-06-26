@@ -31,7 +31,16 @@ const Styles = StyleSheet.create({
 	privacyButtonIcon: { color: '#FFF' },
 });
 
-const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
+const ProfileForm = ({
+	genders,
+	profile,
+	loading,
+	onSave,
+	onCancel,
+	changeProfilePicture,
+	changeCoverPicture,
+	isMine,
+}) => {
 	const [editingMode, setEditingMode] = useState(false);
 	const [resetValues, setResetValues] = useState({});
 	const [formValues, setFormValues] = useState({
@@ -50,7 +59,7 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 		mode: 'onSubmit',
 	});
 
-	const { errors } = formState;
+	const { errors, dirtyFields } = formState;
 
 	const updateFromEntity = (entity) => {
 		const keys = Object.keys(formValues);
@@ -63,6 +72,7 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 		});
 
 		setFormValues(newFormValues);
+		reset(newFormValues);
 	};
 
 	const handleEdit = () => {
@@ -73,18 +83,33 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 	const handleCancel = () => {
 		setEditingMode(false);
 		reset(resetValues);
-		console.debug(resetValues);
+		onCancel(resetValues);
 	};
 
 	const handleSave = () => {
 		return new Promise((resolve, reject) => {
 			const isValid = async (data) => {
-				console.debug(data);
-				setEditingMode(false);
-				await performSave(data);
+				const dirty = {};
 
-				updateFromEntity(data);
-				resolve(data);
+				for (const key in dirtyFields) {
+					if (
+						dirtyFields[key] &&
+						Object.hasOwnProperty.call(data, key)
+					) {
+						dirty[key] = data[key];
+					}
+				}
+
+				setEditingMode(false);
+				try {
+					await onSave(data, dirty);
+
+					updateFromEntity(dirty);
+					resolve(data);
+				} catch (e) {
+					console.debug(e);
+					reject();
+				}
 			};
 
 			const isErrored = (data) => {
@@ -136,6 +161,8 @@ const ProfileForm = ({ genders, profile, loading, performSave, isMine }) => {
 				onCancel={handleCancel}
 				onEdit={handleEdit}
 				onSave={handleSave}
+				changeCoverPicture={changeCoverPicture}
+				changeProfilePicture={changeProfilePicture}
 			/>
 
 			<View style={{ paddingHorizontal: 14, marginTop: 12 }}>
@@ -280,7 +307,8 @@ ProfileForm.propTypes = {
 	genders: PropTypes.array,
 	profile: PropTypes.object,
 	loading: PropTypes.bool,
-	performSave: PropTypes.func,
+	onSave: PropTypes.func,
+	onCancel: PropTypes.func,
 	isMine: PropTypes.bool,
 };
 
@@ -288,7 +316,8 @@ ProfileForm.defaultProps = {
 	genders: [],
 	profile: {},
 	loading: false,
-	performSave: () => {},
+	onSave: () => {},
+	onCancel: () => {},
 	isMine: false,
 };
 
