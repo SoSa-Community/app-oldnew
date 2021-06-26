@@ -21,19 +21,32 @@ const ProfileProvider = (props) => {
 	};
 
 	useEffect(() => {
-		if (user) {
-			LocalStorage.retrieve('profile', true)
-				.then((retrievedProfile) =>
-					updateProfile(retrievedProfile, false),
-				)
-				.catch((e) => {
-					profileService
-						.mine()
-						.then((retrievedProfile) =>
-							updateProfile(retrievedProfile),
-						);
-				});
-		}
+		(async () => {
+			if (user) {
+				let retrievedProfile;
+				let save = true;
+
+				try {
+					retrievedProfile = await LocalStorage.retrieve(
+						'profile',
+						true,
+					);
+					save = false;
+				} catch (e) {
+					console.debug('e', e);
+				}
+
+				if (!retrievedProfile) {
+					try {
+						retrievedProfile = await profileService.mine();
+					} catch (error) {
+						console.debug('err', e);
+					}
+				}
+
+				updateProfile(retrievedProfile, save);
+			}
+		})();
 	}, [user]);
 
 	return <ProfileContext.Provider value={{ profile }} {...props} />;
