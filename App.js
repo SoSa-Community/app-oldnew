@@ -1,6 +1,12 @@
-import { STORYBOOK_MODE } from '@env';
-import StoryBook from './storybook';
 import React from 'react';
+import { STORYBOOK_MODE } from '@env';
+
+// temp fix for the promise.finally
+// https://github.com/storybookjs/storybook/issues/8371
+const fn = Promise.prototype.finally;
+//import StoryBook from './storybook';
+Promise.prototype.finally = fn;
+
 import { View } from 'react-native';
 import SoSa from './App/SoSa';
 
@@ -9,7 +15,13 @@ import { AppProvider } from './App/context/AppContext';
 import { AuthProvider } from './App/context/AuthContext';
 
 const App = () => {
-	if (STORYBOOK_MODE) return <View style={{backgroundColor: '#2D2F30', flex:1}}><StoryBook /></View> ;
+	if (STORYBOOK_MODE === 'true') {
+		return (
+			<View style={{ backgroundColor: '#2D2F30', flex: 1 }}>
+				<StoryBook />
+			</View>
+		);
+	}
 	return (
 		<AppProvider>
 			<APIProvider>
