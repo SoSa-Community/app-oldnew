@@ -1,35 +1,16 @@
 import React, { useEffect } from 'react';
 import { View, TouchableHighlight, StyleSheet, Text } from 'react-native';
-import FastImage from 'react-native-fast-image';
 
-import { useAuthenticatedNavigation } from '../context/AuthenticatedNavigationContext';
-import SettingsItem from '../components/SettingsItem';
+import { useAuthenticatedNavigation } from '../../../context/AuthenticatedNavigationContext';
+import SettingsItem from '../../../components/SettingsItem';
+import { useAuth } from '../../../context/AuthContext';
+import Button from '../../../components/Button/Button';
 
-const Styles = StyleSheet.create({
-	topContainer: {
-		flex: 0,
-		alignItems: 'center',
-		marginVertical: '5%',
-	},
+const Styles = StyleSheet.create({});
 
-	picture: {
-		width: 128,
-		height: 128,
-		borderRadius: 128 / 2,
-		borderWidth: 0.25,
-		borderColor: '#121111',
-		marginRight: 8,
-	},
-
-	username: {
-		fontSize: 22,
-		marginTop: 6,
-	},
-});
-
-const nickname = '';
 const SettingsScreen = () => {
 	const { setMenuOptions } = useAuthenticatedNavigation();
+	const { logout } = useAuth();
 
 	useEffect(() => {
 		setMenuOptions({
@@ -42,20 +23,6 @@ const SettingsScreen = () => {
 
 	return (
 		<View style={{ flex: 1 }}>
-			<View style={Styles.topContainer}>
-				<TouchableHighlight>
-					<FastImage
-						style={Styles.picture}
-						source={{
-							uri: `https://picsum.photos/300/300?seed=${Math.random()}`,
-						}}
-						resizeMethod="resize"
-						resizeMode="stretch"
-					/>
-				</TouchableHighlight>
-				<Text style={Styles.username}>{nickname}</Text>
-			</View>
-
 			<View style={{ flex: 1 }}>
 				<SettingsItem
 					title="Show Profile On Touch"
@@ -77,6 +44,9 @@ const SettingsScreen = () => {
 					description="Some people like separators, some people don't"
 					name="chat:show_separators"
 				/>
+				<View style={{ alignItems: 'center', marginTop: 16 }}>
+					<Button onPress={() => logout()} text="Logout" />
+				</View>
 			</View>
 		</View>
 	);

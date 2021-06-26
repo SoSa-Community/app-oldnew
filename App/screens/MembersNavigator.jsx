@@ -20,13 +20,14 @@ import MeetupScreen from './authenticated/Meetups/Meetup';
 
 import ChatScreen from './authenticated/Chat/Chat';
 import CreateMeetupScreen from './authenticated/Meetups/CreateMeetup';
-import MyProfileScreen from './authenticated/Profile/MyProfile.old';
+import MyProfileScreen from './authenticated/Profile/MyProfile';
 import WelcomeScreen from './authenticated/Welcome/Welcome';
-import SettingsScreen from './Settings';
+import SettingsScreen from './authenticated/Settings/Settings';
 
 import ProfileModal from '../components/ProfileModal';
 
 import BaseStyles from './styles/base';
+import ProfilePicture from '../components/ProfilePicture/ProfilePicture';
 const Stack = createStackNavigator();
 
 const Styles = StyleSheet.create({
@@ -128,13 +129,6 @@ const MembersNavigator = ({
 		closeLeftDrawer();
 	};
 
-	if (isLoading)
-		return (
-			<View>
-				<Text>Loading</Text>
-			</View>
-		);
-
 	useEffect(() => {
 		if (firstRun) {
 			setStackNavigation(stackNavigation);
@@ -162,32 +156,28 @@ const MembersNavigator = ({
 	}, [firstRun]);
 
 	useEffect(() => {
-		if (profile) {
-			updateDrawerItem(
-				'options',
-				<View style={Styles.menuFooterButtons} key={'options'}>
-					<TouchableOpacity
-						onPress={showMyProfile}
-						style={[Styles.pictureButton, Styles.menuFooterButton]}>
-						<FastImage
-							source={{ uri: profile?.picture }}
-							style={Styles.picture}
-						/>
-					</TouchableOpacity>
-					<FooterButton
-						onPress={showSettings}
-						icon={['fal', 'cogs']}
-					/>
-					<FooterButton
-						onPress={() => logout()}
-						icon={['fal', 'sign-out-alt']}
-					/>
-				</View>,
-				false,
-				true,
-			);
-		}
+		updateDrawerItem(
+			'options',
+			<View style={Styles.menuFooterButtons} key={'options'}>
+				<ProfilePicture
+					picture={profile?.picture}
+					onPress={showMyProfile}
+					containerStyle={Styles.menuFooterButton}
+				/>
+				<FooterButton onPress={showSettings} icon={['fal', 'cogs']} />
+			</View>,
+			false,
+			true,
+		);
 	}, [profile]);
+
+	if (isLoading) {
+		return (
+			<View>
+				<Text>Loading</Text>
+			</View>
+		);
+	}
 
 	return (
 		<View style={BaseStyles.container}>

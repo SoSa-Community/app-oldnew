@@ -101,9 +101,24 @@ const RegistrationScreen = () => {
 						onPress={handleRegister}
 						text="Let me in!"
 					/>
-					
-					<Text style={{textAlign:'center', paddingTop: 16, color:'#8a8a8a', fontSize: 16}}>OR</Text>
-					<Text style={{textAlign:'center', color:'#fff', fontSize: 16}}>Register with another account</Text>
+
+					<Text
+						style={{
+							textAlign: 'center',
+							paddingTop: 16,
+							color: '#8a8a8a',
+							fontSize: 16,
+						}}>
+						OR
+					</Text>
+					<Text
+						style={{
+							textAlign: 'center',
+							color: '#fff',
+							fontSize: 16,
+						}}>
+						Register with another account
+					</Text>
 
 					<SocialButtons
 						{...{
