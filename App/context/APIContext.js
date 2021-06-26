@@ -60,11 +60,14 @@ class StaticClient {
 						});
 					},
 					reauth: () => validateSession(),
-					authFailed: () => {
-						middleware
-							.trigger('logout', 'authentication_failed')
-							.finally(() => resolve('authentication_failed'));
-					},
+					authFailed: () =>
+						new Promise((resolve, reject) => {
+							middleware
+								.trigger('logout', 'authentication_failed')
+								.finally(() =>
+									resolve('authentication_failed'),
+								);
+						}),
 				},
 			);
 		}
