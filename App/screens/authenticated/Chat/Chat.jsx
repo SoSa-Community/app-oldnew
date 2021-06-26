@@ -66,13 +66,10 @@ const ChatScreen = ({ navigation, showMemberProfile }) => {
 	const [uploadedImages, setUploadedImages] = useState([]);
 	const [rooms, setRooms] = useState([]);
 	const [scrolling, setScrolling] = useState(true);
-	const [
-		newMessagesNotificationVisible,
-		setNewMessagesNotificationVisible,
-	] = useState(false);
-	const [slowDownNotifierVisible, setSlowDownNotifierVisible] = useState(
-		false,
-	);
+	const [newMessagesNotificationVisible, setNewMessagesNotificationVisible] =
+		useState(false);
+	const [slowDownNotifierVisible, setSlowDownNotifierVisible] =
+		useState(false);
 
 	const [currentRoom, setCurrentRoom] = useState(null);
 	const [canSend, setCanSend] = useState(true);
@@ -577,10 +574,12 @@ const ChatScreen = ({ navigation, showMemberProfile }) => {
 			generalService,
 			community,
 			(uploading) => setUploading(uploading),
-			({ uri, fileName, type, data }) => {
-				image.image = `data:${type};base64,${data}`;
-				updateState();
-			},
+			({ uri, fileName, type, data }) =>
+				new Promise((resolve) => {
+					image.image = `data:${type};base64,${data}`;
+					updateState();
+					resolve();
+				}),
 		)
 			.then(({ uris, tag, uuid }) => {
 				image.uri = uris[0];

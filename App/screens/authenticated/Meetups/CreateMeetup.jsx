@@ -187,10 +187,12 @@ const CreateMeetupScreen = ({ navigation }) => {
 			generalService,
 			'sosa',
 			(uploading) => setUploading(uploading),
-			({ uri, fileName, type, data }) => {
-				setPreviousImage(image);
-				setImage(`data:${type};base64,${data}`);
-			},
+			({ type, data }) =>
+				new Promise((resolve) => {
+					setPreviousImage(image);
+					setImage(`data:${type};base64,${data}`);
+					resolve();
+				}),
 		)
 			.then(({ uris, tag, uuid }) => {
 				if (Array.isArray(uris)) {

@@ -109,7 +109,7 @@ export class GeneralProvider extends RequestProvider {
 								if (_id) hooks.trigger(packet);
 							}
 
-							return middleware.trigger(`event`, packet);
+							return middleware.trigger('event', packet);
 						},
 						connect: (socket) => {
 							const {

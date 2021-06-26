@@ -97,7 +97,6 @@ export default class Helpers {
 	) => {
 		return new Promise((resolve, reject) => {
 			if (typeof isUploading !== 'function') isUploading = () => {};
-			if (typeof beforeUpload !== 'function') beforeUpload = () => {};
 
 			const fileTooBigError = () => {
 				isUploading(false);
@@ -108,36 +107,39 @@ export default class Helpers {
 
 			const { maxFileSize } = AppConfig;
 
-			const doUpload = (file) => {
+			const doUpload = async (file) => {
 				isUploading(true);
-				generalService
-					.handleUpload(communityId, file)
-					.then(resolve)
-					.catch((errors) => {
-						console.info('App::UploadFile::error', errors);
 
-						const code = errors?.message?.Code;
-						let title = 'Error uploading image';
-						let message = '';
+				try {
+					const response = await generalService.handleUpload(
+						communityId,
+						file,
+					);
+					resolve(response);
+				} catch (errors) {
+					console.info('App::UploadFile::error', errors);
 
-						if (Array.isArray(code)) {
-							if (code[0] === 'EntityTooLarge') {
-								return fileTooBigError();
-							} else {
-								message = 'Invalid image';
-							}
+					const code = errors?.message?.Code;
+					let title = 'Error uploading image';
+					let message = '';
+
+					if (Array.isArray(code)) {
+						if (code[0] === 'EntityTooLarge') {
+							return fileTooBigError();
 						} else {
-							message = errors?.message;
+							message = 'Invalid image';
 						}
+					} else {
+						message = errors?.message;
+					}
 
-						if (message.length && message !== 'user_cancelled')
-							createModal(title, message);
+					if (message.length && message !== 'user_cancelled')
+						createModal(title, message);
 
-						reject(errors);
-					})
-					.finally(() => {
-						isUploading(false);
-					});
+					reject(errors);
+				} finally {
+					isUploading(false);
+				}
 			};
 
 			let options = {
@@ -149,14 +151,19 @@ export default class Helpers {
 				},
 			};
 
-			ImagePicker.launchImageLibrary(options, (response) => {
-				if (response.didCancel) {
-					reject(new Error('user_cancelled'));
-				} else if (response.error) {
-					reject(response.error);
-				} else if (response.customButton) {
-					reject(new Error('custom_button'));
-				} else {
+			ImagePicker.showImagePicker(options, async (response) => {
+				if (response.didCancel)
+					return reject(new Error('user_cancelled'));
+				if (response.error) return reject(response.error);
+				if (response.customButton)
+					return reject(new Error('custom_button'));
+
+				if (Math.floor(response?.fileSize / 1024) > maxFileSize)
+					return fileTooBigError();
+
+				try {
+					if (beforeUpload) await beforeUpload(response);
+
 					let {
 						uri,
 						fileName,
@@ -167,17 +174,20 @@ export default class Helpers {
 						width,
 						originalRotation,
 					} = response;
-					if (Math.floor(fileSize / 1024) > maxFileSize)
-						return fileTooBigError();
 
-					beforeUpload(response);
 					if (!fileName) {
 						const uriSplit = uri.split('/');
 						fileName = uriSplit[uriSplit.length - 1];
 					}
 
-					const file = { uri, type, name: fileName };
-					doUpload(file);
+					try {
+						const file = { uri, type, name: fileName };
+						await doUpload(file);
+					} catch (e) {
+						reject(e);
+					}
+				} catch (e) {
+					console.debug(e);
 				}
 			});
 		});
