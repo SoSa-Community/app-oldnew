@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import {
-	View,
-	StyleSheet
-} from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
 import { useAPI } from '../../../context/APIContext';
@@ -87,18 +84,31 @@ const MyProfileScreen = ({ navigation }) => {
 	);
 
 	const uploadImage = async (field) => {
-		const { uris, tag, uuid } = await Helpers.uploadFile(
-			modals?.create,
-			generalService,
-			'sosa',
-			(uploading) => {},
-			(response) => new Promise((resolve) => resolve()),
-		);
+		try {
+			const options = {
+				handleUpload: (file) => {
+					setIsLoading(true);
+					return generalService.handleUpload('sosa', file);
+				},
+				cropperToolbarTitle: 'Crop your picture',
+				cropping: true,
+				croppingHeight: field === 'picture' ? 600 : 1080,
+				croppingWidth: field === 'picture' ? 600 : 1920,
+			};
 
-		console.debug(uris, tag, uuid);
-		if (Array.isArray(uris)) {
-			const toSave = { [field]: uris.pop() };
-			await saveProfile(toSave, toSave);
+			const { uris, tag, uuid } = await Helpers.uploadFile(options);
+
+			if (Array.isArray(uris)) {
+				const toSave = { [field]: uris.pop() };
+				await saveProfile(toSave, toSave);
+			}
+		} catch (e) {
+			const message = Array.isArray(e) ? e.pop()?.message : e?.message;
+			if (message !== 'user_cancelled') {
+				modals?.create('Error uploading image', message);
+			}
+		} finally {
+			setIsLoading(false);
 		}
 	};
 

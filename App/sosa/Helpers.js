@@ -1,8 +1,10 @@
 import { Alert } from 'react-native';
-import ImagePicker from 'react-native-image-picker';
+import ImageCropPicker, { openCamera } from 'react-native-image-crop-picker';
 
 import APIError from './APIError';
 import AppConfig from '../config';
+import { SoSaError } from '../services/API/entities/SoSaError';
+import BottomSheet from 'react-native-bottomsheet';
 
 export default class Helpers {
 	static generateRand = () => {
@@ -88,33 +90,27 @@ export default class Helpers {
 		return atob(input.replace(/[^A-Za-z0-9\+\/\=]/g, ''));
 	}
 
-	static uploadFile = (
-		createModal,
-		generalService,
-		communityId,
-		isUploading,
+	static uploadFile = ({
+		handleUpload,
 		beforeUpload,
-	) => {
-		return new Promise((resolve, reject) => {
-			if (typeof isUploading !== 'function') isUploading = () => {};
-
+		title = 'Crop photo',
+		mediaType = 'photo',
+		cropping = false,
+		croppingHeight = 600,
+		croppingWidth = 600,
+	}) => {
+		return new Promise(async (resolve, reject) => {
 			const fileTooBigError = () => {
-				isUploading(false);
-				const title = "Ooops! that's a bit too big!";
-				const message = 'The max image size is 10mb';
-				createModal(title, message);
+				reject(
+					new SoSaError('file_to_big', 'The max image size is 10mb'),
+				);
 			};
 
 			const { maxFileSize } = AppConfig;
 
 			const doUpload = async (file) => {
-				isUploading(true);
-
 				try {
-					const response = await generalService.handleUpload(
-						communityId,
-						file,
-					);
+					const response = await handleUpload(file);
 					resolve(response);
 				} catch (errors) {
 					console.info('App::UploadFile::error', errors);
@@ -133,63 +129,82 @@ export default class Helpers {
 						message = errors?.message;
 					}
 
-					if (message.length && message !== 'user_cancelled')
-						createModal(title, message);
-
-					reject(errors);
-				} finally {
-					isUploading(false);
+					if (message.length && message !== 'user_cancelled') {
+						reject(new SoSaError(message, message));
+					} else {
+						reject(errors);
+					}
 				}
 			};
 
-			let options = {
-				title: 'Upload',
-				takePhotoButtonTitle: 'Take a Photo',
-				chooseFromLibraryButtonTitle: 'Select From Gallery',
-				storageOptions: {
-					skipBackup: true,
-				},
-			};
+			try {
+				const options = {
+					cropperToolbarTitle: title,
+					avoidEmptySpaceAroundImage: true,
+					mediaType,
+					cropping,
+					includeBase64: true
+				};
 
-			ImagePicker.showImagePicker(options, async (response) => {
-				if (response.didCancel)
-					return reject(new Error('user_cancelled'));
-				if (response.error) return reject(response.error);
-				if (response.customButton)
-					return reject(new Error('custom_button'));
-
-				if (Math.floor(response?.fileSize / 1024) > maxFileSize)
-					return fileTooBigError();
-
-				try {
-					if (beforeUpload) await beforeUpload(response);
-
-					let {
-						uri,
-						fileName,
-						fileSize,
-						type,
-						data,
-						height,
-						width,
-						originalRotation,
-					} = response;
-
-					if (!fileName) {
-						const uriSplit = uri.split('/');
-						fileName = uriSplit[uriSplit.length - 1];
-					}
-
-					try {
-						const file = { uri, type, name: fileName };
-						await doUpload(file);
-					} catch (e) {
-						reject(e);
-					}
-				} catch (e) {
-					console.debug(e);
+				if (cropping) {
+					options.width = croppingWidth;
+					options.height = croppingHeight;
 				}
-			});
+
+				BottomSheet.showBottomSheetWithOptions(
+					{
+						options: ['Camera', 'Phone'],
+						title: 'Where from?',
+						dark: true,
+						cancelButtonIndex: 3,
+					},
+					async (value) => {
+						const response = await ImageCropPicker[
+							value ? 'openPicker' : 'openCamera'
+						](options);
+
+						if (Math.floor(response?.size / 1024) > maxFileSize)
+							return fileTooBigError();
+
+						try {
+							if (beforeUpload) await beforeUpload(response);
+
+							let {
+								path,
+								filename,
+								mime,
+								data,
+								height,
+								width,
+								exif,
+								duration,
+							} = response;
+
+							if (!filename) {
+								const uriSplit = path.split('/');
+								filename = uriSplit[uriSplit.length - 1];
+							}
+
+							try {
+								const file = {
+									uri: path,
+									type: mime,
+									name: filename,
+								};
+								await doUpload(file);
+							} catch (e) {
+								reject(e);
+							}
+						} catch (e) {
+							console.debug(e);
+						}
+					},
+				);
+			} catch (e) {
+				if (e?.message === 'User cancelled image selection')
+					e.message = 'user_cancelled';
+				reject(e);
+			}
 		});
 	};
 
