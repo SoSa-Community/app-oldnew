@@ -181,25 +181,38 @@ const CreateMeetupScreen = ({ navigation }) => {
 			.finally(() => setSaving(false));
 	};
 
-	const uploadPicture = () => {
-		Helpers.uploadFile(
-			modals?.create,
-			generalService,
-			'sosa',
-			(uploading) => setUploading(uploading),
-			({ type, data }) =>
+	const uploadPicture = async () => {
+		const options = {
+			handleUpload: (file) => {
+				setUploading(true);
+				return generalService.handleUpload('sosa', file);
+			},
+			beforeUpload: ({ mime, data }) =>
 				new Promise((resolve) => {
 					setPreviousImage(image);
-					setImage(`data:${type};base64,${data}`);
+					setImage(`data:${mime};base64,${data}`);
 					resolve();
 				}),
-		)
-			.then(({ uris, tag, uuid }) => {
-				if (Array.isArray(uris)) {
-					setImageURI(uris.pop());
-				}
-			})
-			.catch((error) => setImage(previousImage));
+			cropperToolbarTitle: 'Crop your picture',
+			cropping: true,
+			croppingHeight: 1080,
+			croppingWidth: 1920,
+		};
+
+		try {
+			const { uris, tag, uuid } = await Helpers.uploadFile(options);
+			if (Array.isArray(uris)) {
+				setImageURI(uris.pop());
+			}
+		} catch (e) {
+			setImage(previousImage);
+			const message = Array.isArray(e) ? e.pop()?.message : e?.message;
+			if (message !== 'user_cancelled') {
+				modals?.create('Error uploading image', message);
+			}
+		} finally {
+			setUploading(false);
+		}
 	};
 
 	let source = {};

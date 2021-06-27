@@ -547,7 +547,7 @@ const ChatScreen = ({ navigation, showMemberProfile }) => {
 		);
 	};
 
-	const handleUpload = () => {
+	const handleUpload = async () => {
 		let image = {
 			id: Helpers.generateId(),
 			uri: '',
@@ -569,32 +569,39 @@ const ChatScreen = ({ navigation, showMemberProfile }) => {
 			setUploadedImages(images);
 		};
 
-		Helpers.uploadFile(
-			modals.create,
-			generalService,
-			community,
-			(uploading) => setUploading(uploading),
-			({ uri, fileName, type, data }) =>
+		const options = {
+			handleUpload: (file) => {
+				setUploading(true);
+				return generalService.handleUpload(community, file);
+			},
+			beforeUpload: ({ mime, data }) =>
 				new Promise((resolve) => {
-					image.image = `data:${type};base64,${data}`;
+					image.image = `data:${mime};base64,${data}`;
 					updateState();
 					resolve();
 				}),
-		)
-			.then(({ uris, tag, uuid }) => {
-				image.uri = uris[0];
-				image.percentage = 100;
-				updateState();
-			})
-			.catch((error) => {
-				const index = uploadedImages.indexOf(image);
-				if (index !== -1) {
-					const images = [...uploadedImages];
-					images.splice(index, 1);
-					setUploadedImages(images);
-				}
-			})
-			.finally(() => setUploading(false));
+		};
+
+		try {
+			const { uris, tag, uuid } = await Helpers.uploadFile(options);
+			image.uri = uris[0];
+			image.percentage = 100;
+			updateState();
+		} catch (e) {
+			const message = Array.isArray(e) ? e.pop()?.message : e?.message;
+			const index = uploadedImages.indexOf(image);
+			if (index !== -1) {
+				const images = [...uploadedImages];
+				images.splice(index, 1);
+				setUploadedImages(images);
+			}
+
+			if (message !== 'user_cancelled') {
+				modals?.create('Error uploading image', message);
+			}
+		} finally {
+			setUploading(false);
+		}
 	};
 
 	useEffect(() => {
