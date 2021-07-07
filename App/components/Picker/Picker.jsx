@@ -65,7 +65,7 @@ const Picker = forwardRef(
 			return found ? found.label : selectedValue;
 		};
 
-		const picker = () => {
+		const Picker = () => {
 			const items = options.map(({ label, value }) => (
 				<RNPicker.Item label={label} value={value} key={value} />
 			));
@@ -110,7 +110,7 @@ const Picker = forwardRef(
 			return <Text style={[Styles.label, textStyle]}>{text}</Text>;
 		}
 
-		if (Platform.OS !== 'ios') return picker();
+		if (Platform.OS !== 'ios') return <Picker />;
 		else {
 			return (
 				<PickerModal
@@ -122,7 +122,7 @@ const Picker = forwardRef(
 					onCancel={() => setShowPicker(false)}
 					onConfirm={() => doChange(tempPickerValue)}
 					textStyle={textStyle}>
-					{picker()}
+					<Picker />
 				</PickerModal>
 			);
 		}
