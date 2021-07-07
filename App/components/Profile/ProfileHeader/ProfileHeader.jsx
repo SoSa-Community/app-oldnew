@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
 	TouchableOpacity,
 	StyleSheet,
 	View,
-	Image,
 	ImageBackground,
 	Text,
 } from 'react-native';
 import PropTypes from 'prop-types';
 
-import IconButton from '../IconButton';
+import IconButton from '../../IconButton';
 import ProfilePicture from '../ProfilePicture/ProfilePicture';
-import FloatingIconButton from '../FloatingCameraButton/FloatingIconButton';
+import FloatingIconButton from '../../FloatingCameraButton/FloatingIconButton';
 
 const Styles = StyleSheet.create({
 	container: { flex: 0 },
@@ -65,6 +64,7 @@ const ProfileHeader = ({
 	loading,
 	changeProfilePicture,
 	changeCoverPicture,
+	hideSaveCancel,
 }) => {
 	const handleCancel = () => {
 		if (typeof onCancel === 'function') onCancel();
@@ -87,7 +87,7 @@ const ProfileHeader = ({
 	};
 
 	const cancelButton = () => {
-		if (isEditable && !loading) {
+		if (isEditable && !loading && !hideSaveCancel) {
 			if (editingMode) {
 				return (
 					<View style={[Styles.cancelColumn]}>
@@ -103,7 +103,7 @@ const ProfileHeader = ({
 	};
 
 	const saveButton = () => {
-		if (isEditable && !loading) {
+		if (isEditable && !loading && !hideSaveCancel) {
 			if (editingMode) {
 				return (
 					<View style={Styles.saveColumn}>
@@ -132,15 +132,20 @@ const ProfileHeader = ({
 		return <></>;
 	};
 
+	let parsedCoverPicture = require('../../../assets/profiles/cover.jpg');
+	if (coverPicture) {
+		if (typeof coverPicture === 'string' && coverPicture.length) {
+			parsedCoverPicture = { uri: coverPicture };
+		} else {
+			parsedCoverPicture = coverPicture;
+		}
+	}
+	
 	return (
 		<View style={Styles.container}>
 			<View style={Styles.coverContainer}>
 				<ImageBackground
-					source={
-						typeof coverPicture === 'string'
-							? { uri: coverPicture }
-							: coverPicture
-					}
+					source={parsedCoverPicture}
 					style={Styles.cover}>
 					{!loading && <View style={Styles.overlay} />}
 					{loading && (
@@ -198,15 +203,17 @@ ProfileHeader.propTypes = {
 	onSave: PropTypes.func,
 	isEditable: PropTypes.bool,
 	editingMode: PropTypes.bool,
+	hideSaveCancel: PropTypes.bool,
 };
 
 ProfileHeader.defaultProps = {
-	coverPicture: require('../../assets/profiles/cover.jpg'),
+	coverPicture: null,
 	profilePicture: undefined,
 	onCancel: () => {},
 	onSave: () => {},
 	isEditable: false,
 	editingMode: false,
+	hideSaveCancel: false,
 };
 
 export default ProfileHeader;

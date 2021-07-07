@@ -27,7 +27,8 @@ import SettingsScreen from './authenticated/Settings/Settings';
 import ProfileModal from '../components/ProfileModal';
 
 import BaseStyles from './styles/base';
-import ProfilePicture from '../components/ProfilePicture/ProfilePicture';
+import ProfilePicture from '../components/Profile/ProfilePicture/ProfilePicture';
+import WelcomeProfileScreen from './authenticated/Profile/WelcomeProfileScreen';
 const Stack = createStackNavigator();
 
 const Styles = StyleSheet.create({
@@ -220,6 +221,11 @@ const MembersNavigator = ({
 						name="MyProfile"
 						options={{ headerShown: false }}
 						component={MyProfileScreen}
+					/>
+					<Stack.Screen
+						name="WelcomeProfile"
+						options={{ headerShown: false }}
+						component={WelcomeProfileScreen}
 					/>
 					<Stack.Screen
 						name="Settings"

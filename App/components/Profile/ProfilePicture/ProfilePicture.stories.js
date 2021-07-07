@@ -3,10 +3,10 @@ import { storiesOf } from '@storybook/react-native';
 
 import React from 'react';
 
-import CenterView from '../../../storybook/stories/CenterView/index';
+import CenterView from '../../../../storybook/stories/CenterView';
 import ProfilePicture from './ProfilePicture';
 
-const defaultPicture = require(`../../assets/profiles/default.jpg`);
+const defaultPicture = require('../../../assets/profiles/default.jpg');
 
 storiesOf('Components/ProfilePicture', module)
 	.addDecorator((getStory) => <CenterView>{getStory()}</CenterView>)

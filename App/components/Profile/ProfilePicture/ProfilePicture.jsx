@@ -9,7 +9,7 @@ import {
 import PropTypes from 'prop-types';
 import FastImage from 'react-native-fast-image';
 
-import FloatingIconButton from '../FloatingCameraButton/FloatingIconButton';
+import FloatingIconButton from '../../FloatingCameraButton/FloatingIconButton';
 
 const createImageStyle = (size) => {
 	return { width: size, height: size, borderRadius: size / 2 };
@@ -48,23 +48,29 @@ const ProfilePicture = ({
 }) => {
 	const imageComponent = () => {
 		const image = () => {
-			if (typeof picture === 'string' || typeof picture === 'object') {
-				return (
-					<FastImage
-						style={[Styles[size], !onPress ? style : null]}
-						source={
-							typeof picture === 'string'
-								? { uri: picture }
-								: picture
-						}
-					/>
-				);
+			let processedPicture = require('../../../assets/profiles/default.jpg');
+
+			if (picture) {
+				if (typeof picture !== 'string' || !picture.length) {
+					processedPicture = picture;
+				} else {
+					return (
+						<FastImage
+							style={[Styles[size], !onPress ? style : null]}
+							source={
+								typeof picture === 'string'
+									? { uri: picture }
+									: picture
+							}
+						/>
+					);
+				}
 			}
 
 			return (
 				<Image
 					style={[Styles[size], !onPress ? style : null]}
-					source={picture}
+					source={processedPicture}
 				/>
 			);
 		};
@@ -140,7 +146,7 @@ ProfilePicture.propTypes = {
 ProfilePicture.defaultProps = {
 	size: 'base',
 	onPress: null,
-	picture: require(`../../assets/profiles/default.jpg`),
+	picture: require('../../../assets/profiles/default.jpg'),
 	containerStyle: null,
 	style: null,
 };
