@@ -6,8 +6,8 @@
 function loadStories() {
 	require('../App/components/FloatingCameraButton/FloatingIconButton.stories');
 	require('../App/components/FieldWrapper/FieldWrapper.stories');
-	require('../App/components/ProfileHeader/ProfileHeader.stories');
-	require('../App/components/ProfilePicture/ProfilePicture.stories');
+	require('../App/components/Profile/ProfileHeader/ProfileHeader.stories');
+	require('../App/components/Profile/ProfilePicture/ProfilePicture.stories');
 	require('../App/components/SocialButton/SocialButton.stories');
 	require('../App/screens/authenticated/Profile/MyProfile.stories');
 }

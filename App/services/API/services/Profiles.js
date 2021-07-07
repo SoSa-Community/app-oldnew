@@ -39,7 +39,9 @@ export class ProfileService {
 			.run()
 			.then(({ data }) => {
 				const { profile, options, widgets } = data;
-				const parsedProfile = Profile.fromJSON(profile);
+				let parsedProfile = null;
+
+				if (profile) parsedProfile = Profile.fromJSON(profile);
 
 				if (!forEditing) return parsedProfile;
 				else {
