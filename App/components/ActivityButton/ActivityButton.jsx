@@ -48,8 +48,9 @@ const ActivityButton = ({
 
 	return (
 		<TouchableHighlight
-			onPress={!showActivity && !disabled ? onPress : null}>
-			<View style={styles}>
+			onPress={!showActivity && !disabled ? onPress : null}
+			style={styles}>
+			<View>
 				<Text style={[Styles.text, textStyle]}>{text}</Text>
 				{showActivity && !disabled && (
 					<ActivityIndicator
