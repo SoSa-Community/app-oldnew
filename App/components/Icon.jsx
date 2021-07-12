@@ -40,7 +40,8 @@ import {
 	faCamera as falCamera,
 	faGift as falGift,
 	faMapMarkerAlt as falMapMarkerAlt,
-	faUserCheck as falUserCheck
+	faUserCheck as falUserCheck,
+	faMask as falMask,
 } from '@fortawesome/pro-light-svg-icons';
 
 import { faWifi as farWifi } from '@fortawesome/pro-regular-svg-icons';
@@ -84,6 +85,7 @@ library.add(
 	falGift,
 	falMapMarkerAlt,
 	falUserCheck,
+	falMask
 );
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';

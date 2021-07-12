@@ -1,6 +1,6 @@
 import { Platform, StyleSheet } from 'react-native';
 
-const backgroundColour1 = '#121211';
+const backgroundColour1 = '#2D2F30';
 const headerTextColour = '#fff';
 
 const BaseStyles = StyleSheet.create({

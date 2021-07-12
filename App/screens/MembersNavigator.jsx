@@ -99,9 +99,11 @@ const MembersNavigator = ({
 		update: updateDrawerItem,
 		closeLeftDrawer,
 		closeRightDrawer,
+		setTopbarVisible,
 	} = useAuthenticatedNavigation();
+
 	const { logout } = useAuth();
-	const { profile } = useProfile();
+	const { profile, isFetchingProfile } = useProfile();
 
 	const stackNavigation = useRef();
 
@@ -172,7 +174,7 @@ const MembersNavigator = ({
 		);
 	}, [profile]);
 
-	if (isLoading) {
+	if (isLoading || isFetchingProfile) {
 		return (
 			<View>
 				<Text>Loading</Text>
@@ -188,7 +190,9 @@ const MembersNavigator = ({
 				onStateChange={(state) => {
 					if (!state) return;
 				}}>
-				<Stack.Navigator initialRouteName="Chat">
+				<Stack.Navigator
+					initialRouteName={!profile ? 'WelcomeProfile' : 'Chat'}>
+
 					<Stack.Screen name="Chat" options={{ headerShown: false }}>
 						{(props) => (
 							<ChatScreen

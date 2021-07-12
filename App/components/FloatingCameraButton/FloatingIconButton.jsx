@@ -1,5 +1,4 @@
 import React from 'react';
-import { View } from 'react-native';
 import PropTypes from 'prop-types';
 import IconButton from '../IconButton';
 
@@ -35,7 +34,7 @@ FloatingIconButton.propTypes = {
 	icon: PropTypes.array,
 	size: PropTypes.number,
 	onPress: PropTypes.func,
-	style: PropTypes.object,
+	style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
 	containerStyle: PropTypes.object,
 };
 

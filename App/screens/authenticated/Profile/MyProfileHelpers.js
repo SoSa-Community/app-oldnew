@@ -32,7 +32,6 @@ const updateProfileState = (fields, setProfile, profile) => {
 };
 
 const saveProfile = async (data, dirty, profileService, setProfile) => {
-	console.debug(data, dirty);
 	if (Object.keys(dirty).length) {
 		try {
 			const updatedProfile = await profileService.save(dirty);

@@ -53,17 +53,14 @@ const NavigationHeader = forwardRef(({ ...props }, ref) => {
 	};
 	menuStack = [menuDefaults];
 
-	const {
-		toggleSwipe,
-		openLeftDrawer,
-		getStackNavigator,
-	} = useAuthenticatedNavigation();
+	const { toggleSwipe, openLeftDrawer, getStackNavigator } =
+		useAuthenticatedNavigation();
 
 	const [preferences, setPreferences] = useState({});
-	const [showTopBar, setShowTopBar] = useState(true);
 	const [menu, setMenu] = useState(menuDefaults);
 	const [leftMenu, setLeftMenu] = useState(<></>);
 	const [rightMenu, setRightMenu] = useState(<></>);
+	const [isVisible, setIsVisible] = useState(true);
 
 	const [headerIcons, dispatch] = useReducer((state, data) => {
 		const { action } = data;
@@ -168,13 +165,10 @@ const NavigationHeader = forwardRef(({ ...props }, ref) => {
 				menuStack.push(currentState);
 			}
 		},
-
 		popMenuStack,
+		isVisible,
+		setIsVisible
 	}));
-
-	if (!showTopBar) {
-		return <></>;
-	}
 
 	const {
 		title,
@@ -268,6 +262,10 @@ const NavigationHeader = forwardRef(({ ...props }, ref) => {
 			setRightMenu(<View style={Styles.menuTopRight}>{icons}</View>);
 		}
 	}, [showRight, headerIcons]);
+	
+	if (!isVisible) {
+		return <></>;
+	}
 
 	return (
 		<View style={Styles.menuTop}>
