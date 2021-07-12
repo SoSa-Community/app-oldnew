@@ -64,7 +64,7 @@ const DateTimePicker = forwardRef(
 	) => {
 		const [showPicker, setShowPicker] = useState(false);
 		const [tempPickerValue, setTempPickerValue] = useState(new Date());
-		const [selectedDate, setSelectedDate] = useState(new Date());
+		const [selectedDate, setSelectedDate] = useState(initialValue);
 		const formattedDate = !selectedDate
 			? ''
 			: moment(selectedDate).format(forTime ? 'hh:mm' : 'DD/MM/YYYY');
