@@ -16,7 +16,7 @@ import FormTextField from '../../../components/Forms/TextField/FormTextField';
 
 import PropTypes from 'prop-types';
 import IconButton from '../../../components/IconButton';
-import { handleSave } from './MyProfileHelpers';
+import { handleSave, updateFromEntity } from './MyProfileHelpers';
 
 const Styles = StyleSheet.create({
 	nicknameTaglineContainer: { justifyContent: 'center', marginBottom: 12 },
@@ -67,11 +67,11 @@ const ProfileForm = forwardRef(
 			current_location: '',
 			name: '',
 		});
-		
+
 		const form = useForm({
 			mode: 'onSubmit',
 		});
-		
+
 		const { control, formState, watch, reset } = form;
 		const { errors } = formState;
 
@@ -86,7 +86,10 @@ const ProfileForm = forwardRef(
 			onCancel(resetValues);
 		};
 
-		useImperativeHandle(ref, () => ({ handleSave }));
+		useImperativeHandle(ref, () => ({
+			handleSave: () =>
+				handleSave(form, onSave, formValues, setFormValues),
+		}));
 
 		const getGenderName = () => {
 			let name = '-';
@@ -116,7 +119,7 @@ const ProfileForm = forwardRef(
 		};
 
 		useEffect(() => {
-			if (profile) updateFromEntity(profile);
+			if (profile) updateFromEntity(profile, formValues, setFormValues, reset);
 			if (!useCustomSaveButton) setEditingMode(false);
 		}, [profile]);
 
@@ -138,7 +141,7 @@ const ProfileForm = forwardRef(
 							form,
 							onSave,
 							formValues,
-							setFormValues
+							setFormValues,
 						);
 						if (useCustomSaveButton) setEditingMode(false);
 						return data;
@@ -207,10 +210,11 @@ const ProfileForm = forwardRef(
 						<FieldWrapper
 							icon={['fal', 'gift']}
 							label={editingMode ? 'When were you born?' : 'Age'}
-							value={formValues?.age}
+							value={formValues?.age || '-'}
 							containerStyle={Styles.fieldContainerStyle}
 							editingMode={editingMode}
 							buttons={fieldButtons('age')}>
+							
 							<FormDateTimePicker
 								name="date_of_birth"
 								control={control}

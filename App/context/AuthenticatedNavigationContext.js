@@ -93,6 +93,8 @@ const AuthenticatedNavigationProvider = ({
 	const addHeaderIcon = (props) => topBar?.current?.addHeaderIcon(props);
 	const removeHeaderIcon = (id) => topBar?.current?.removeHeaderIcon(id);
 	const setHeaderIcons = (icons) => topBar?.current?.setHeaderIcons(icons);
+	const setTopbarVisible = (visible) =>
+		topBar?.current?.setIsVisible(visible);
 
 	const setMenuOptions = (options, justUpdate, resetOnBack) => {
 		topBar?.current?.setMenuOptions(options, justUpdate, resetOnBack);
@@ -130,6 +132,7 @@ const AuthenticatedNavigationProvider = ({
 				addHeaderIcon,
 				removeHeaderIcon,
 				setHeaderIcons,
+				setTopbarVisible,
 				popMenuStack,
 				setMenuOptions,
 				getStackNavigator: () => stackNavigation,

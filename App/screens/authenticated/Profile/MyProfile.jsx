@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -9,16 +9,16 @@ import { useApp } from '../../../context/AppContext';
 import ProfileForm from './ProfileForm';
 
 import { refreshProfile, saveProfile, uploadImage } from './MyProfileHelpers';
+import { useProfile } from '../../../context/ProfileContext';
 
 const Styles = StyleSheet.create({});
 
 const MyProfileScreen = ({ navigation }) => {
-	const firstTime = true;
-
 	const { setHeaderIcons, removeHeaderIcon, setMenuOptions } =
 		useAuthenticatedNavigation();
 
 	const { modals } = useApp();
+	const { updateProfile } = useProfile();
 	const {
 		services: { general: generalService, profiles: profileService },
 	} = useAPI();
@@ -34,11 +34,7 @@ const MyProfileScreen = ({ navigation }) => {
 			let isActive = true;
 			if (isActive) {
 				setEditingMode(false);
-				if (!firstTime) {
-					setMenuOptions({ leftMode: 'back', title: 'My Profile' });
-				} else {
-					setMenuOptions({ showLeft: false, title: 'Welcome' });
-				}
+				setMenuOptions({ leftMode: 'back', title: 'My Profile' });
 				refreshProfile(profileService, setGenders, setProfile);
 			}
 
@@ -47,6 +43,12 @@ const MyProfileScreen = ({ navigation }) => {
 			};
 		}, []),
 	);
+
+	useEffect(() => {
+		if (profile) {
+			updateProfile(profile, true);
+		}
+	}, [profile]);
 
 	return (
 		<View style={{ backgroundColor: '#2D2F30', flex: 1 }}>
