@@ -64,20 +64,39 @@ const DateTimePicker = forwardRef(
 	) => {
 		const [showPicker, setShowPicker] = useState(false);
 		const [tempPickerValue, setTempPickerValue] = useState(new Date());
-		const [selectedDate, setSelectedDate] = useState(initialValue);
+		const [selectedDate, setSelectedDate] = useState(null);
 		const formattedDate = !selectedDate
 			? ''
 			: moment(selectedDate).format(forTime ? 'hh:mm' : 'DD/MM/YYYY');
 
 		const getType = () => (forTime ? 'time' : 'date');
 
+		const convertValueToDateObject = (value) => {
+			let date = new Date(value);
+			if (
+				Object.prototype.toString.call(date) !== '[object Date]' ||
+				isNaN(date.getTime())
+			) {
+				date = new Date();
+			}
+
+			if (forTime && typeof value === 'string') {
+				const [hour, minutes] = value.split(':');
+				date.setHours(hour);
+				date.setMinutes(minutes);
+			}
+			return date;
+		};
+
 		const doChange = (data) => {
 			setShowPicker(false);
 
 			if (data) {
 				setSelectedDate(data);
-				const otherData = new Date(data.getTime());
-
+				let otherData = '';
+				if (getType() === 'date') {
+					otherData = new Date(data.getTime());
+				}
 				if (typeof onChange === 'function') {
 					onChange(Helpers.dateToString(data, getType()), otherData);
 				}
@@ -140,22 +159,17 @@ const DateTimePicker = forwardRef(
 
 		useEffect(() => {
 			if (value) {
-				let date = new Date(value);
-				if (
-					Object.prototype.toString.call(date) !== '[object Date]' ||
-					isNaN(date.getTime())
-				) {
-					date = new Date();
-				}
-
-				if (forTime) {
-					const [hour, minutes] = value.split(':');
-					date.setHours(hour);
-					date.setMinutes(minutes);
-				}
+				const date = convertValueToDateObject(value);
 				doChange(date);
 			}
 		}, [value]);
+
+		useEffect(() => {
+			if (initialValue) {
+				const date = convertValueToDateObject(initialValue);
+				doChange(date);
+			}
+		}, [initialValue]);
 
 		useImperativeHandle(ref, () => ({
 			value: selectedDate,
