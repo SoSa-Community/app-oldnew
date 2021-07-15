@@ -120,7 +120,7 @@ export class RequestProvider {
 				const endpoint = `${this.config.host}/${uri}`;
 				const timeout = 10000;
 
-				console.info('Client::RequestProvider::Request', uri, {
+				console.info('Client::RequestProvider::Request', endpoint, {
 					method,
 					body,
 					headers,
@@ -138,21 +138,29 @@ export class RequestProvider {
 				});
 
 				clearTimeout(timeoutTimer);
-				const json = await response.json();
+				let json = '';
 
-				console.info(
-					'Client::RequestProvider::Request::Response',
-					json,
-				);
-
-				if (json?.session) {
-					const {
-						client: { sessionHandler },
-					} = this;
-					session.parseJSON(json.session);
-					await sessionHandler.updateSession(session);
+				try {
+					json = await response.json();
+					if (json?.session) {
+						const {
+							client: { sessionHandler },
+						} = this;
+						session.parseJSON(json.session);
+						await sessionHandler.updateSession(session);
+					}
+					console.info(
+						'Client::RequestProvider::Request::Response::JSON',
+						json,
+					);
+					resolve(json);
+				} catch (e) {
+					console.info(
+						'Client::RequestProvider::Request::Response',
+						json,
+					);
+					reject(e);
 				}
-				resolve(json);
 			} catch (e) {
 				reject(e);
 			}

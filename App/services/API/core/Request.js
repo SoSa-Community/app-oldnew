@@ -30,7 +30,7 @@ export class Request {
 	}
 
 	run = () => {
-		return new Promise((resolve, reject) => {
+		return new Promise(async (resolve, reject) => {
 			const {
 				provider: {
 					client: {
@@ -40,48 +40,51 @@ export class Request {
 				},
 			} = this;
 
-			return handleRequest(this)
-				.then((json) => {
-					this.response = json;
+			try {
+				const json = await handleRequest(this);
+				this.response = json;
 
-					if (json && json.response) {
+				if (json) {
+					if (json?.response) {
 						const { response } = json;
 						const { session, user } = response || {};
 						const { username, nickname } = user || {};
 
 						if (session || username || nickname) {
-							return getSession().then((sessionInstance) => {
-								if (session) sessionInstance.parseJSON(session);
+							try {
+								const sessionInstance = await getSession();
 
+								if (session) sessionInstance.parseJSON(session);
 								if (username)
 									sessionInstance.username = username;
 								if (nickname)
 									sessionInstance.nickname = nickname;
 
-								return updateSession(sessionInstance)
-									.then(() => json)
-									.finally(() => json);
-							});
+								await updateSession(sessionInstance);
+							} catch (e) {
+								console.debug(e);
+							}
 						}
 					}
-					return json;
-				})
-				.then((json) => {
-					if (json) {
-						let errors = [];
-						if (Array.isArray(json.errors) && json.errors.length)
-							errors = json.errors;
-						else if (json.error) errors.push(errors);
-						if (errors.length)
-							reject(
-								errors.map((error) =>
-									SoSaError.fromJSON(error),
-								),
-							);
+
+					let errors = [];
+
+					if (Array.isArray(json.errors) && json.errors.length)
+						errors = json.errors;
+					else if (json.error) errors.push(errors);
+
+					if (errors.length)
+						reject(
+							errors.map((error) => SoSaError.fromJSON(error)),
+						);
+					else {
+						resolve(json);
 					}
-					resolve(json);
-				})
-				.catch((error) => reject(error));
+				}
+			} catch (e) {
+				console.debug(e);
+				reject(e);
+			}
 		});
 	};
 }
