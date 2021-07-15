@@ -78,7 +78,7 @@ const Picker = forwardRef(
 					}
 					placeholder={placeholder}
 					prompt={placeholder}
-					style={[Styles.label, textStyle, { flex: 1 }]}
+					style={[Styles.label, textStyle, { flex: 1, height: 24 }]}
 					onValueChange={(itemValue, itemIndex) => {
 						if (Platform.OS === 'ios')
 							setTempPickerValue(itemValue);

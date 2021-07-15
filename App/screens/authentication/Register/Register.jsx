@@ -14,7 +14,7 @@ import { useForm } from 'react-hook-form';
 const Styles = StyleSheet.create({
 	keyboardView: { flex: 1 },
 	container: {
-		backgroundColor: '#121211',
+		backgroundColor: '#2D2F30',
 		flex: 1,
 	},
 	inner: { paddingHorizontal: 30, justifyContent: 'center' },

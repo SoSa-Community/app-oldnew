@@ -28,7 +28,7 @@ const SoSa = () => {
 
 	return (
 		<View style={BaseStyles.container}>
-			<StatusBar barStyle="light-content" backgroundColor="#121211" />
+			<StatusBar barStyle="light-content" backgroundColor="#2D2F30" />
 			<View style={{ flex: 1 }}>
 				<NavigationContainer ref={appNavigation}>
 					<Stack.Navigator
@@ -42,7 +42,7 @@ const SoSa = () => {
 						<Stack.Screen
 							name="Login"
 							component={LoginScreen}
-							options={{ title: 'Login To SoSa' }}
+							options={{ title: 'Welcome To SoSa' }}
 						/>
 						<Stack.Screen
 							name="Register"

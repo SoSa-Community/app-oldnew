@@ -25,6 +25,8 @@ const Styles = StyleSheet.create({
 	lengthIndicator: {
 		alignSelf: 'center',
 		paddingRight: 12,
+		position: 'absolute',
+		right: 0,
 	},
 
 	lengthIndicatorWarning: {
@@ -97,11 +99,22 @@ const TextField = forwardRef((props, ref) => {
 		} else {
 			lengthIndicatorStyles.push(Styles.lengthIndicatorNeutral);
 			return (
-				<Text style={[lengthIndicatorStyles]}>
-					{!inputValue.length ? 'at-least ' : ''}
-					{`${minLength - inputValue.length}`}
-					{!inputValue.length ? ' thingies ' : ''}
-				</Text>
+				<View
+					style={{
+						position: 'absolute',
+						right: 0,
+						bottom: 0,
+						top: 0,
+						backgroundColor: 'green',
+						justifyContent: 'flex-end',
+						flexDirection: 'row',
+					}}>
+					<Text style={[lengthIndicatorStyles]}>
+						{!inputValue.length ? 'at-least ' : ''}
+						{`${minLength - inputValue.length}`}
+						{!inputValue.length ? ' thingies ' : ''}
+					</Text>
+				</View>
 			);
 		}
 	};

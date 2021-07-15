@@ -192,7 +192,6 @@ const MembersNavigator = ({
 				}}>
 				<Stack.Navigator
 					initialRouteName={!profile ? 'WelcomeProfile' : 'Chat'}>
-
 					<Stack.Screen name="Chat" options={{ headerShown: false }}>
 						{(props) => (
 							<ChatScreen
