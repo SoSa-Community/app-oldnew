@@ -2,7 +2,7 @@ import React, {
 	useState,
 	useEffect,
 	forwardRef,
-	useImperativeHandle,
+	useImperativeHandle, useRef,
 } from 'react';
 import { TextInput, Text, View, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
@@ -62,10 +62,13 @@ const TextField = forwardRef((props, ref) => {
 		lengthDangerPercentage,
 		style,
 		placeholderColour,
+		hideLengthIndicator,
+		selectTextOnFocus,
 	} = props;
 
 	const [inputValue, setInputValue] = useState(value || '');
 	const [lengthPercentage, setLengthPercentage] = useState(0);
+	const inputRef = useRef();
 
 	const clear = () => setInputValue('');
 
@@ -73,6 +76,10 @@ const TextField = forwardRef((props, ref) => {
 		setInputValue(data);
 		if (typeof onChange === 'function') onChange(data);
 	};
+	
+	const handleOnFocus = () => {
+	
+	}
 
 	const reset = () => {
 		if (initialValue !== null) {
@@ -81,41 +88,43 @@ const TextField = forwardRef((props, ref) => {
 	};
 
 	const renderLengthWarning = () => {
-		let lengthIndicatorStyles = [Styles.lengthIndicator];
-		if (inputValue.length >= minLength) {
-			if (lengthPercentage >= lengthDangerPercentage) {
-				lengthIndicatorStyles.push(Styles.lengthIndicatorDanger);
-			} else if (lengthPercentage >= lengthWarningPercentage) {
-				lengthIndicatorStyles.push(Styles.lengthIndicatorWarning);
-			}
-			if (lengthPercentage >= lengthIndicatorShowPercentage) {
+		if(!hideLengthIndicator){
+			let lengthIndicatorStyles = [Styles.lengthIndicator];
+			if (inputValue.length >= minLength) {
+				if (lengthPercentage >= lengthDangerPercentage) {
+					lengthIndicatorStyles.push(Styles.lengthIndicatorDanger);
+				} else if (lengthPercentage >= lengthWarningPercentage) {
+					lengthIndicatorStyles.push(Styles.lengthIndicatorWarning);
+				}
+				if (lengthPercentage >= lengthIndicatorShowPercentage) {
+					return (
+						<Text
+							style={[
+								lengthIndicatorStyles,
+							]}>{`${inputValue.length}/${maxLength}`}</Text>
+					);
+				}
+			} else {
+				lengthIndicatorStyles.push(Styles.lengthIndicatorNeutral);
 				return (
-					<Text
-						style={[
-							lengthIndicatorStyles,
-						]}>{`${inputValue.length}/${maxLength}`}</Text>
+					<View
+						style={{
+							position: 'absolute',
+							right: 0,
+							bottom: 0,
+							top: 0,
+							backgroundColor: 'green',
+							justifyContent: 'flex-end',
+							flexDirection: 'row',
+						}}>
+						<Text style={[lengthIndicatorStyles]}>
+							{!inputValue.length ? 'at-least ' : ''}
+							{`${minLength - inputValue.length}`}
+							{!inputValue.length ? ' thingies ' : ''}
+						</Text>
+					</View>
 				);
 			}
-		} else {
-			lengthIndicatorStyles.push(Styles.lengthIndicatorNeutral);
-			return (
-				<View
-					style={{
-						position: 'absolute',
-						right: 0,
-						bottom: 0,
-						top: 0,
-						backgroundColor: 'green',
-						justifyContent: 'flex-end',
-						flexDirection: 'row',
-					}}>
-					<Text style={[lengthIndicatorStyles]}>
-						{!inputValue.length ? 'at-least ' : ''}
-						{`${minLength - inputValue.length}`}
-						{!inputValue.length ? ' thingies ' : ''}
-					</Text>
-				</View>
-			);
 		}
 	};
 
@@ -142,6 +151,9 @@ const TextField = forwardRef((props, ref) => {
 		clear,
 		reset,
 		set: handleChange,
+		focus: () => inputRef?.current?.focus(),
+		blur: () => inputRef?.current?.blur(),
+		measure: () => inputRef?.current?.measure(),
 	}));
 
 	let styles = [Styles.input];
@@ -151,6 +163,7 @@ const TextField = forwardRef((props, ref) => {
 	return (
 		<>
 			<TextInput
+				ref={inputRef}
 				selection={selection}
 				onSelectionChange={onSelectionChange}
 				multiline={multiline}
@@ -162,7 +175,9 @@ const TextField = forwardRef((props, ref) => {
 				editable={enabled}
 				onBlur={onBlur}
 				onKeyPress={onKeyPress}
+				onFocus={handleOnFocus}
 				autoCorrect={autoCorrect}
+				selectTextOnFocus={selectTextOnFocus}
 				maxLength={maxLength ? maxLength : null}
 			/>
 			{renderLengthWarning()}
@@ -202,6 +217,8 @@ TextField.propTypes = {
 	lengthDangerPercentage: PropTypes.number,
 	editable: PropTypes.bool,
 	placeholderColour: PropTypes.string,
+	hideLengthIndicator: PropTypes.bool,
+	selectTextOnFocus: PropTypes.bool,
 };
 
 TextField.defaultProps = {
@@ -233,6 +250,8 @@ TextField.defaultProps = {
 	lengthDangerPercentage: 95,
 	editable: true,
 	placeholderColour: '#8a8a8a',
+	hideLengthIndicator: false,
+	selectTextOnFocus: false
 };
 
 export default TextField;
