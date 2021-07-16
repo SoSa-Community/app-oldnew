@@ -34,7 +34,7 @@ const Styles = StyleSheet.create({
 	},
 
 	errorTextColor: { color: '#E20000' },
-	errorText: { color: '#E20000', fontSize: 14 },
+	errorText: { color: '#E20000', fontSize: 14, marginTop: 4, marginLeft: 4 },
 
 	editingValue: {
 		color: '#fff',

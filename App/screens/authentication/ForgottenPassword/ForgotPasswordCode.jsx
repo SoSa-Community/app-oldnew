@@ -1,252 +1,197 @@
-import React, { Component } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Text, View, StyleSheet, TouchableHighlight } from 'react-native';
 
-import BaseStyles from '../../styles/base';
-import Styles from '../../styles/onboarding';
-import { TouchableWithoutFeedback, Text, View } from 'react-native';
-
-import Helpers from '../../../sosa/Helpers';
-import FormError from '../../../components/FormError/FormError';
-import TextField from '../../../components/TextField/TextField';
-import SecureTextField from '../../../components/SecureTextField/SecureTextField';
 import ActivityButton from '../../../components/ActivityButton/ActivityButton';
+import { useAPI } from '../../../context/APIContext';
+import { useForm } from 'react-hook-form';
+import FormTextField from '../../../components/Forms/TextField/FormTextField';
+import FieldWrapper from '../../../components/FieldWrapper/FieldWrapper';
+import FPStyles from './ForgotPasswordStyles';
+import FormError from '../../../components/FormError/FormError';
 
-export default class ForgotPasswordCode extends Component {
-	navigation = null;
-	codeLength = 6;
+const Styles = StyleSheet.create({
+	codeInputWrapper: { flexDirection: 'row', marginBottom: 4 },
+	codeInputContainer: { flex: 1, marginHorizontal: 4 },
+	codeInputFieldWrapper: { paddingVertical: 20 },
+	...FPStyles,
+});
 
-	state = {
-		emailProvided: false,
-		emailInput: '',
-		codeInput: '',
-		checking: false,
-		checkError: '',
-		passwordError: '',
-		passwordInput: '',
-	};
+const ForgotPasswordCode = ({ navigation, route }) => {
+	const [processing, setProcessing] = useState(false);
+	const [isValid, setIsValid] = useState(false);
+	const [errors, setErrors] = useState([]);
 
-	constructor(props) {
-		super();
-		this.navigation = props.navigation;
+	const codeRefs = [
+		useRef(),
+		useRef(),
+		useRef(),
+		useRef(),
+		useRef(),
+		useRef(),
+	];
 
-		if (
-			props.route &&
-			props.route.params &&
-			props.route.params.email &&
-			props.route.params.email.length > 0
-		) {
-			this.state.emailInput = props.route.params.email;
-			this.state.emailProvided = true;
-		}
-	}
+	const {
+		services: { auth: authService },
+	} = useAPI();
 
-	setLoading = (isLoading) => {
-		this.setState({ checking: isLoading });
-	};
+	const { handleSubmit, control, formState, setError, setValue, watch } =
+		useForm({
+			mode: 'onChange',
+		});
 
-	setError = (field, error) => {
-		let obj = {};
-		obj[field] = error;
+	const values = watch();
 
-		this.setState(obj);
-	};
+	const handleCode = () => {
+		setProcessing(true);
 
-	validateTextField = (inputFieldName, label, length) => {
-		let field = this.state[inputFieldName];
+		const isValid = async (data) => {
+			let { email } = data;
+			let pin = [];
 
-		if ((length === null && field.length > 0) || field.length === length) {
-			return '';
-		} else if (length === null && field.length === 0) {
-			return `The ${label} can't be empty`;
-		} else if (field.length > 0) {
-			return `Your ${label} should be ${length} characters`;
-		}
-		return null;
-	};
-
-	formIsValid = () => {
-		let code = this.validateTextField('codeInput', 'code', this.codeLength);
-		let email = this.validateTextField('emailInput', 'email', null);
-		let password = this.validatePassword();
-
-		return (
-			code !== null &&
-			code.length === 0 &&
-			email !== null &&
-			email.length === 0 &&
-			password !== null &&
-			password.length === 0
-		);
-	};
-
-	validatePassword = () => {
-		try {
-			if (Helpers.validatePassword(this.state.passwordInput) === false) {
-				return null;
+			for (let x = 0; x <= codeRefs.length; x++) {
+				pin.push(data[`pin${x}`]);
 			}
-		} catch (e) {
-			return e.message;
-		}
-		return '';
+
+			if (!email && route?.params?.email?.length) {
+				email = route?.params?.email;
+			}
+
+			try {
+				const response = await authService?.forgotPasswordValidate(
+					email,
+					pin.join(''),
+				);
+
+				const { error } = response;
+
+				if (error) throw error;
+
+				const {
+					response: { token, transient },
+				} = response;
+
+				navigation.replace('ForgotPasswordNew', { token, transient });
+			} catch (error) {
+				setErrors(error);
+			}
+			setProcessing(false);
+		};
+
+		const isErrored = (data) => {
+			setProcessing(false);
+		};
+		handleSubmit(isValid, isErrored)();
 	};
 
-	handleRequest = (namespace, data, errorField, callback, post = true) => {
-		this.setLoading(true);
-		try {
-			Helpers.request(namespace, data, post)
-				.then((json) => {
-					console.log('JSON', json);
+	const boxes = () => {
+		const arr = [];
 
-					let error = '';
-					if (json.error) error = json.error.message;
-
-					if (callback) {
-						try {
-							callback(error, json);
-						} catch (e) {
-							console.log('Callback Error', e);
-						}
-					}
-					this.setError(errorField, error);
-				})
-				.catch((e) => {
-					console.log(e);
-					this.setError(errorField, e);
-				})
-				.finally(() => {
-					this.setLoading(false);
-				});
-		} catch (e) {
-			console.log(e);
-			this.setError(errorField, e.message);
-			this.setLoading(false);
-		}
-	};
-
-	validateCodePassword = () => {
-		this.handleRequest(
-			'forgot/validate',
-			{
-				email: this.state.emailInput,
-				pin: this.state.codeInput,
-			},
-			'checkError',
-			(error, json) => {
-				if (error.length === 0) {
-					try {
-						this.resetPassword(
-							json.response.token,
-							json.response.transient,
-						);
-					} catch (e) {
-						console.log(e);
-					}
-				}
-			},
-			false,
-		);
-	};
-
-	resetPassword = (token, transient) => {
-		this.handleRequest(
-			'forgot/reset',
-			{
-				token: token,
-				transient: transient,
-				password: this.state.passwordInput,
-			},
-			'passwordError',
-			(error, json) => {
-				if (error.length === 0) {
-					this.navigation.replace('Login', {
-						email: this.state.emailInput,
-						password: this.state.repeatPasswordInput,
-						passwordReset: true,
-					});
-				}
-			},
-		);
-	};
-
-	render() {
-		return (
-			<View style={BaseStyles.container}>
-				<View style={Styles.formContainer}>
-					<Text style={Styles.subheader}>
-						You should have received an e-mail with a 6 digit code
-					</Text>
-
-					<View style={Styles.content_container}>
-						<FormError errors={this.state.checkError} />
-						{this.state.emailProvided ? null : (
-							<TextField
-								icon={['fal', 'user']}
-								placeholder="Your E-mail"
-								value={this.state.emailInput}
-								onChangeText={(data) =>
-									this.setState({ emailInput: data })
-								}
-								validateInput={() =>
-									this.validateTextField(
-										'emailInput',
-										'E-mail',
-										null,
-									)
-								}
-							/>
-						)}
-
-						<TextField
-							icon={['fal', 'user']}
-							placeholder={`Your ${this.codeLength}-Character Code`}
-							value={this.state.codeInput}
-							onChangeText={(data) =>
-								this.setState({ codeInput: data })
+		const buildInput = (index) => (
+			<View style={Styles.codeInputContainer} key={`${index}`}>
+				<FieldWrapper
+					error={errors?.pin?.message}
+					editingMode
+					containerStyle={Styles.codeInputFieldWrapper}>
+					<FormTextField
+						ref={codeRefs[index]}
+						name={`pin${index}`}
+						placeholder="-"
+						control={control}
+						enabled={!processing}
+						style={{ textAlign: 'center' }}
+						maxLength={1}
+						hideLengthIndicator
+						selectTextOnFocus
+						onChange={(data) => {
+							if (data) codeRefs[index + 1]?.current?.focus();
+							else {
+								codeRefs[index - 1]?.current?.focus();
 							}
-							validateInput={() =>
-								this.validateTextField(
-									'codeInput',
-									'code',
-									this.codeLength,
-								)
-							}
-						/>
-
-						<FormError errors={this.state.passwordError} />
-						<SecureTextField
-							placeholder="New password"
-							onChangeText={(data) =>
-								this.setState({ passwordInput: data })
-							}
-							validateInput={() => this.validatePassword()}
-						/>
-
-						<View style={Styles.buttonRow}>
-							<View style={{ flex: 4 }}>
-								<TouchableWithoutFeedback
-									onPress={this.navigation.goBack}>
-									<View
-										style={[
-											Styles.letMeIn_button,
-											Styles.secondary_button,
-										]}>
-										<Text style={Styles.letMeIn_text}>
-											Re-request
-										</Text>
-									</View>
-								</TouchableWithoutFeedback>
-							</View>
-							<View style={{ flex: 6 }}>
-								<ActivityButton
-									showActivity={this.state.checking}
-									onPress={this.validateCodePassword}
-									text="Change My Password!"
-									validateInput={() => this.formIsValid()}
-								/>
-							</View>
-						</View>
-					</View>
-				</View>
+						}}
+					/>
+				</FieldWrapper>
 			</View>
 		);
-	}
-}
+
+		for (let x = 0; x < codeRefs.length; x++) {
+			arr.push(buildInput(x));
+		}
+		return arr;
+	};
+
+	const text = route?.params?.email?.length
+		? 'Please enter the code you received or '
+		: 'Please re-enter your e-mail and the code you received at that e-mail address or ';
+
+	useEffect(() => {
+		const { params } = route;
+		if (params && Object.hasOwnProperty.call(params, 'email')) {
+			const { email } = params;
+			if (email.length) setValue('email', email);
+		}
+	}, []);
+
+	useEffect(() => {
+		let valid = false;
+
+		if (values?.email) {
+			let pin = [];
+			for (let x = 0; x <= codeRefs.length; x++) {
+				const key = `pin${x}`;
+				if (Object.hasOwnProperty.call(values, key) && values[key]) {
+					pin.push(values[key]);
+				}
+			}
+			if (pin.length === codeRefs.length) {
+				valid = true;
+			}
+		}
+		setIsValid(valid);
+	}, [values]);
+
+	return (
+		<View style={Styles.container}>
+			<View style={Styles.formContainer}>
+				<Text style={Styles.header}>Enter code</Text>
+				{!route?.params?.email?.length && (
+					<FieldWrapper
+						error={errors?.email?.message}
+						editingMode
+						icon={['fal', 'envelope']}>
+						<FormTextField
+							name="email"
+							placeholder="Re-enter your email address"
+							control={control}
+							enabled={!processing}
+						/>
+					</FieldWrapper>
+				)}
+				<View style={Styles.codeInputWrapper}>{boxes()}</View>
+				<FormError errors={errors} />
+				<Text style={Styles.subheader}>
+					{text}{' '}
+					<TouchableHighlight
+						onPress={() => {
+							navigation.goBack();
+						}}>
+						<Text style={Styles.subheaderButton}>
+							use a different email
+						</Text>
+					</TouchableHighlight>
+				</Text>
+			</View>
+			<View style={Styles.buttonBottom}>
+				<ActivityButton
+					showActivity={processing}
+					onPress={handleCode}
+					text="Confirm code"
+					style={Styles.button}
+					textStyle={Styles.buttonText}
+					disabled={!isValid}
+				/>
+			</View>
+		</View>
+	);
+};
+
+export default ForgotPasswordCode;

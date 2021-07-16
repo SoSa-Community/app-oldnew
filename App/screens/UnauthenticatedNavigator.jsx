@@ -10,9 +10,12 @@ import LoginScreen from './authentication/Login/Login';
 import RegistrationScreen from './authentication/Register/Register';
 import ForgotPassword from './authentication/ForgottenPassword/ForgotPassword';
 import ForgotPasswordCode from './authentication/ForgottenPassword/ForgotPasswordCode';
+import ForgotPasswordNew from './authentication/ForgottenPassword/ForgotPasswordNew';
+import ForgotPasswordSuccessful from './authentication/ForgottenPassword/ForgotPasswordSuccessful';
 
 import BaseStyles from '../screens/styles/base';
 import SplashScreen from './Splash';
+
 
 const Stack = createStackNavigator();
 
@@ -52,12 +55,22 @@ const SoSa = () => {
 						<Stack.Screen
 							name="ForgotPassword"
 							component={ForgotPassword}
-							options={{ title: 'Forgotten Password' }}
+							options={{ title: '' }}
 						/>
 						<Stack.Screen
 							name="ForgotPasswordCode"
 							component={ForgotPasswordCode}
-							options={{ title: 'Check your e-mail' }}
+							options={{ title: '' }}
+						/>
+						<Stack.Screen
+							name="ForgotPasswordNew"
+							component={ForgotPasswordNew}
+							options={{ title: '' }}
+						/>
+						<Stack.Screen
+							name="ForgotPasswordSuccessful"
+							component={ForgotPasswordSuccessful}
+							options={{ title: '' }}
 						/>
 					</Stack.Navigator>
 				</NavigationContainer>

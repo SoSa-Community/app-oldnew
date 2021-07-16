@@ -45,6 +45,34 @@ export class AuthService {
 		return response;
 	};
 
+	forgotPassword = async (email) => {
+		const request = new Request(this.provider, 'forgot', '', { email });
+		return await request.run();
+	};
+
+	forgotPasswordValidate = async (email, pin) => {
+		const request = new Request(
+			this.provider,
+			'forgot',
+			'validate',
+			{
+				email,
+				pin,
+			},
+			'GET',
+		);
+		return await request.run();
+	};
+
+	resetPassword = async (token, transient, password) => {
+		const request = new Request(this.provider, 'forgot', 'reset', {
+			token,
+			transient,
+			password,
+		});
+		return await request.run();
+	};
+
 	login = (username, password) => {
 		return this.handleLoginRegister(username, password);
 	};
