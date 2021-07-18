@@ -113,6 +113,20 @@ const DateTimePicker = forwardRef(
 				? moment(selectedDate).format(forTime ? 'hh:mm' : 'DD/MM/YYYY')
 				: textValue;
 
+			const labelComponent = () => {
+				if (typeof label === 'string' && label.length) {
+					return (
+						<Text style={[Styles.label, textStyle]}>{label}</Text>
+					);
+				}
+
+				return (
+					<Text style={[Styles.placeholder, placeholderStyle]}>
+						{placeholder}
+					</Text>
+				);
+			};
+
 			return (
 				<TouchableOpacity
 					onPress={() => {
@@ -120,14 +134,7 @@ const DateTimePicker = forwardRef(
 						setShowPicker(true);
 					}}
 					style={Styles.placeholderButton}>
-					{label.length > 0 && (
-						<Text style={[Styles.label, textStyle]}>{label}</Text>
-					)}
-					{label.length === 0 && (
-						<Text style={[Styles.placeholder, placeholderStyle]}>
-							{placeholder}
-						</Text>
-					)}
+					{labelComponent()}
 				</TouchableOpacity>
 			);
 		};
