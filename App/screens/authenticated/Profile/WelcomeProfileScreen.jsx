@@ -121,7 +121,13 @@ const WelcomeProfileScreen = ({ navigation }) => {
 						isMine
 						loading={isLoading}
 						onSave={(data, dirty) =>
-							saveProfile(data, dirty, profileService, profile || {}, setProfile)
+							saveProfile(
+								data,
+								dirty,
+								profileService,
+								profile || {},
+								setProfile,
+							)
 						}
 						changeProfilePicture={() =>
 							uploadImage(
