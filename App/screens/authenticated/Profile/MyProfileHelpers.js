@@ -22,7 +22,7 @@ const refreshProfile = (profileService, setGenders, setProfile) => {
 		.catch((error) => console.debug(error));
 };
 
-const updateProfileState = (fields, setProfile, profile) => {
+const updateProfileState = (fields, profile, setProfile) => {
 	const copiedEntity = Object.assign(
 		Object.create(Object.getPrototypeOf(profile)),
 		profile,
@@ -31,12 +31,16 @@ const updateProfileState = (fields, setProfile, profile) => {
 	setProfile(copiedEntity);
 };
 
-const saveProfile = async (data, dirty, profileService, setProfile) => {
+const saveProfile = async (data, dirty, profileService, profile, setProfile) => {
 	if (Object.keys(dirty).length) {
 		try {
-			const updatedProfile = await profileService.save(dirty);
-			setProfile(updatedProfile);
-		} catch (e) {}
+			console.debug('dirty', dirty);
+			await profileService.save(dirty);
+			updateProfileState(dirty, profile, setProfile);
+		} catch (e) {
+			console.debug(e);
+			throw e;
+		}
 	}
 };
 
@@ -45,6 +49,7 @@ const uploadImage = async (
 	setIsLoading,
 	generalService,
 	profileService,
+	profile,
 	setProfile,
 	modals,
 ) => {
@@ -64,7 +69,7 @@ const uploadImage = async (
 
 		if (Array.isArray(uris)) {
 			const toSave = { [field]: uris.pop() };
-			await saveProfile(toSave, toSave, profileService, setProfile);
+			await saveProfile(toSave, toSave, profileService, profile, setProfile);
 		}
 	} catch (e) {
 		const message = Array.isArray(e) ? e.pop()?.message : e?.message;

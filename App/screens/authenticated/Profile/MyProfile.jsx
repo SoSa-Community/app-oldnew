@@ -11,7 +11,9 @@ import ProfileForm from './ProfileForm';
 import { refreshProfile, saveProfile, uploadImage } from './MyProfileHelpers';
 import { useProfile } from '../../../context/ProfileContext';
 
-const Styles = StyleSheet.create({});
+const Styles = StyleSheet.create({
+	container: { backgroundColor: '#2D2F30', flex: 1 },
+});
 
 const MyProfileScreen = ({ navigation }) => {
 	const { setHeaderIcons, removeHeaderIcon, setMenuOptions } =
@@ -31,16 +33,10 @@ const MyProfileScreen = ({ navigation }) => {
 
 	useFocusEffect(
 		React.useCallback(() => {
-			let isActive = true;
-			if (isActive) {
-				setEditingMode(false);
-				setMenuOptions({ leftMode: 'back', title: 'My Profile' });
-				refreshProfile(profileService, setGenders, setProfile);
-			}
+			setMenuOptions({ leftMode: 'back', title: 'My Profile' });
+			refreshProfile(profileService, setGenders, setProfile);
 
-			return () => {
-				isActive = false;
-			};
+			return () => {};
 		}, []),
 	);
 
@@ -50,23 +46,37 @@ const MyProfileScreen = ({ navigation }) => {
 		}
 	}, [profile]);
 
+	useEffect(() => {
+		setEditingMode(false);
+	}, []);
+
 	return (
-		<View style={{ backgroundColor: '#2D2F30', flex: 1 }}>
+		<View style={Styles.container}>
 			<ProfileForm
 				mock
 				genders={genders}
 				profile={profile}
 				isMine
 				loading={isLoading}
-				onSave={(data, dirty) =>
-					saveProfile(data, dirty, profileService, setProfile)
-				}
+				onSave={(data, dirty) => {
+					console.debug('hello');
+					saveProfile(
+						data,
+						dirty,
+						profileService,
+						profile,
+						setProfile,
+					)
+						.then(() => setEditingMode(false))
+						.catch((error) => console.debug(error));
+				}}
 				changeProfilePicture={() =>
 					uploadImage(
 						'picture',
 						setIsLoading,
 						generalService,
 						profileService,
+						profile,
 						setProfile,
 						modals,
 					)
@@ -77,6 +87,7 @@ const MyProfileScreen = ({ navigation }) => {
 						setIsLoading,
 						generalService,
 						profileService,
+						profile,
 						setProfile,
 						modals,
 					)

@@ -70,7 +70,7 @@ ActivityButton.propTypes = {
 	showActivity: PropTypes.bool,
 	onPress: PropTypes.func,
 	text: PropTypes.string.isRequired,
-	style: PropTypes.object,
+	style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
 	disabled: PropTypes.bool,
 };
 

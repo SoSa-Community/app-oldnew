@@ -109,9 +109,9 @@ const DateTimePicker = forwardRef(
 		};
 
 		const renderFieldLabel = () => {
-			const textValue = moment(selectedDate).format(
-				forTime ? 'hh:mm' : 'DD/MM/YYYY',
-			);
+			const label = selectedDate
+				? moment(selectedDate).format(forTime ? 'hh:mm' : 'DD/MM/YYYY')
+				: textValue;
 
 			return (
 				<TouchableOpacity
@@ -120,12 +120,10 @@ const DateTimePicker = forwardRef(
 						setShowPicker(true);
 					}}
 					style={Styles.placeholderButton}>
-					{textValue.length > 0 && (
-						<Text style={[Styles.label, textStyle]}>
-							{textValue}
-						</Text>
+					{label.length > 0 && (
+						<Text style={[Styles.label, textStyle]}>{label}</Text>
 					)}
-					{textValue.length === 0 && (
+					{label.length === 0 && (
 						<Text style={[Styles.placeholder, placeholderStyle]}>
 							{placeholder}
 						</Text>
@@ -136,14 +134,18 @@ const DateTimePicker = forwardRef(
 
 		const renderPicker = () => {
 			if (!showPicker) return <></>;
+
+			let date =
+				Platform.OS === 'ios' && tempPickerValue
+					? tempPickerValue
+					: selectedDate;
+
+			if (!date) date = new Date();
+
 			return (
 				<RNDateTimePicker
 					testID="dateTimePicker"
-					value={
-						Platform.OS === 'ios' && tempPickerValue
-							? tempPickerValue
-							: selectedDate
-					}
+					value={date}
 					mode={getType()}
 					display={Platform.OS === 'ios' ? 'spinner' : 'default'}
 					onChange={(event, selectedDate) => {

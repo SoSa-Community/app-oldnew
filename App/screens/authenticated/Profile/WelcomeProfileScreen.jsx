@@ -16,7 +16,7 @@ import {
 	updateProfileState,
 	uploadImage,
 } from './MyProfileHelpers';
-import {useProfile} from '../../../context/ProfileContext';
+import { useProfile } from '../../../context/ProfileContext';
 
 const Styles = StyleSheet.create({
 	container: { backgroundColor: '#2D2F30', flex: 1 },
@@ -82,11 +82,9 @@ const WelcomeProfileScreen = ({ navigation }) => {
 		try {
 			const updatedProfile = await profileFormRef?.current?.handleSave();
 			updateProfile(updatedProfile, true);
-			
+
 			navigation.replace('Chat');
-		} catch (e) {
-		
-		}
+		} catch (e) {}
 	};
 
 	useFocusEffect(
@@ -114,8 +112,7 @@ const WelcomeProfileScreen = ({ navigation }) => {
 					to help you connect with the community
 				</Text>
 
-				<View
-					style={Styles.form}>
+				<View style={Styles.form}>
 					<WelcomeForm
 						ref={profileFormRef}
 						mock
@@ -124,7 +121,7 @@ const WelcomeProfileScreen = ({ navigation }) => {
 						isMine
 						loading={isLoading}
 						onSave={(data, dirty) =>
-							saveProfile(data, dirty, profileService, setProfile)
+							saveProfile(data, dirty, profileService, profile || {}, setProfile)
 						}
 						changeProfilePicture={() =>
 							uploadImage(
@@ -132,6 +129,7 @@ const WelcomeProfileScreen = ({ navigation }) => {
 								setIsLoading,
 								generalService,
 								profileService,
+								profile || {},
 								setProfile,
 								modals,
 							)
@@ -142,6 +140,7 @@ const WelcomeProfileScreen = ({ navigation }) => {
 								setIsLoading,
 								generalService,
 								profileService,
+								profile || {},
 								setProfile,
 								modals,
 							)

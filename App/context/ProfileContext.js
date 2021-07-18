@@ -15,11 +15,11 @@ const ProfileProvider = ({ children, ...props }) => {
 	const [profile, setProfile] = useState(null);
 	const [isFetchingProfile, setIsFetchingProfile] = useState(true);
 
-	const updateProfile = (profile, save = true) => {
-		setProfile(profile);
+	const updateProfile = async (profile, save = true) => {
 		if (save) {
-			LocalStorage.save('profile', profile);
+			await LocalStorage.save('profile', profile);
 		}
+		setProfile(profile);
 	};
 
 	const loadProfile = async (force) => {
@@ -46,20 +46,20 @@ const ProfileProvider = ({ children, ...props }) => {
 					console.debug('err', error);
 				}
 			}
-			updateProfile(retrievedProfile, save);
+			await updateProfile(retrievedProfile, save);
 		}
 		setIsFetchingProfile(false);
 	};
 
 	useEffect(() => {
-		if (user) {
-			setIsFetchingProfile(true);
-			(async () => {
+		(async () => {
+			if (user) {
+				setIsFetchingProfile(true);
 				await loadProfile(true);
-			})();
-		} else {
-			updateProfile(null, true);
-		}
+			} else {
+				await updateProfile(null, true);
+			}
+		})();
 	}, [user]);
 
 	const LoadingScreen = () => {

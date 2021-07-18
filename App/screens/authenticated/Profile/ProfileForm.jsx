@@ -5,8 +5,8 @@ import React, {
 	useState,
 } from 'react';
 import { View, StyleSheet } from 'react-native';
-
 import { useForm } from 'react-hook-form';
+import PropTypes from 'prop-types';
 
 import ProfileHeader from '../../../components/Profile/ProfileHeader/ProfileHeader';
 import FieldWrapper from '../../../components/FieldWrapper/FieldWrapper';
@@ -14,7 +14,6 @@ import FormDateTimePicker from '../../../components/Forms/DateTimePicker/FormDat
 import FormPicker from '../../../components/Forms/Picker/FormPicker';
 import FormTextField from '../../../components/Forms/TextField/FormTextField';
 
-import PropTypes from 'prop-types';
 import IconButton from '../../../components/IconButton';
 import { handleSave, updateFromEntity } from './MyProfileHelpers';
 
@@ -119,7 +118,8 @@ const ProfileForm = forwardRef(
 		};
 
 		useEffect(() => {
-			if (profile) updateFromEntity(profile, formValues, setFormValues, reset);
+			if (profile)
+				updateFromEntity(profile, formValues, setFormValues, reset);
 			if (!useCustomSaveButton) setEditingMode(false);
 		}, [profile]);
 
@@ -214,7 +214,6 @@ const ProfileForm = forwardRef(
 							containerStyle={Styles.fieldContainerStyle}
 							editingMode={editingMode}
 							buttons={fieldButtons('age')}>
-							
 							<FormDateTimePicker
 								name="date_of_birth"
 								control={control}
@@ -224,7 +223,7 @@ const ProfileForm = forwardRef(
 								value={formValues?.date_of_birth}
 								enabled
 								editable
-								textValue={profile?.age}
+								textValue={profile?.age || '-'}
 							/>
 						</FieldWrapper>
 					)}
