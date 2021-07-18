@@ -24,13 +24,17 @@ export default class LocalStorage {
 	static save(key, value) {
 		return new Promise((resolve, reject) => {
 			if (!key) reject('invalid_key');
+			let promise = null;
 
-			const setValue =
-				typeof value === 'object' ? JSON.stringify(value) : value;
+			if (!value) promise = AsyncStorage.removeItem(key);
+			else {
+				const setValue =
+					typeof value === 'object' ? JSON.stringify(value) : value;
 
-			AsyncStorage.setItem(key, setValue)
-				.then(() => resolve())
-				.catch((error) => reject(error));
+				promise = AsyncStorage.setItem(key, setValue);
+			}
+
+			promise.then(() => resolve()).catch((error) => reject(error));
 		});
 	}
 }
