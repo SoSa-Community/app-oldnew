@@ -35,7 +35,7 @@
     "prop-types": "^15.7.2",
     "react": "16.13.1",
     "react-fast-compare": "^3.2.0",
-    "react-native": "^0.63.4",
+    "react-native": "^0.64.1",
     "react-native-device-info": "^5.6.5",
     "react-native-dotenv": "^2.5.0",
     "react-native-fast-image": "^8.3.4",
