@@ -59,7 +59,7 @@
     "react-native-svg": "^11.0.1",
     "react-native-tab-view": "^3.0.1",
     "react-native-vector-icons": "^6.7.0",
-    "react-native-webview": "^8.2.1",
+    "react-native-webview": "^11.0.0",
     "react-native-xml2js": "^1.0.3",
     "react-navigation": "^4.4.4",
     "socket.io-client": "^4.1.2",
