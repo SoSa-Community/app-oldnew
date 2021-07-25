@@ -1,14 +1,12 @@
 export default class APIError extends Error {
+	constructor(message = '', field = null, code = 0) {
+		super(message);
 
-    constructor(message='', field=null, code=0) {
-        super(message);
+		this.field = field;
+		this.code = code;
+	}
 
-        this.field = field;
-        this.code = code;
-    }
-
-    static fromJSON({message, code, field}) {
-        return new APIError(message, field, code);
-    }
-
+	static fromJSON({ message, code, field }) {
+		return new APIError(message, field, code);
+	}
 }

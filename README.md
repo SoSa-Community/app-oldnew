@@ -62,4 +62,7 @@ xcodebuild -workspace SoSa.xcworkspace -scheme SoSa clean archive -configuration
 xcodebuild -archivePath SoSa.xcarchive -exportPath /path/to/export/to/SoSa.ipa -exportOptionsPlist /path/to/ExportOptions.plist -exportArchive
 ```
 
+##Storybook
+`adb reverse tcp:7007 tcp:7007`
+
 
