@@ -16,6 +16,17 @@ storiesOf('Screens/MyProfile', module)
 			/>
 		);
 	})
+	.add('Form - Editing', () => {
+		return (
+			<ProfileForm
+				mock
+				genders={mockGenders}
+				profile={mockProfile}
+				isMine
+				isEditable
+			/>
+		);
+	})
 	.add('Form - Other', () => {
 		return <ProfileForm mock genders={mockGenders} profile={mockProfile} />;
 	});

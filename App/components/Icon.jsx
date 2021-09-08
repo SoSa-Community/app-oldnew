@@ -8,6 +8,8 @@ import {
 	faTrees as fasTrees,
 	faTimesCircle as fasTimesCircle,
 	faPencil as fasPencil,
+	faPeopleCarry as fasPeopleCarry,
+	faCog as fasCog,
 } from '@fortawesome/pro-solid-svg-icons';
 
 import { faGlobeEurope as fadGlobeEurope } from '@fortawesome/pro-duotone-svg-icons';
@@ -42,6 +44,8 @@ import {
 	faMapMarkerAlt as falMapMarkerAlt,
 	faUserCheck as falUserCheck,
 	faMask as falMask,
+	faLockAlt as falAltLock,
+	faTimes as falTimes
 } from '@fortawesome/pro-light-svg-icons';
 
 import { faWifi as farWifi } from '@fortawesome/pro-regular-svg-icons';
@@ -85,7 +89,11 @@ library.add(
 	falGift,
 	falMapMarkerAlt,
 	falUserCheck,
-	falMask
+	falMask,
+	falAltLock,
+	fasPeopleCarry,
+	falTimes,
+	fasCog
 );
 
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';

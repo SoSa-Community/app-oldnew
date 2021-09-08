@@ -9,6 +9,7 @@ function loadStories() {
 	require('../App/components/FieldWrapper/FieldWrapper.stories');
 	require('../App/components/FloatingCameraButton/FloatingIconButton.stories');
 	require('../App/components/FormError/FormError.stories');
+	require('../App/components/PrivacyPicker/PrivacyPicker.stories');
 	require('../App/components/Profile/ProfileHeader/ProfileHeader.stories');
 	require('../App/components/Profile/ProfilePicture/ProfilePicture.stories');
 	require('../App/components/SecureTextField/SecureTextField.stories');
@@ -22,6 +23,7 @@ const stories = [
 	'../App/components/FieldWrapper/FieldWrapper.stories',
 	'../App/components/FloatingCameraButton/FloatingIconButton.stories',
 	'../App/components/FormError/FormError.stories',
+	'../App/components/PrivacyPicker/PrivacyPicker.stories',
 	'../App/components/Profile/ProfileHeader/ProfileHeader.stories',
 	'../App/components/Profile/ProfilePicture/ProfilePicture.stories',
 	'../App/components/SecureTextField/SecureTextField.stories',
