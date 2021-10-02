@@ -3,28 +3,33 @@ import { storiesOf } from '@storybook/react-native';
 import React from 'react';
 import { mockGenders, mockProfile } from '../../../Mocks/MyProfile.mock';
 import ProfileForm from './ProfileForm';
+import { ScrollView } from '../../../components/ScrollView/ScrollView';
 
 storiesOf('Screens/MyProfile', module)
 	.addDecorator((getStory) => getStory())
 	.add('Form - Own', () => {
 		return (
-			<ProfileForm
-				mock
-				genders={mockGenders}
-				profile={mockProfile}
-				isMine
-			/>
+			<ScrollView>
+				<ProfileForm
+					mock
+					genders={mockGenders}
+					profile={mockProfile}
+					isMine
+				/>
+			</ScrollView>
 		);
 	})
 	.add('Form - Editing', () => {
 		return (
-			<ProfileForm
-				mock
-				genders={mockGenders}
-				profile={mockProfile}
-				isMine
-				isEditable
-			/>
+			<ScrollView>
+				<ProfileForm
+					mock
+					genders={mockGenders}
+					profile={mockProfile}
+					isMine
+					isEditable
+				/>
+			</ScrollView>
 		);
 	})
 	.add('Form - Other', () => {
