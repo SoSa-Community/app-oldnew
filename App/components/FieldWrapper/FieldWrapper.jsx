@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import PropTypes from 'prop-types';
 
@@ -55,6 +55,9 @@ const FieldWrapper = ({
 	buttons,
 	error,
 }) => {
+	const ref = useRef(null);
+	const [layout, setLayout] = useState(null);
+
 	if (editingMode) {
 		const containerStyles = [
 			Styles.container,
@@ -72,11 +75,28 @@ const FieldWrapper = ({
 
 		const renderButtons = () => {
 			if (!buttons) return <></>;
-			return <View style={{ alignItems: 'flex-end' }}>{buttons}</View>;
+
+			let renderedButtons = <></>;
+			if (typeof buttons === 'function')
+				renderedButtons = buttons(ref, layout);
+			else {
+				renderedButtons = buttons;
+			}
+
+			return (
+				<View style={{ alignItems: 'flex-end' }}>
+					{renderedButtons}
+				</View>
+			);
 		};
 
 		return (
-			<View style={{ width: '100%', marginVertical: 8 }}>
+			<View
+				style={{ width: '100%', marginVertical: 8 }}
+				ref={ref}
+				onLayout={({ nativeEvent }) => {
+					setLayout(nativeEvent?.layout);
+				}}>
 				{label ? <Text style={labelStyles}>{label}</Text> : <></>}
 				<View style={containerStyles}>
 					{icon ? (
