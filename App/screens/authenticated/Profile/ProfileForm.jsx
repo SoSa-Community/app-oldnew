@@ -4,7 +4,7 @@ import React, {
 	useImperativeHandle,
 	useState,
 } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
 
@@ -16,6 +16,7 @@ import FormTextField from '../../../components/Forms/TextField/FormTextField';
 
 import IconButton from '../../../components/IconButton';
 import { handleSave, updateFromEntity } from './MyProfileHelpers';
+import PrivacyPicker from '../../../components/PrivacyPicker/PrivacyPicker';
 
 const Styles = StyleSheet.create({
 	nicknameTaglineContainer: { justifyContent: 'center', marginBottom: 12 },
@@ -50,9 +51,12 @@ const ProfileForm = forwardRef(
 			isEditable,
 			useCustomSaveButton,
 			hideFields,
+			scrollView,
+			...props
 		},
 		ref,
 	) => {
+		console.debug(props);
 		const [editingMode, setEditingMode] = useState(isEditable);
 		const [resetValues, setResetValues] = useState({});
 		const [formValues, setFormValues] = useState({
@@ -66,6 +70,9 @@ const ProfileForm = forwardRef(
 			current_location: '',
 			name: '',
 		});
+
+		const [privacyPopup, setPrivacyPopup] = useState(null);
+		const [fieldContainerLayout, setFieldContainerLayout] = useState(null);
 
 		const form = useForm({
 			mode: 'onSubmit',
@@ -104,17 +111,62 @@ const ProfileForm = forwardRef(
 			return name;
 		};
 
-		const fieldButtons = () => {
-			return [];
-			return [
-				<IconButton
-					icon={['fad', 'globe-europe']}
-					size={16}
-					style={Styles.privacyButtonIcon}
-					containerStyle={Styles.privacyButton}
-					onPress={() => {}}
-				/>,
-			];
+		const fieldButtons = (field) => {
+			return (ref, layout) => {
+				return [
+					<IconButton
+						icon={['fad', 'globe-europe']}
+						size={16}
+						style={Styles.privacyButtonIcon}
+						containerStyle={Styles.privacyButton}
+						onPress={() => {
+							const maxHeight =
+								fieldContainerLayout?.y +
+								fieldContainerLayout?.height;
+							let top = Math.floor(
+								layout?.height +
+									layout?.y +
+									fieldContainerLayout?.y,
+							);
+
+							if (top + 240 >= maxHeight) top = layout?.y;
+
+							scrollView?.scrollTo({
+								y: top - 240,
+								x: 0,
+								animated: true,
+							});
+
+							setPrivacyPopup(
+								<TouchableWithoutFeedback
+									onPress={() => setPrivacyPopup(null)}>
+									<View
+										style={{
+											position: 'absolute',
+											width: '100%',
+											top: 0,
+											left: 0,
+											bottom: 0,
+											zIndex: 1,
+											backgroundColor:
+												'rgba(0, 0, 0, 0.80)',
+										}}>
+										<View
+											style={{
+												position: 'absolute',
+												width: '100%',
+												top,
+												left: layout?.width - 276,
+											}}>
+											<PrivacyPicker visible />
+										</View>
+									</View>
+								</TouchableWithoutFeedback>,
+							);
+						}}
+					/>,
+				];
+			};
 		};
 
 		useEffect(() => {
@@ -129,6 +181,8 @@ const ProfileForm = forwardRef(
 
 		return (
 			<View style={{ flex: 1 }}>
+				{privacyPopup}
+
 				<ProfileHeader
 					isEditable={isMine}
 					editingMode={editingMode}
@@ -151,7 +205,11 @@ const ProfileForm = forwardRef(
 					hideSaveCancel={useCustomSaveButton}
 				/>
 
-				<View style={{ paddingHorizontal: 14, marginTop: 12 }}>
+				<View
+					style={{ paddingHorizontal: 14, marginTop: 12 }}
+					onLayout={({ nativeEvent }) => {
+						setFieldContainerLayout(nativeEvent?.layout);
+					}}>
 					{!hideFields.includes('nickname') && (
 						<FieldWrapper
 							value={formValues?.nickname}
