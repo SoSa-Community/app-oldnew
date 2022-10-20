@@ -52,7 +52,7 @@
     "react-native-modal": "^11.10.0",
     "react-native-pager-view": "^5.1.10",
     "react-native-pure-jwt": "^2.2.2",
-    "react-native-reanimated": "^1.13.3",
+    "react-native-reanimated": "^2.10.0",
     "react-native-render-html": "git+https://github.com/SoSa-Community/react-native-render-html.git#master",
     "react-native-safe-area-context": "^0.7.3",
     "react-native-screens": "^2.18.1",
